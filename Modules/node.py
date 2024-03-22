@@ -4,13 +4,12 @@ from Modules.paquet import Paquet
 
 class Node(object):
 
-    _instance_counter = 0
+    instance_counter = 0
 
-    def __init__(self, name, node_type, oputput_speed = None) -> None:
-        Node._instance_counter += 1
+    def __init__(self, name, oputput_speed = None) -> None:
+        Node.instance_counter += 1
         
         self.name : str = name
-        self.type : str = node_type
         self.oputput_speed : int = oputput_speed
         self.data_paquets : list = []
 
@@ -26,12 +25,12 @@ class Node(object):
 
 class Source(Node): 
 
-    _instance_counter = 0
+    instance_counter = 0
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         
-        Source._instance_counter += 1
+        Source.instance_counter += 1
 
 
     def receve_paquet(self) -> AttributeError:
@@ -41,12 +40,12 @@ class Source(Node):
 
 class Endpoint(Node):
 
-    _instance_counter = 0
+    instance_counter = 0
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         
-        Endpoint._instance_counter += 1
+        Endpoint.instance_counter += 1
 
 
     def send_paquet(self) -> AttributeError:

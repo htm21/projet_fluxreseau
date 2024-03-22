@@ -5,12 +5,17 @@ from Modules.paquet import Paquet
 from Modules.node import Node, Source, Buffer, Endpoint
 
 
+def main() -> None:
+
+    network = Network()
+
+    while network:
+        if network.nodes:
+            "taking care of node interactions"
 
 
-resau = Network()
 
-resau.add_node("Source")
-# resau.add_node("Buffer")
-resau.add_node("Endpoint")
-
-resau.info()
+if __name__ == "__main__":
+    print("\033c") # Clear Terminal Start
+    main()
+    print("\033c") # Clear Terminal End

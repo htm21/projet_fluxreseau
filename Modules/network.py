@@ -1,15 +1,15 @@
-from Modules.node import Source, Buffer, Endpoint
+from Modules.node import Node, Source, Buffer, Endpoint
 
 class Network(object):
 
-    _instance_counter = 0
+    instance_counter = 0
 
     def __init__(self, name : str = None) -> None:
-        Network._instance_counter += 1
+        Network.instance_counter += 1
 
-        self.name = name if name else f"Network-{Network._instance_counter}"
+        self.name = name if name else f"Network-{Network.instance_counter}"
 
-        self.nodes : dict[dict] = {} # Sources, Endpoints or Buffers in the network
+        self.nodes : dict[str : Node] = {} # Sources, Endpoints or Buffers in the network
         self.links : set[tuple] = {} # Links between nodes
         self.NODE_TYPES = {
             "Source" : Source,
@@ -18,31 +18,49 @@ class Network(object):
             }
 
 
-    def add_node(self, node_type = None, name = None, *args, **kwargs) -> None:
+
+    def add_node(self, node_type = "Source", name = None, *args, **kwargs) -> None:
+        '''
+        Creates a node and adds it onto the network object by adding it to the "self.nodes" dictionary.
+        If no node type is given it defaults to a "Source" type Node
+        If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Source-1  
+        
+        '''
+
         class_type = self.NODE_TYPES.get(node_type)
         
         if not class_type:
             raise KeyError(f" '{node_type}' is not a valid node type")
-        
         else:
             if not name:
-                name = f"{node_type}-{self.NODE_TYPES.get(node_type)._instance_counter}"
+                name = f"{node_type}-{self.NODE_TYPES.get(node_type).instance_counter}"
             
-            self.nodes[name] = self.NODE_TYPES.get(node_type)(name = name, node_type = node_type, *args, **kwargs)
-            # Use Node name to acces the object in the dict of nodes
+        self.nodes[name] = self.NODE_TYPES.get(node_type)(name = name, node_type = node_type, *args, **kwargs)
+        # Use Node name to acces the object in the dict of nodes
 
 
-    def del_node(self, name) -> None:
-        # removes a Source node or a Endpoit node to the network
+    def del_node(self, node : str) -> None:
+        '''
+        Deletes a Node from the network by deleting the node from the "self.nodes" dictionary 
+        and deleting all existing links to the deleted node from the "self.links" set.
+        '''
+
+        del self.nodes[node] 
+        
+        for connection in self.links:
+            if node in connection:
+                del connection
+
+
+    def create_link(self, node_1, node_2, bandwidth) -> None:
         pass
 
-
-    def create_link(self, node_name_1, node_name_2, bandwidth) -> None:
-        # creates a link between two nodes
-        pass
-
-
+    
     def info(self):
+        '''
+        Outputs a simple overview of the networks state
+        '''
+
         print(f"\nNetwork : {self.name}")
         print(f"Nodes : {len(self.nodes)}")
         print(f"    Sources : {Source._instance_counter}")
