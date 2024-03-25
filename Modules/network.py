@@ -2,29 +2,25 @@ from Modules.node import Node, Source, Buffer, Endpoint
 
 class Network(object):
 
-    instance_counter = 0
-
     def __init__(self, name : str = None) -> None:
-        Network.instance_counter += 1
 
-        self.name = name if name else f"Network-{Network.instance_counter}"
+        self.name = name if name else f"Network"
 
         self.nodes : dict[str : Node] = {} # Sources, Endpoints or Buffers in the network
-        self.links : set[tuple] = {} # Links between nodes
+        self.links : set[tuple] = set() # Links between nodes
         self.NODE_TYPES = {
             "Source" : Source,
             "Endpoint" : Endpoint,
-            "Buffer" : Buffer
+            "Buffer" : Buffer,
+            "Node" : Node
             }
 
 
-
-    def add_node(self, node_type = "Source", name = None, *args, **kwargs) -> None:
+    def add_node(self, node_type = "Node", name = None, *args, **kwargs) -> None:
         '''
         Creates a node and adds it onto the network object by adding it to the "self.nodes" dictionary.
         If no node type is given it defaults to a "Source" type Node
         If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Source-1  
-        
         '''
 
         class_type = self.NODE_TYPES.get(node_type)
@@ -36,7 +32,7 @@ class Network(object):
                 name = f"{node_type}-{self.NODE_TYPES.get(node_type).instance_counter}"
             
         self.nodes[name] = self.NODE_TYPES.get(node_type)(name = name, node_type = node_type, *args, **kwargs)
-        # Use Node name to acces the object in the dict of nodes
+        # Use Node name to acces the node object in the dict of nodes
 
 
     def del_node(self, node : str) -> None:
@@ -52,18 +48,44 @@ class Network(object):
                 del connection
 
 
-    def create_link(self, node_1, node_2, bandwidth) -> None:
-        pass
+    def create_link(self, node_1 : str, node_2 : str) -> None:
+        '''
+        Creates a link between two nodes if it satisfies the linking requirements
+        Adds a tuple(node_name, node_name) to the 'self.links' set
+        '''
+        
+        if (node_1, node_2) in self.links:
+            return
+        
+        elif self.nodes[node_1].type == "Node" or self.nodes[node_2].type == "Node":
+            
+            raise TypeError(f" Type 'Node' must be defined before linking")
+
+        elif self.nodes[node_1].type == "Source" and self.nodes[node_2].type == "Source":
+
+            raise TypeError(f" Type 'Source' cannot be link to a 'Source' node")
+
+        else:    
+            self.links.add((node_1, node_2))
 
     
     def info(self):
         '''
         Outputs a simple overview of the networks state
         '''
+       
+        print()
+        
 
-        print(f"\nNetwork : {self.name}")
-        print(f"Nodes : {len(self.nodes)}")
-        print(f"    Sources : {Source._instance_counter}")
-        print(f"    Endpoints : {Endpoint._instance_counter}")
-        print(f"    Buffers : {0}") # Buffer._instance_counter (TBD)
-        print(f"Connections : {len(self.links)}\n")
+        f"{self.name}\nNodes : {len(self.nodes)}     Sources : {Source.instance_counter}     Endpoints : {Endpoint.instance_counter}     Buffers : {Buffer.instance_counter}\nConnections : {len(self.links)}"
+
+        print(f"{self.name}")
+        print(f"\nNodes : {len(self.nodes)}")
+        print(f"    Sources : {Source.instance_counter}")
+        print(f"    Endpoints : {Endpoint.instance_counter}")
+        print(f"    Buffers : {Buffer.instance_counter}")
+        print(f"\nConnections : {len(self.links)}")
+        for connection in self.links:
+            print(f"    {connection[0]} | {connection[1]}")
+        
+        print()
