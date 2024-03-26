@@ -7,7 +7,7 @@ class Network(object):
         self.name = name if name else f"Network"
 
         self.nodes : dict[str : Node] = {} # Sources, Endpoints or Buffers in the network
-        self.links : set[tuple] = set() # Links between nodes
+        self.links : set[tuple[str, str]] = set() # Links between nodes
         self.NODE_TYPES = {
             "Source" : Source,
             "Endpoint" : Endpoint,
@@ -19,17 +19,17 @@ class Network(object):
     def add_node(self, node_type = "Node", name = None, *args, **kwargs) -> None:
         '''
         Creates a node and adds it onto the network object by adding it to the "self.nodes" dictionary.
-        If no node type is given it defaults to a "Source" type Node
-        If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Source-1  
+        If no node type is given it defaults to a "Node" type Node (Not defined node)
+        If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Node-1  
         '''
 
         class_type = self.NODE_TYPES.get(node_type)
         
         if not class_type:
             raise KeyError(f" '{node_type}' is not a valid node type")
-        else:
-            if not name:
-                name = f"{node_type}-{self.NODE_TYPES.get(node_type).instance_counter}"
+        
+        if not name:
+            name = f"{node_type}-{self.NODE_TYPES.get(node_type).instance_counter}"
             
         self.nodes[name] = self.NODE_TYPES.get(node_type)(name = name, node_type = node_type, *args, **kwargs)
         # Use Node name to acces the node object in the dict of nodes
@@ -77,7 +77,7 @@ class Network(object):
         print()
         
 
-        f"{self.name}\nNodes : {len(self.nodes)}     Sources : {Source.instance_counter}     Endpoints : {Endpoint.instance_counter}     Buffers : {Buffer.instance_counter}\nConnections : {len(self.links)}"
+        # f"{self.name}\nNodes : {len(self.nodes)}     Sources : {Source.instance_counter}     Endpoints : {Endpoint.instance_counter}     Buffers : {Buffer.instance_counter}\nConnections : {len(self.links)}"
 
         print(f"{self.name}")
         print(f"\nNodes : {len(self.nodes)}")

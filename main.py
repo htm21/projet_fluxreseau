@@ -4,16 +4,16 @@ from Modules.network import Network
 from Modules.paquet import Paquet
 from Modules.node import Node, Source, Buffer, Endpoint
 
-import sys
-import ctypes
+# import sys
+# import ctypes
 import tkinter as tk
 from GUIModules.app import App
 
 
 def main() -> None:
 
-    if "win" in sys.platform:
-        ctypes.windll.shcore.SetProcessDpiAwareness(0)
+    # if "win" in sys.platform:
+    #     ctypes.windll.shcore.SetProcessDpiAwareness(0)
 
 
     root = tk.Tk()
@@ -24,7 +24,7 @@ def main() -> None:
     root.mainloop()
 
 
-    network = Network()
+    # network = Network()
 
     # network.add_node(node_type = "Source")
     # network.add_node(node_type = "Buffer")
