@@ -1,4 +1,4 @@
-import pyglet
+# import pyglet
 import tkinter as tk
 from Modules.utils import*
 
@@ -10,7 +10,7 @@ from GUIModules.sandbox import SandBox
 
 class App:
 
-    pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")
+    # pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")
 
     def __init__(self, parent : tk.Tk) -> None:
 
