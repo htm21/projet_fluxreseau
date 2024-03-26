@@ -55,7 +55,8 @@ class Network(object):
         '''
         
         if (node_1, node_2) in self.links:
-            return
+
+            raise TypeError(f" The two 'Node' are already linked")
         
         elif self.nodes[node_1].type == "Node" or self.nodes[node_2].type == "Node":
             
@@ -64,6 +65,10 @@ class Network(object):
         elif self.nodes[node_1].type == "Source" and self.nodes[node_2].type == "Source":
 
             raise TypeError(f" Type 'Source' cannot be link to a 'Source' node")
+        
+        elif self.nodes[node_1].type == "Endpoint" and self.nodes[node_2].type == "Source":
+
+            raise TypeError(f" Type 'Endpoint' cannot be link to a 'Endpoint' node")
 
         else:    
             self.links.add((node_1, node_2))
