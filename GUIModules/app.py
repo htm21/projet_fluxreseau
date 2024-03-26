@@ -27,7 +27,7 @@ class App:
         self.parent.geometry(f"{self.window_width}x{self.window_height}+{self.x}+{self.y}")      
         self.parent.title("Project Transmission")
         self.parent.minsize(1280, 720)
-        self.parent.iconbitmap(default = f"{app_folder_path}/Icons/icon.ico")
+        # self.parent.iconbitmap(default = f"{app_folder_path}/Icons/icon.ico")
         self.parent.option_add(font, '19')
 
         self.Main_Frame = tk.Frame(self.parent)
