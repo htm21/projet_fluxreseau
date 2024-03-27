@@ -10,8 +10,8 @@ from Modules.utils import *
 
 class App:
 
-    if platform.system() == "Windows":
-        pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")
+    # if platform.system() == "Windows":
+    #     pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")
 
     def __init__(self, parent : tk.Tk) -> None:
 
