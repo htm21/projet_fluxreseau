@@ -5,14 +5,15 @@ class Node(object):
 
     instance_counter : int = 0
 
-    def __init__(self, node_id : int, name : str, node_type : str = "Node", oputput_speed : int = 0) -> None:
+    def __init__(self, node_id : int, name : str, node_type : str = "Node", output_speed : int = 0) -> None:
         Node.instance_counter += 1
         
         self.id : int = node_id
         self.name : str = name
         self.type : str = node_type 
-        self.oputput_speed : int = oputput_speed
+        self.output_speed : int = output_speed
         self.paquet_queue : list[Paquet] = []
+        self.connections : int = 0
 
 
     def cerate_paquet(self, endpoint : str, path : list[str], data : str, size : int, tracking : bool) -> Paquet:

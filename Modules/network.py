@@ -15,23 +15,22 @@ class Network(tk.Canvas):
         tk.Canvas.__init__(self, parent, *args, **kwargs)
         
         self.parent = parent
-        self.icon_size = 90
-        self.icons : dict[str : tuple[PIL.ImageTk, PIL.ImageTk]] = {
-            "Node" : (load_to_size("node", self.icon_size, self.icon_size), load_to_size("highlight_node", self.icon_size, self.icon_size)),
-            "Source" : (load_to_size("source_node", self.icon_size, self.icon_size), load_to_size("highlight_source_node", self.icon_size, self.icon_size)),
-            "Endpoint" : (load_to_size("endpoint_node", self.icon_size, self.icon_size), load_to_size("highlight_endpoint_node", self.icon_size, self.icon_size)),
-            "Buffer" : (load_to_size("buffer_node", self.icon_size, self.icon_size), load_to_size("highlight_buffer_node", self.icon_size, self.icon_size)),
+        self.icon_size : tuple = 90, 90
+        self.icons : dict[str : tuple] = {
+            "Node" : (load_to_size("node", *self.icon_size), load_to_size("highlight_node", *self.icon_size)),
+            "Source" : (load_to_size("source_node", *self.icon_size), load_to_size("highlight_source_node", *self.icon_size)),
+            "Buffer" : (load_to_size("buffer_node", *self.icon_size), load_to_size("highlight_buffer_node", *self.icon_size)),
+            "Endpoint" : (load_to_size("endpoint_node", *self.icon_size), load_to_size("highlight_endpoint_node", *self.icon_size)),
             } # dictionary that holds the normal node image and also the highlighted node image
-        self.canvasid_to_node : dict[int : str] = {} 
         self.selected_node = None
         self.bind('<Button-1>', self.select_node)
         
         # Logic Stuff ==================================================================
         
         self.name = name if name else f"Network"
-        self.nodes : dict[str : Node] = {} # Sources, Endpoints or Buffers in the network
-        self.links : set[tuple[str, str]] = set() # Links between nodes
-        self.NODE_TYPES = {
+        self.nodes : dict[str or int: Node] = {} # Sources, Endpoints or Buffers in the network
+        self.links : set[tuple] = set() # Links between nodes
+        self.NODE_TYPES : dict[str : Node]= {
             "Source" : Source,
             "Endpoint" : Endpoint,
             "Buffer" : Buffer,
@@ -39,7 +38,7 @@ class Network(tk.Canvas):
             }
 
 
-    def add_node(self, node_type = "Node", name = None, *args, **kwargs) -> None:
+    def add_node(self, node_type = "Source", name = None, *args, **kwargs) -> None:
         '''
         Creates a node and adds it onto the network object by adding it to the "self.nodes" dictionary.
         If no node type is given it defaults to a "Node" type Node (Not defined node)
@@ -53,16 +52,16 @@ class Network(tk.Canvas):
         
         if not name:
             name = f"{node_type}-{self.NODE_TYPES.get(node_type).instance_counter}"
-        
 
         canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0])
         # Creating canvas object with "node_type" in the middle of the Canvas
+        
+        node = self.NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, *args, **kwargs)
+        # Creating the node object with "node_type"
 
-        self.canvasid_to_node[canvas_node] = name
-        # Use the Canvas object Id to link the Node object with its corresponding Canvas object
-
-        self.nodes[name] = self.NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, *args, **kwargs)
-        # Use Node name to acces the node object in the dict of nodes
+        self.nodes[canvas_node] = node
+        self.nodes[name] = node
+        # Use Node name or canvas_id to acces the node object in the dict of nodes
 
 
     def del_node(self, node : str) -> None:
@@ -100,7 +99,9 @@ class Network(tk.Canvas):
 
             raise TypeError(f" Type 'Endpoint' cannot be link to a 'Endpoint' node")
 
-        else:    
+        else:
+            self.nodes[node_1].connections += 1
+            self.nodes[node_2].connections += 1
             self.links.add((node_1, node_2))
 
     
@@ -123,22 +124,22 @@ class Network(tk.Canvas):
         print()
 
 
-    def get_node_from_canvas_id(self, canvas_id : int) -> Node:
-        return self.nodes[self.canvasid_to_node[canvas_id]]
-
-
     def select_node(self, event):
         
-        node_ids = self.find_overlapping(event.x, event.y, event.x, event.y)
+        node_ids = self.find_overlapping(event.x, event.y, event.x, event.y) # Finds canvas item closest to cursor
+        
         if not node_ids:
+            self.event_generate("<<NetworkInfo>>")
             self.deselect_node()
             return
 
         if self.selected_node:
             self.deselect_node()
         
-        node_id = node_ids[0]
-        node = self.get_node_from_canvas_id(node_id)
+        self.event_generate("<<NodeInfo>>", x = event.x, y = event.y)
+        node_id = node_ids[-1] # Takes the one most in top
+        node = self.nodes[node_id]
+
         self.selected_node = node
         self.itemconfig(node.id, image = self.icons[node.type][1])
     

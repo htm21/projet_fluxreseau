@@ -10,8 +10,8 @@ from Modules.utils import *
 
 class App:
 
-    # if platform.system() == "Windows":
-    #     pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")
+    if platform.system() == "Windows":
+        pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")
 
     def __init__(self, parent : tk.Tk) -> None:
 
@@ -48,6 +48,10 @@ class App:
 
 
         self.parent.bind("<<AddNode>>", lambda args : self.network_sandbox.add_node())
+        self.parent.bind("<<NodeInfo>>", lambda event: self.side_bar.set_info_data(self.network_sandbox.nodes[self.network_sandbox.find_overlapping(event.x, event.y, event.x, event.y)[-1]])) #  Worst atrocity I've ever done 
+        self.parent.bind("<<NetworkInfo>>", lambda args : self.side_bar.set_info_data(self.network_sandbox))
+
+    
 
     def create_alert(self, type : str, text : str) -> None:
         pass
@@ -55,6 +59,13 @@ class App:
 
 
 #  , highlightbackground = "#FFFFFF", highlightthickness = 2
+
+
+
+
+
+
+
 
 
 # highlight = "#ffcc22"
@@ -80,7 +91,3 @@ class App:
 # buffer:
 # box : #3d3829
 # icon : #2a2822
-        
-
-
-

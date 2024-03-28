@@ -5,8 +5,8 @@ from PIL import Image,ImageTk
 
 
 app_folder_path = os.getcwd().replace("\\", "/")
-# font = "Montserrat"
-font = "Arial"
+font = "Montserrat"
+# font = "Arial"
 
 
 def screen_dimensions(root : tk.Tk) -> tuple[int, int]:
