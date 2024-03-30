@@ -1,4 +1,6 @@
 import os
+from math import log10
+import random as rd
 import screeninfo
 import tkinter as tk
 from PIL import Image,ImageTk
@@ -30,3 +32,9 @@ def load_to_size(icon : str, width : int, height : int) -> ImageTk.PhotoImage:
     icon = icon.resize((width, height), Image.ANTIALIAS)
 
     return ImageTk.PhotoImage(icon)
+
+
+def sleep_time(parameter):
+    U = rd.uniform(0.1,1)
+    sleep = -(1/parameter)*log10(U)
+    return sleep
