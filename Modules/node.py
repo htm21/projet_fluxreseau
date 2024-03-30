@@ -16,7 +16,7 @@ class Node(object):
         self.connections : int = 0
 
 
-    def cerate_paquet(self, endpoint : str, path : list[str], data : str, size : int, tracking : bool) -> Paquet:
+    def create_paquet(self, endpoint : str, path : list[str], data : str, size : int, tracking : bool) -> Paquet:
         self.receve_paquet(Paquet(endpoint, path, data, size, tracking))
     
 
@@ -63,7 +63,7 @@ class Endpoint(Node):
         raise AttributeError( "'Endpoint' object has no attribute 'send_paquet'" )
 
 
-    def cerate_paquet(self, *args, **kwargs) -> Paquet:
+    def create_paquet(self, *args, **kwargs) -> Paquet:
         raise AttributeError( "'Endpoint' object has no attribute 'cerate_paquet'" )
 
 
@@ -94,5 +94,5 @@ class Buffer(Node):
             return self.file.pop(0)       
 
 
-    def cerate_paquet(self, *args, **kwargs) -> Paquet:
+    def create_paquet(self, *args, **kwargs) -> Paquet:
         raise AttributeError( "'Buffer' object has no attribute 'cerate_paquet'" )

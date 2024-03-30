@@ -38,12 +38,15 @@ class Network(tk.Canvas):
             }
 
 
+
     def add_node(self, node_type = "Source", name = None, *args, **kwargs) -> None:
         '''
         Creates a node and adds it onto the network object by adding it to the "self.nodes" dictionary.
         If no node type is given it defaults to a "Node" type Node (Not defined node)
         If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Node-1  
         '''
+
+
 
         class_type = self.NODE_TYPES.get(node_type)
         
@@ -103,25 +106,6 @@ class Network(tk.Canvas):
             self.nodes[node_1].connections += 1
             self.nodes[node_2].connections += 1
             self.links.add((node_1, node_2))
-
-    
-    def info(self):
-        '''
-        Outputs a simple overview of the networks state
-        '''
-       
-        print()
-        
-        print(f"{self.name}")
-        print(f"\nNodes : {len(self.nodes)}")
-        print(f"    Sources : {Source.instance_counter}")
-        print(f"    Endpoints : {Endpoint.instance_counter}")
-        print(f"    Buffers : {Buffer.instance_counter}")
-        print(f"\nConnections : {len(self.links)}")
-        for connection in self.links:
-            print(f"    {connection[0]} | {connection[1]}")
-        
-        print()
 
 
     def select_node(self, event):

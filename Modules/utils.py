@@ -5,8 +5,8 @@ from PIL import Image,ImageTk
 
 
 app_folder_path = os.getcwd().replace("\\", "/")
-font = "Montserrat"
-# font = "Arial"
+# font = "Montserrat"
+font = "Arial"
 
 
 def screen_dimensions(root : tk.Tk) -> tuple[int, int]:
@@ -19,10 +19,6 @@ def monitor_dimensions() -> tuple[int, int]:
     monitor_width, monitor_height = monitor.width, monitor.height
     
     return monitor_width, monitor_height
-
-
-# def load_icon(icon : str) -> tk.PhotoImage:
-#     return tk.PhotoImage(file = f"{app_folder_path}/Icons/{icon}.png")
 
 
 def load_to_size(icon : str, width : int, height : int) -> ImageTk.PhotoImage:

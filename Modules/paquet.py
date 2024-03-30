@@ -1,7 +1,8 @@
 # a paquet will have a predetermined path to take when it is created that coresponds to a list of node names it has pass through till its endpoint
 
 
-class Paquet: # Data Class
+
+class Paquet:
     def __init__(self, endpoint : str, path : list[str], data : str, size : int, tracking : bool) -> None:
         
         self.endpoint : str = endpoint # Name of Endpoint Node

@@ -29,7 +29,6 @@ class App:
         self.parent.title("Project Transmission")
         self.parent.minsize(1280, 720)
         # self.parent.iconbitmap(default = f"{app_folder_path}/Icons/icon.ico") Need to fix later
-        self.parent.option_add(font, '19')
 
         self.Main_Frame = tk.Frame(self.parent)
         self.Main_Frame.pack(anchor = "center", fill = "both", expand = True)
@@ -58,11 +57,9 @@ class App:
 
 
 
+
+
 #  , highlightbackground = "#FFFFFF", highlightthickness = 2
-
-
-
-
 
 
 
@@ -71,6 +68,26 @@ class App:
 # highlight = "#ffcc22"
 
 # link : #394642
+
+# success
+# box : #004d00
+# icon : #003300
+
+# error
+# box : #4d0000
+# icon : #330000
+
+# special paquet
+# box : #3D2932
+# icon : #2E1F25
+
+# swap
+# box : #3D3029
+# icon : #2E241F
+
+# delete
+# box : #3d2932
+# icon : #2a2226
 
 # network
 # box : #2E293D
