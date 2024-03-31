@@ -127,8 +127,10 @@ class NodeCreationMenu(tk.Frame):
         button.config(foreground = "#FFFFFF")
 
     def create_node(self, *args):
-        # self.parent_obj.add_node()
-        pass
+        self.parent_obj.add_node()
+        # pass
+        NodeCreationMenu.instance_counter -= 1
+        self.destroy()
     
     def cancel_node(self, *args):
         NodeCreationMenu.instance_counter -= 1

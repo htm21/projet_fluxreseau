@@ -42,6 +42,7 @@ class Network(tk.Canvas):
         self.parametre = sleep_time(2)
 
 
+
     def update_network(self):
         
         for node in self.nodes:
@@ -61,13 +62,16 @@ class Network(tk.Canvas):
             return
 
 
-    def add_node(self, node_type, name, *args, **kwargs) -> None:
+    def add_node(self, node_type = "Source", name = None, *args, **kwargs) -> None:
         '''
         Creates a node and adds it onto the network by adding it to the "self.nodes" dictionary which anc be later accessed by the node name or canvas id.
         If no node type is given it defaults to a "Source" type Node
         If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Node-1  
         '''
         
+        if not name:
+            name = f"{node_type}-{self.NODE_TYPES[node_type].instance_counter}"
+
         canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0])
         # Creating canvas object with "node_type" in the middle of the Canvas
         

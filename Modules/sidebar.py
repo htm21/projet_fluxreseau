@@ -12,8 +12,6 @@ class SideBar(tk.Frame):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
 
-        self.text = ""
-
         self.icon_size : tuple = 75, 75
         self.icons = {
             "Node" : (load_to_size("node", *self.icon_size), load_to_size("highlight_node", *self.icon_size)),
@@ -35,7 +33,7 @@ class SideBar(tk.Frame):
         self.add_node = CustomButton(self.controls, event = "<<AddNode>>", icons = self.icons["Node"], image = self.icons["Node"][0], text = "        Add Node", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.add_connection = CustomButton(self.controls, image = self.icons["Link"], text = "    Add Connection", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.info_title = tk.Label(self.info, image = self.icons["Network"], text = "    Network Info", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.info_lable = tk.Label(self.info, text = self.text, justify = "left", anchor = "w", font = f"{font} 15 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.info_lable = tk.Label(self.info, justify = "left", anchor = "w", font = f"{font} 15 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         
 
         self.add_node.pack(side = "top", padx = 5, pady = (0, 15))
@@ -52,15 +50,8 @@ class SideBar(tk.Frame):
             info_text = f"Name : {network.name}\n\nNodes : {len(network.nodes) // 2}\n      Sources : {Source.instance_counter}\n      Endpoints : {Endpoint.instance_counter}\n      Buffers : {Buffer.instance_counter}\n\nConnections : {len(network.connections)}"
             self.info_lable.config(text = info_text)
 
-        if isinstance(data, Node):
+        elif isinstance(data, Node):
             node = data
             self.info_title.config(image = self.icons[node.type], text = f"    {node.name} Info")
             info_text = f"Type : {node.type}\n\nName : {node.name}\n\nCanvas ID : {node.id}\n\nThroughput : {node.output_speed}\n\nConnections : {node.connections}\n\nPaquet Queue :\n\n{node.paquet_queue[:5]}"
             self.info_lable.config(text = info_text)
-            
-            # node_type = node.type
-            # name = node.name
-            # canvas_id = node.id
-            # throughput = node.output_speed
-            # connections = node.connections
-            # paquets = node.paquet_queue[:5]
