@@ -42,10 +42,21 @@ class Network(tk.Canvas):
         for node in self.nodes:
             if self.clock - node.last_update_time >= self.parametre:
                 if node.type == "Source":
-                    pass
+                    if node.send_paquet():
+                        paquet = node.send_paquet()
+                    else :
+                        node.create_paquet()
+                        paquet = node.send_paquet()
+                    for link in self.connections :
+                        if node in link :
+                            link[1].receve_paquet(paquet)
                 
                 elif node.type == "Buffer":
-                    pass
+                    paquet = node.send_paquet()
+                    for link in self.connections :
+                        if node in link :
+                            pass
+
         
     
     def create_node(self) -> None:
