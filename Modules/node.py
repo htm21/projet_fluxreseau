@@ -5,7 +5,7 @@ class Node(object):
 
     instance_counter : int = 0
 
-    def __init__(self, node_id : int, name : str, node_type : str = "Source", output_speed : int = 0, input_speed : int = 0) -> None:
+    def __init__(self, node_id : int, name : str, node_type : str = "Source", output_speed : int = 0, input_speed : int = 0, max_send_paquets : int = 0) -> None:
         Node.instance_counter += 1
         
         self.id : int = node_id
@@ -13,6 +13,8 @@ class Node(object):
         self.type : str = node_type 
         self.output_speed : int = output_speed # Bytes
         self.input_speed : int = input_speed # Bytes
+        self.max_send_paquets = max_send_paquets
+
         self.paquet_queue : list[Paquet] = []
         self.connections : int = 0
         self.last_update_time : float = 0
@@ -44,7 +46,6 @@ class Source(Node):
 
     def __init__(self, *args, **kwargs) -> None:
         Node.__init__(self, *args, **kwargs)
-        
         Source.instance_counter += 1
 
 

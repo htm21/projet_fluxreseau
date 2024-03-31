@@ -53,5 +53,5 @@ class SideBar(tk.Frame):
         elif isinstance(data, Node):
             node = data
             self.info_title.config(image = self.icons[node.type], text = f"    {node.name} Info")
-            info_text = f"Type : {node.type}\n\nName : {node.name}\n\nCanvas ID : {node.id}\n\nThroughput : {node.output_speed}\n\nConnections : {node.connections}\n\nPaquet Queue :\n\n{node.paquet_queue[:5]}"
+            info_text = f"Type : {node.type}\n\nName : {node.name}\n\nCanvas ID : {node.id}\n\nThroughput : {node.output_speed} bytes/s\n\nConnections : {node.connections}\n\nPaquet Queue :\n\n{node.paquet_queue[:5]}"
             self.info_lable.config(text = info_text)

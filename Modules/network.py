@@ -32,12 +32,6 @@ class Network(tk.Canvas):
         self.name = name if name else f"Network"
         self.nodes : dict[str or int: Node] = {} # Sources, Endpoints or Buffers in the network
         self.connections : dict = {} # Links between nodes
-        self.NODE_TYPES : dict[str : Node]= {
-            "Source" : Source,
-            "Endpoint" : Endpoint,
-            "Buffer" : Buffer,
-            "Node" : Node
-            }
         self.clock = time()
         self.parametre = sleep_time(2)
 
@@ -56,26 +50,24 @@ class Network(tk.Canvas):
     
     def create_node(self) -> None:
         if NodeCreationMenu.instance_counter == 0:
-            menu = NodeCreationMenu(self, parent_obj = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
+            menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
             menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
         else:
             return
 
 
-    def add_node(self, node_type = "Source", name = None, *args, **kwargs) -> None:
+    def add_node(self, node_type, name, *args, **kwargs) -> None:
         '''
         Creates a node and adds it onto the network by adding it to the "self.nodes" dictionary which anc be later accessed by the node name or canvas id.
         If no node type is given it defaults to a "Source" type Node
         If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Node-1  
         '''
         
-        if not name:
-            name = f"{node_type}-{self.NODE_TYPES[node_type].instance_counter}"
 
         canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0])
         # Creating canvas object with "node_type" in the middle of the Canvas
         
-        node = self.NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, *args, **kwargs)
+        node = NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, *args, **kwargs)
         # Creating the node object with "node_type"
 
         self.nodes[canvas_node] = node

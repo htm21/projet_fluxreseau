@@ -6,11 +6,17 @@ import tkinter as tk
 
 from math import log10
 from PIL import Image,ImageTk
+from Modules.node import Node, Source, Buffer, Endpoint
 
 
 app_folder_path = os.getcwd().replace("\\", "/")
 font = "Montserrat" if platform.system() == "Windows" else "Arial"
-
+NODE_TYPES : dict[str : Node]= {
+    "Source" : Source,
+    "Endpoint" : Endpoint,
+    "Buffer" : Buffer,
+    "Node" : Node
+    }
 
 def screen_dimensions(root : tk.Tk) -> tuple[int, int]:
     
