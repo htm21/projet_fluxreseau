@@ -42,20 +42,18 @@ class Network(tk.Canvas):
         for node in self.nodes:
             if self.clock - node.last_update_time >= self.parametre:
                 if node.type == "Source":
-                    if node.send_paquet():
-                        paquet = node.send_paquet()
-                    else :
-                        node.create_paquet()
-                        paquet = node.send_paquet()
-                    for link in self.connections :
-                        if node in link :
-                            link[1].receve_paquet(paquet)
+                    paquet = node.send_paquet()
+                    if not paquet :
+                        paquet = node.create_paquet()
+                    if node.name in self.connections :
+                        self.nodes([self.connections[node.name]]).receve_paquet(paquet)
                 
                 elif node.type == "Buffer":
                     paquet = node.send_paquet()
-                    for link in self.connections :
-                        if node in link :
-                            pass
+                    if paquet : 
+                        if node.name in self.connections :
+                            self.nodes([self.connections[node.name]]).receve_paquet(paquet)
+                        
 
         
     
@@ -95,7 +93,7 @@ class Network(tk.Canvas):
 
         del self.nodes[node] 
         
-        for connection in self.links:
+        for connection in self.connections:
             if node in connection:
                 del connection
 
@@ -106,7 +104,7 @@ class Network(tk.Canvas):
         Adds a tuple(node_name, node_name) to the 'self.links' set
         '''
         
-        if (node_1, node_2) in self.links:
+        if (node_1, node_2) in self.connections:
 
             raise TypeError(f" The two 'Node' are already linked")
         
