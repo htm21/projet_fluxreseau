@@ -46,10 +46,10 @@ class App:
         self.buffer_frame.pack(side = "right", fill = "y")
 
 
-        self.parent.bind("<<AddNode>>", lambda args : self.network_sandbox.add_node())
+        self.parent.bind("<<AddNode>>", lambda args : self.network_sandbox.create_node())
         self.parent.bind("<<NodeInfo>>", lambda event: self.side_bar.set_info_data(self.network_sandbox.nodes[self.network_sandbox.find_overlapping(event.x, event.y, event.x, event.y)[-1]])) #  Worst atrocity I've ever done 
         self.parent.bind("<<NetworkInfo>>", lambda args : self.side_bar.set_info_data(self.network_sandbox))
-
+        
     
 
     def create_alert(self, type : str, text : str) -> None:
@@ -97,11 +97,11 @@ class App:
 # box : #394642
 # icon : #1E2422
 
-# send
+# source
 # box : #354d33
 # arrow : #232a22
 
-# receve
+# endpoint
 # box : #3d2932
 # arrow : #2a2226
 

@@ -1,6 +1,8 @@
 import PIL
 import tkinter as tk
 
+from time import time
+from Modules.node_creation_menu import NodeCreationMenu
 from Modules.node import Node, Source, Buffer, Endpoint
 from Modules.utils import *
 
@@ -29,33 +31,43 @@ class Network(tk.Canvas):
         
         self.name = name if name else f"Network"
         self.nodes : dict[str or int: Node] = {} # Sources, Endpoints or Buffers in the network
-        self.links : set[tuple] = set() # Links between nodes
+        self.connections : dict = {} # Links between nodes
         self.NODE_TYPES : dict[str : Node]= {
             "Source" : Source,
             "Endpoint" : Endpoint,
             "Buffer" : Buffer,
             "Node" : Node
             }
+        self.clock = time()
+        self.parametre = sleep_time(2)
 
 
+    def update_network(self):
+        
+        for node in self.nodes:
+            if self.clock - node.last_update_time >= self.parametre:
+                if node.type == "Source":
+                    pass
+                
+                elif node.type == "Buffer":
+                    pass
+        
+    
+    def create_node(self) -> None:
+        if NodeCreationMenu.instance_counter == 0:
+            menu = NodeCreationMenu(self, parent_obj = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
+            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
+        else:
+            return
 
-    def add_node(self, node_type = "Source", name = None, *args, **kwargs) -> None:
+
+    def add_node(self, node_type, name, *args, **kwargs) -> None:
         '''
-        Creates a node and adds it onto the network object by adding it to the "self.nodes" dictionary.
-        If no node type is given it defaults to a "Node" type Node (Not defined node)
+        Creates a node and adds it onto the network by adding it to the "self.nodes" dictionary which anc be later accessed by the node name or canvas id.
+        If no node type is given it defaults to a "Source" type Node
         If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Node-1  
         '''
-
-
-
-        class_type = self.NODE_TYPES.get(node_type)
         
-        if not class_type:
-            raise KeyError(f" '{node_type}' is not a valid node type")
-        
-        if not name:
-            name = f"{node_type}-{self.NODE_TYPES.get(node_type).instance_counter}"
-
         canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0])
         # Creating canvas object with "node_type" in the middle of the Canvas
         
@@ -64,6 +76,7 @@ class Network(tk.Canvas):
 
         self.nodes[canvas_node] = node
         self.nodes[name] = node
+        self.connections[name] = []
         # Use Node name or canvas_id to acces the node object in the dict of nodes
 
 
@@ -105,8 +118,8 @@ class Network(tk.Canvas):
         else:
             self.nodes[node_1].connections += 1
             self.nodes[node_2].connections += 1
-            self.links.add((node_1, node_2))
-
+            self.connections[node_1].append(node_2)
+            self.connections[node_2].append(node_1)
 
     def select_node(self, event):
         
@@ -132,7 +145,8 @@ class Network(tk.Canvas):
         
 
     def deselect_node(self, *args):
-        self.itemconfig(self.selected_node.id, image = self.icons[self.selected_node.type][0])
+        if self.selected_node:
+            self.itemconfig(self.selected_node.id, image = self.icons[self.selected_node.type][0])
         self.dtag("selected")
 
 

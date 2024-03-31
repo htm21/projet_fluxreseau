@@ -5,18 +5,22 @@ class Node(object):
 
     instance_counter : int = 0
 
-    def __init__(self, node_id : int, name : str, node_type : str = "Node", output_speed : int = 0) -> None:
+    def __init__(self, node_id : int, name : str, node_type : str = "Source", output_speed : int = 0, input_speed : int = 0) -> None:
         Node.instance_counter += 1
         
         self.id : int = node_id
         self.name : str = name
         self.type : str = node_type 
-        self.output_speed : int = output_speed
+        self.output_speed : int = output_speed # Bytes
+        self.input_speed : int = input_speed # Bytes
         self.paquet_queue : list[Paquet] = []
         self.connections : int = 0
+        self.last_update_time : float = 0
 
 
     def create_paquet(self, endpoint : str, path : list[str], data : str, size : int, tracking : bool) -> Paquet:
+        
+        
         self.receve_paquet(Paquet(endpoint, path, data, size, tracking))
     
 
@@ -69,7 +73,7 @@ class Endpoint(Node):
 
 
 class Buffer(Node):
-    
+
     instance_counter : int = 0
 
     def __init__(self, *args, **kwargs) -> None:

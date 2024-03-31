@@ -1,14 +1,15 @@
 import os
-from math import log10
+import platform
 import random as rd
 import screeninfo
 import tkinter as tk
+
+from math import log10
 from PIL import Image,ImageTk
 
 
 app_folder_path = os.getcwd().replace("\\", "/")
-# font = "Montserrat"
-font = "Arial"
+font = "Montserrat" if platform.system() == "Windows" else "Arial"
 
 
 def screen_dimensions(root : tk.Tk) -> tuple[int, int]:
