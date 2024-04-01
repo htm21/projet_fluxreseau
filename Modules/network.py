@@ -5,6 +5,7 @@ from time import time
 from Modules.node_creation_menu import NodeCreationMenu
 from Modules.node import Node, Source, Buffer, Endpoint
 from Modules.utils import *
+from Modules.paquet import *
 
 
 
@@ -34,19 +35,41 @@ class Network(tk.Canvas):
         self.connections : dict = {} # Links between nodes
         self.clock = time()
         self.parametre = sleep_time(2)
-
+        self.arrived_paquets = 0
+ 
 
 
     def update_network(self):
-        
-        for node in self.nodes:
-            if self.clock - node.last_update_time >= self.parametre:
-                if node.type == "Source":
-                    pass
-                
-                elif node.type == "Buffer":
-                    pass
-        
+        for node in self.connections:
+    
+            if self.nodes[node].type == "Source" :
+                paq = self.nodes[node].send_paquet()
+                if not paq :
+                    self.nodes[node].create_paquet(self.connections[node][0], "ABCD",2,False)          # probleme avec paquets
+                    paq = self.nodes[node].send_paquet()
+
+                if node in self.connections :
+                    if self.nodes[self.connections[node][0]].type == "Buffer":
+                        self.nodes[self.connections[node][0]].receve_paquet(paq)
+
+                    if self.nodes[self.connections[node][0]].type == "Endpoint" :
+                        self.nodes[self.connections[node][0]].receve_paquet(paq)
+                        self.arrived_paquets += 1
+                    
+
+            elif self.nodes[node].type == "Buffer" :
+                paq = self.nodes[node].send_paquet()
+                if not paq :
+                    continue
+                if node in self.connections :
+
+                    if self.nodes[self.connections[node][0]].type == "Source" :
+                        continue
+                    self.nodes[self.connections[node][0]].receve_paquet(paq)
+
+                    if self.nodes[self.connections[node][0]].type == "Endpoint" :
+                        self.arrived_paquets += 1
+            
     
     def create_node(self) -> None:
         if NodeCreationMenu.instance_counter == 0:
@@ -84,7 +107,7 @@ class Network(tk.Canvas):
 
         del self.nodes[node] 
         
-        for connection in self.links:
+        for connection in self.connections:
             if node in connection:
                 del connection
 
@@ -95,7 +118,7 @@ class Network(tk.Canvas):
         Adds a tuple(node_name, node_name) to the 'self.links' set
         '''
         
-        if (node_1, node_2) in self.links:
+        if (node_1, node_2) in self.connections:
 
             raise TypeError(f" The two 'Node' are already linked")
         

@@ -12,7 +12,14 @@ def main() -> None:
 
     root = tk.Tk()
     app = App(root)
-    root.mainloop()
+
+    app.network_sandbox.add_node("Source", "TEST S")
+    app.network_sandbox.add_node("Buffer", "TEST B")
+    app.network_sandbox.create_link("TEST S", "TEST B")
+    app.network_sandbox.update_network()
+
+
+    #root.mainloop()
 
 
 if __name__ == "__main__":
