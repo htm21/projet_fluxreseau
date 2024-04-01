@@ -7,7 +7,6 @@ from Modules.app import App
 
 
 def main() -> None:
-
     if platform.system() == "Windows":
         ctypes.windll.shcore.SetProcessDpiAwareness(0)
 

@@ -31,7 +31,8 @@ ALERTS = {
         "NotEnoughNodes" : "There are not enough nodes to connect!",
         "TwoSources" : "You can't connect two Sources",
         "TwoEndpoints" : "You can't connect two Endpoints",
-        "ExistingConnection" : "Nodes are already connected!"
+        "ExistingConnection" : "Nodes are already connected!",
+        "SameName" : "Two nodes can't have the same name!"
         }
     }
 

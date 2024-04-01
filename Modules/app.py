@@ -71,13 +71,11 @@ class App(object):
 
 
     def create_alert(self, alert : tuple) -> None:
-        
         image_padding = " "
         text = image_padding + ALERTS[alert[0]][alert[1]]
         color = "#4d0000" if alert[0] == "Error" else "#004d00"
 
-        self.alert_lable.config(image = self.icons[alert[0]], text = f"{image_padding + text}", background = color)
-        
+        self.alert_lable.config(image = self.icons[alert[0]], text = text, background = color)
         self.alert_create_time = time()
         self.alert_lable.place(anchor = "sw", relx = 0, rely = 1)
         

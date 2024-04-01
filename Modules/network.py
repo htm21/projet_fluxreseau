@@ -89,6 +89,10 @@ class Network(tk.Canvas):
         If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Node-1  
         '''
         
+        if self.nodes.get(name):
+            self.alert = ("Error", "SameName")
+            self.event_generate("<<Alert>>")
+            return
 
         canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0])
         # Creating canvas object with "node_type" in the middle of the Canvas
