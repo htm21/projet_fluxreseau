@@ -11,12 +11,30 @@ from Modules.node import Node, Source, Buffer, Endpoint
 
 app_folder_path = os.getcwd().replace("\\", "/")
 font = "Montserrat" if platform.system() == "Windows" else "Arial"
+
 NODE_TYPES : dict[str : Node]= {
     "Source" : Source,
     "Endpoint" : Endpoint,
     "Buffer" : Buffer,
     "Node" : Node
     }
+
+ALERTS = {
+    
+    "Success": {
+        "Connection" : "Connection created!",
+        "DeletedNode" : "Node deleted!",
+        "CreateNode" :  "Node created!"
+        },
+    
+    "Error" : {
+        "NotEnoughNodes" : "There are not enough nodes to connect!",
+        "TwoSources" : "You can't connect two Sources",
+        "TwoEndpoints" : "You can't connect two Endpoints",
+        "ExistingConnection" : "Nodes are already connected!"
+        }
+    }
+
 
 def screen_dimensions(root : tk.Tk) -> tuple[int, int]:
     

@@ -73,37 +73,10 @@ class App(object):
     def create_alert(self, alert : tuple) -> None:
         
         image_padding = " "
+        text = image_padding + ALERTS[alert[0]][alert[1]]
+        color = "#4d0000" if alert[0] == "Error" else "#004d00"
 
-        # Success ========================================================================
-
-        if alert[0] == "Success":
-            
-            if alert[1] == "Connection":
-                text = "Connection created!"
-            
-            elif alert[1] == "DeletedNode":
-                text = "Node deleted!"
-            
-            elif alert[1] == "CreateNode":
-                text = "Node created!"
-
-            self.alert_lable.config(image = self.icons["Success"], text = f"{image_padding + text}", background = "#004d00")
-
-        # Errors =========================================================================
-
-        if alert[0] == "Error":
-            if alert[1] == "NotEnoughNodes":
-                text = "There are not enough nodes to connect!"
-
-            elif alert[1] == "TwoSources":
-                text = "You can't connect two Sources"
-            
-            elif alert[1] == "TwoEndpoints":
-                text = "You can't connect two Endpoints"
-            
-            elif alert[1] == "ExistingConnection":
-                text = "Nodes are already connected!"
-            self.alert_lable.config(image = self.icons["Error"], text = f"{image_padding + text}", background = "#4d0000")
+        self.alert_lable.config(image = self.icons[alert[0]], text = f"{image_padding + text}", background = color)
         
         self.alert_create_time = time()
         self.alert_lable.place(anchor = "sw", relx = 0, rely = 1)
