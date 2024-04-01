@@ -20,7 +20,7 @@ class Node(object):
         self.last_update_time : float = 0
 
 
-    def create_paquet(self, endpoint : str, path : list[str], data : str, size : int, tracking : bool) -> Paquet:
+    def create_paquet(self, endpoint : str = None, path : list[str] = None, data : str = None, size : int = None, tracking : bool = None) -> Paquet:
         
         
         self.receve_paquet(Paquet(endpoint, path, data, size, tracking))
@@ -84,6 +84,7 @@ class Buffer(Node):
         
         self.capacity = 10  # Comme ce buffer est de capacité finie, notée C ici je prends 10 pour l'exemple
         self.number_element = 0
+        self.file = []
 
 
     def receve_paquet(self, paquet : Paquet) -> None:

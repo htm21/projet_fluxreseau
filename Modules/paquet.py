@@ -3,7 +3,7 @@
 
 
 class Paquet:
-    def __init__(self, endpoint : str, path : list[str], data : str, size : int, tracking : bool) -> None:
+    def __init__(self, endpoint : str=None, path : list[str]=None, data : str=None, size : int=None, tracking : bool=None) -> None:
         
         self.endpoint : str = endpoint # Name of Endpoint Node
         self.path : list[str] = [] # precalculated path for the paquet to take

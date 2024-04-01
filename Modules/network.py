@@ -38,22 +38,28 @@ class Network(tk.Canvas):
 
 
     def update_network(self):
-        
-        for node in self.nodes:
-            if self.clock - node.last_update_time >= self.parametre:
-                if node.type == "Source":
-                    paquet = node.send_paquet()
-                    if not paquet :
-                        paquet = node.create_paquet()
-                    if node.name in self.connections :
-                        self.nodes([self.connections[node.name]]).receve_paquet(paquet)
-                
-                elif node.type == "Buffer":
-                    paquet = node.send_paquet()
-                    if paquet : 
-                        if node.name in self.connections :
-                            self.nodes([self.connections[node.name]]).receve_paquet(paquet)
-                        
+        print("debut fonction")
+        for node in self.connections:
+            
+            print(f" NODE TYPE : {self.nodes[node].type} ")
+            if self.nodes[node].type == "Source" :
+                paquet = self.nodes[node].send_paquet()
+                print(f" PACKET TYPE : {type(paquet)} ")
+                if not paquet :
+                    print(" ----- IS NONE TYPE ----- ")
+                    #paquet = self.nodes[node].create_paquet()          # probleme avec paquets
+                    print(" ------ CREATED PACKET ------")
+                    print(f" TYPE OF PACKET : {type(paquet)}")
+                    print()
+
+                if node in self.connections :
+                    print()
+                    print(f" NODES CONNECTIONS : {self.connections[node]}")
+                    print(f' EXISTING NODES : {self.nodes} ')
+                    self.nodes[self.connections[node][0]].receve_paquet(paquet)
+                    print(" ------------ DONE ------------ ")
+                    print(f" DESTINATION QUEUE : {self.nodes[self.connections[node][0]].paquet_queue}")
+            
 
         
     
