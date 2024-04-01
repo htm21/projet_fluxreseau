@@ -58,7 +58,22 @@ class Network(tk.Canvas):
                     print(f' EXISTING NODES : {self.nodes} ')
                     self.nodes[self.connections[node][0]].receve_paquet(paquet)
                     print(" ------------ DONE ------------ ")
-                    print(f" DESTINATION QUEUE : {self.nodes[self.connections[node][0]].paquet_queue}")
+                    print(f" DESTINATION QUEUE : {self.nodes[self.connections[node][0]].paquet_queue} ")
+                    print()
+            
+            
+            elif self.nodes[node].type == "Buffer" :
+                paquet = self.nodes[node].send_paquet()
+                print(f" PACKET TYPE : {type(paquet)} ")
+
+                if node in self.connections :
+                    print()
+                    print(f" NODES CONNECTIONS : {self.connections[node]}")
+                    paquet = self.nodes[node].send_paquet()
+                    if not paquet :
+                        continue
+                    self.nodes[self.connections[node][0]].receve_paquet(paquet)
+                    print(" ------------ DONE ------------ ")
             
 
         
