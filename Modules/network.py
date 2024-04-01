@@ -5,6 +5,7 @@ from time import time
 from Modules.node_creation_menu import NodeCreationMenu
 from Modules.node import Node, Source, Buffer, Endpoint
 from Modules.utils import *
+from Modules.paquet import *
 
 
 
@@ -43,34 +44,38 @@ class Network(tk.Canvas):
             
             print(f" NODE TYPE : {self.nodes[node].type} ")
             if self.nodes[node].type == "Source" :
-                paquet = self.nodes[node].send_paquet()
-                print(f" PACKET TYPE : {type(paquet)} ")
-                if not paquet :
+                paq = self.nodes[node].send_paquet()
+                print(f" PACKET TYPE : {type(paq)} ")
+                if not paq :
                     print(" ----- IS NONE TYPE ----- ")
-                    #paquet = self.nodes[node].create_paquet()          # probleme avec paquets
+                    print(f" NODE : {self.nodes[self.connections[node][0]]};    TYPE : {self.nodes[self.connections[node][0]].type}")
+                    self.nodes[node].create_paquet(self.connections[node][0], "ABCD",2,False)          # probleme avec paquets
+                    print(f"      QUEUE ACTUELLE DE {node} :   {self.nodes[node].paquet_queue}")
+                    paq = self.nodes[node].send_paquet()
                     print(" ------ CREATED PACKET ------")
-                    print(f" TYPE OF PACKET : {type(paquet)}")
-                    print()
+                    print(f" TYPE OF PACKET : {type(paq)}")
+                    print( "-----------------------------------------------------")
 
                 if node in self.connections :
                     print()
                     print(f" NODES CONNECTIONS : {self.connections[node]}")
+                    print(f" NODE TYPE : {self.nodes[self.connections[node][0]].type}")
                     print(f' EXISTING NODES : {self.nodes} ')
-                    self.nodes[self.connections[node][0]].receve_paquet(paquet)
+                    self.nodes[self.connections[node][0]].receve_paquet(paq)
+                    print(" ------------ RECEIVED ------------ ")
+                    print(f" DESTINATION QUEUE : {self.nodes[self.connections[node][0]].file} ")
                     print(" ------------ DONE ------------ ")
-                    print(f" DESTINATION QUEUE : {self.nodes[self.connections[node][0]].paquet_queue} ")
-                    print()
             
 
             elif self.nodes[node].type == "Buffer" :
-                paquet = self.nodes[node].send_paquet()
-                print(f" PACKET TYPE : {type(paquet)} ")
-                if not paquet :
+                paq = self.nodes[node].send_paquet()
+                print(f" PACKET TYPE : {type(paq)} ")
+                if not paq :
                     continue
                 if node in self.connections :
                     print()
                     print(f" NODES CONNECTIONS : {self.connections[node]}")
-                    self.nodes[self.connections[node][0]].receve_paquet(paquet)
+                    self.nodes[self.connections[node][0]].receve_paquet(paq)
                     print(" ------------ DONE ------------ ")
             
 

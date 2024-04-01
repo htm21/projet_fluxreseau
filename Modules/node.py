@@ -20,10 +20,10 @@ class Node(object):
         self.last_update_time : float = 0
 
 
-    def create_paquet(self, endpoint : str = None, path : list[str] = None, data : str = None, size : int = None, tracking : bool = None) -> Paquet:
+    def create_paquet(self, endpoint : str = None, data : str = None, size : int = None, tracking : bool = None) -> Paquet:
         
         
-        self.receve_paquet(Paquet(endpoint, path, data, size, tracking))
+        self.receve_paquet(Paquet(endpoint, data, size, tracking))
     
 
     def receve_paquet(self, paquet : Paquet) -> None:
@@ -51,6 +51,10 @@ class Source(Node):
 
     def receve_paquet(self) -> AttributeError:
         raise AttributeError( "'Source' object has no attribute 'receve_paquet'" )
+    
+    def create_paquet(self, endpoint: str = None, data: str = None, size: int = None, tracking: bool = None) -> Paquet:
+        
+        self.paquet_queue.append(Paquet(endpoint, data, size, tracking))
 
 
 
