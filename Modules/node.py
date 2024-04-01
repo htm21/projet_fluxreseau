@@ -21,8 +21,6 @@ class Node(object):
 
 
     def create_paquet(self, endpoint : str, path : list[str], data : str, size : int, tracking : bool) -> Paquet:
-        
-        
         self.receve_paquet(Paquet(endpoint, path, data, size, tracking))
     
 
@@ -49,7 +47,7 @@ class Source(Node):
         Source.instance_counter += 1
 
 
-    def receve_paquet(self) -> AttributeError:
+    def receve_paquet(self, *args, **kwargs) -> AttributeError:
         raise AttributeError( "'Source' object has no attribute 'receve_paquet'" )
 
 
@@ -64,7 +62,7 @@ class Endpoint(Node):
         Endpoint.instance_counter += 1
 
 
-    def send_paquet(self) -> AttributeError:
+    def send_paquet(self, *args, **kwargs) -> AttributeError:
         raise AttributeError( "'Endpoint' object has no attribute 'send_paquet'" )
 
 

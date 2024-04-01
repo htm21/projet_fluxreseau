@@ -22,13 +22,17 @@ class SideBar(tk.Frame):
             "Network" : load_to_size("network", *self.icon_size)}
 
         self.controls = tk.Frame(self, background = kwargs.get("background"))
-        self.buffer_frame = tk.Frame(self, background = "#1D2123", height = 5)
+        self.buffer_frame_1 = tk.Frame(self, background = "#1D2123", height = 5)
         self.info = tk.Frame(self, background = kwargs.get("background"))
+        self.buffer_frame_2 = tk.Frame(self, background = "#1D2123", height = 5)
+        self.object_controls = tk.Frame(self, background = kwargs.get("background"))
+
 
         self.controls.pack(side = "top", pady = 30, fill = "x")
-        self.buffer_frame.pack(side = "top", fill = "x")
+        self.buffer_frame_1.pack(side = "top", fill = "x")
         self.info.pack(side = "top", pady = (30, 0), anchor = "n", fill = "both", expand = True)
-
+        self.buffer_frame_2.pack(side = "top", )
+        self.object_controls.pack(side = "top", )
 
         self.add_node = CustomButton(self.controls, event = "<<AddNode>>", icons = self.icons["Node"], image = self.icons["Node"][0], text = "        Add Node", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.add_connection = CustomButton(self.controls, image = self.icons["Link"], text = "    Add Connection", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
@@ -39,7 +43,7 @@ class SideBar(tk.Frame):
         self.add_node.pack(side = "top", padx = 5, pady = (0, 15))
         self.add_connection.pack(side = "top", padx = 5, pady = (15, 0), fill = "x")
         self.info_title.pack(side = "top", padx = 5, pady = (0, 15))
-        self.info_lable.pack(side = "left", anchor = "nw", padx = 10)
+        self.info_lable.pack(side = "left", anchor = "nw", padx = (25, 0))
 
     
     def set_info_data(self, data) -> None:
