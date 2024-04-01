@@ -125,9 +125,9 @@ class Network(tk.Canvas):
                 if sub_node == node.name:
                     self.connections[main_node].remove(node.name)
                     self.nodes[main_node].connections -=1 
+                    self.connection_counter -= 1
         
         NODE_TYPES[node.type].instance_counter -= 1
-        self.connection_counter -= 1
 
         self.delete(node.id)
         del self.nodes[node.name]

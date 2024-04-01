@@ -46,7 +46,7 @@ class App(object):
 
         # Frames =======================================================================
 
-        self.Main_Frame = tk.Frame(self.parent)
+        self.Main_Frame = tk.Frame(self.parent, highlightthickness = 5, highlightbackground = "#1D2123")
         self.side_bar = SideBar(self.Main_Frame, background = "#22282a", width = 400)
         self.buffer_frame = tk.Frame(self.Main_Frame, background = "#1D2123", width = 5)
         self.network_sandbox = Network(self.Main_Frame, border = 0, highlightthickness = 0, background = "#171a1c")
