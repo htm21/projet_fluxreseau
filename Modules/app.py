@@ -2,20 +2,32 @@ import pyglet
 import platform
 import tkinter as tk
 
+from time import time
 from Modules.sidebar import SideBar
 from Modules.network import Network 
 from Modules.utils import *
 
 
 
-class App:
+class App(object):
+
 
     if platform.system() == "Windows":
         pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")
 
-    def __init__(self, parent : tk.Tk) -> None:
 
+    def __init__(self, parent : tk.Tk) -> None:
         self.parent = parent
+
+        self.icon_size = 15, 15
+        self.icons = {
+            "Success" : load_to_size("success", *self.icon_size),
+            "Error" : load_to_size("error", *self.icon_size)
+            }
+        self.alert_on_screen_time = 5
+        self.alert_create_time = 0
+
+        # Window Positioning ===========================================================
 
         monitor_width, monitor_height = monitor_dimensions()
         monitor_width_center, monitor_height_center = monitor_width // 2, monitor_height // 2
@@ -25,49 +37,99 @@ class App:
         self.window_width_center, self.window_height_center = self.window_width // 2, self.window_height // 2
         self.x, self.y = monitor_width_center - self.window_width_center, monitor_height_center - self.window_height_center
 
+        # Window Settings ==============================================================
+
         self.parent.geometry(f"{self.window_width}x{self.window_height}+{self.x}+{self.y}")      
         self.parent.title("Project Transmission")
         self.parent.minsize(1280, 720)
         # self.parent.iconbitmap(default = f"{app_folder_path}/Icons/icon.ico") Need to fix later
 
+        # Frames =======================================================================
+
         self.Main_Frame = tk.Frame(self.parent)
-        self.Main_Frame.pack(anchor = "center", fill = "both", expand = True)
-
-
-        
         self.side_bar = SideBar(self.Main_Frame, background = "#22282a", width = 400)
         self.buffer_frame = tk.Frame(self.Main_Frame, background = "#1D2123", width = 5)
         self.network_sandbox = Network(self.Main_Frame, border = 0, highlightthickness = 0, background = "#171a1c")
 
-
+        self.Main_Frame.pack(anchor = "center", fill = "both", expand = True)  
         self.network_sandbox.pack(side = "left", fill = "both", expand = True)
         self.side_bar.pack(side = "right", fill = "y")
         self.side_bar.pack_propagate(0)
         self.buffer_frame.pack(side = "right", fill = "y")
 
+        # Widgets ======================================================================
+
+        self.alert_lable = tk.Label(self.Main_Frame, compound = "left", font = f"{font} 15 bold", foreground = "#FFFFFF", padx = 10)
+
+        # Binds ========================================================================
 
         self.parent.bind("<<AddNode>>", lambda args : self.network_sandbox.create_node())
-        self.parent.bind("<<NodeInfo>>", lambda event: self.side_bar.set_info_data(self.network_sandbox.nodes[self.network_sandbox.find_overlapping(event.x, event.y, event.x, event.y)[-1]])) #  Worst atrocity I've ever done 
-        self.parent.bind("<<NetworkInfo>>", lambda args : self.side_bar.set_info_data(self.network_sandbox))
+        self.parent.bind("<<ObjControls>>", lambda args : self.side_bar.set_object_controls(self.network_sandbox.selected_node))
+        self.parent.bind("<<DeleteNode>>", lambda args : self.network_sandbox.del_node(self.network_sandbox.selected_node))
+        self.parent.bind("<<AddConnection>>", lambda args : self.network_sandbox.create_connection())
+        self.parent.bind("<<Alert>>", lambda args : self.create_alert(self.network_sandbox.alert))
+
+
+    def create_alert(self, alert : tuple) -> None:
         
-    
+        image_padding = " "
 
-    def create_alert(self, type : str, text : str) -> None:
-        pass
+        # Success ========================================================================
+
+        if alert[0] == "Success":
+            
+            if alert[1] == "Connection":
+                text = "Connection created!"
+            
+            elif alert[1] == "DeletedNode":
+                text = "Node deleted!"
+            
+            elif alert[1] == "CreateNode":
+                text = "Node created!"
+
+            self.alert_lable.config(image = self.icons["Success"], text = f"{image_padding + text}", background = "#004d00")
+
+        # Errors =========================================================================
+
+        if alert[0] == "Error":
+            if alert[1] == "NotEnoughNodes":
+                text = "There are not enough nodes to connect!"
+
+            elif alert[1] == "TwoSources":
+                text = "You can't connect two Sources"
+            
+            elif alert[1] == "TwoEndpoints":
+                text = "You can't connect two Endpoints"
+            
+            elif alert[1] == "ExistingConnection":
+                text = "Nodes are already connected!"
+            self.alert_lable.config(image = self.icons["Error"], text = f"{image_padding + text}", background = "#4d0000")
+        
+        self.alert_create_time = time()
+        self.alert_lable.place(anchor = "sw", relx = 0, rely = 1)
+        
 
 
 
 
 
-#  , highlightbackground = "#FFFFFF", highlightthickness = 2
 
 
 
 
+
+
+
+
+
+
+
+
+# Colors ========================================================================
 
 # highlight = "#ffcc22"
 
-# link : #394642
+# Connection : #394642
 
 # success
 # box : #004d00
@@ -78,10 +140,10 @@ class App:
 # icon : #330000
 
 # special paquet
-# box : #3D2932
-# icon : #2E1F25
+# box : #2E293D
+# icon : #221F2E
 
-# swap
+# save / load
 # box : #3D3029
 # icon : #2E241F
 

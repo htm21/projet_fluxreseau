@@ -21,9 +21,7 @@ class Node(object):
 
 
     def create_paquet(self, endpoint : str = None, data : str = None, size : int = None, tracking : bool = None) -> Paquet:
-        
-        
-        self.receve_paquet(Paquet(endpoint, data, size, tracking))
+        self.paquet_queue.append(Paquet(endpoint, data, size, tracking))
     
 
     def receve_paquet(self, paquet : Paquet) -> None:
@@ -51,10 +49,6 @@ class Source(Node):
 
     def receve_paquet(self, *args, **kwargs) -> AttributeError:
         raise AttributeError( "'Source' object has no attribute 'receve_paquet'" )
-    
-    def create_paquet(self, endpoint: str = None, data: str = None, size: int = None, tracking: bool = None) -> Paquet:
-        
-        self.paquet_queue.append(Paquet(endpoint, data, size, tracking))
 
 
 

@@ -26,13 +26,16 @@ class Network(tk.Canvas):
             "Endpoint" : (load_to_size("endpoint_node", *self.icon_size), load_to_size("highlight_endpoint_node", *self.icon_size)),
             } # dictionary that holds the normal node image and also the highlighted node image
         self.selected_node = None
-        self.bind('<Button-1>', self.select_node)
+        self.alert = None
+        self.bind('<Button-1>', self.select_object)
         
         # Logic Stuff ==================================================================
         
         self.name = name if name else f"Network"
         self.nodes : dict[str or int: Node] = {} # Sources, Endpoints or Buffers in the network
         self.connections : dict = {} # Links between nodes
+        self.connection_counter = 0
+
         self.clock = time()
         self.parametre = sleep_time(2)
         self.arrived_paquets = 0
@@ -40,8 +43,8 @@ class Network(tk.Canvas):
 
 
     def update_network(self):
+        
         for node in self.connections:
-    
             if self.nodes[node].type == "Source" :
                 paq = self.nodes[node].send_paquet()
                 if not paq :
@@ -98,74 +101,116 @@ class Network(tk.Canvas):
         self.connections[name] = []
         # Use Node name or canvas_id to acces the node object in the dict of nodes
 
+        self.alert = ("Success", "CreateNode")
+        self.event_generate("<<Alert>>")
+
 
     def del_node(self, node : str) -> None:
         '''
         Deletes a Node from the network by deleting the node from the "self.nodes" dictionary 
         and deleting all existing links to the deleted node from the "self.links" set.
         '''
-
-        del self.nodes[node] 
         
-        for connection in self.connections:
-            if node in connection:
-                del connection
+        if not node: return
+
+        del self.connections[node.name]
+        
+        for main_node in self.connections:
+    
+            for sub_node in self.connections[main_node]:
+                if sub_node == node.name:
+                    self.connections[main_node].remove(node.name)
+                    self.nodes[main_node].connections -=1 
+        
+        NODE_TYPES[node.type].instance_counter -= 1
+        self.connection_counter -= 1
+
+        self.delete(node.id)
+        del self.nodes[node.name]
+        del self.nodes[node.id]
+
+        self.alert = ("Success", "DeletedNode")
+        self.event_generate("<<Alert>>")
+        self.deselect_object()
 
 
-    def create_link(self, node_1 : str, node_2 : str) -> None:
+    def create_connection(self) -> None:
+        if len(self.connections) < 2:
+            self.alert = ("Error", "NotEnoughNodes")
+            self.event_generate("<<Alert>>")
+            return
+        
+        self.deselect_object()
+        self.config(highlightbackground = "#ffcc22", highlightthickness = 5) 
+        nodes = []
+
+        while len(nodes) < 2:
+            if self.selected_node:
+                nodes.append(self.selected_node)
+                self.deselect_object()
+            self.parent.update()
+        
+        self.config(highlightthickness = 0)
+        self.add_connection(*nodes)
+
+
+    def add_connection(self, node_1 : object, node_2 : object) -> None:
         '''
-        Creates a link between two nodes if it satisfies the linking requirements
+        Creates a connection between two nodes if it satisfies the linking requirements
         Adds a tuple(node_name, node_name) to the 'self.links' set
         '''
-        
-        if (node_1, node_2) in self.connections:
 
-            raise TypeError(f" The two 'Node' are already linked")
-        
-        elif self.nodes[node_1].type == "Node" or self.nodes[node_2].type == "Node":
-            
-            raise TypeError(f" Type 'Node' must be defined before linking")
+        if node_1.type == "Endpoint":
+            node_1, node_2 = node_2, node_1
 
-        elif self.nodes[node_1].type == "Source" and self.nodes[node_2].type == "Source":
+        if node_2.name in self.connections[node_1.name]:
+            self.alert = ("Error", "ExistingConnection")
+            self.event_generate("<<Alert>>")
+            return
 
-            raise TypeError(f" Type 'Source' cannot be link to a 'Source' node")
-        
-        elif self.nodes[node_1].type == "Endpoint" and self.nodes[node_2].type == "Endpoint":
+        elif node_1.type == "Source" and node_2.type == "Source":
+            self.alert = ("Error", "TwoSources")
+            self.event_generate("<<Alert>>")
+            return
 
-            raise TypeError(f" Type 'Endpoint' cannot be link to a 'Endpoint' node")
+        elif node_1.type == "Endpoint" and node_2.type == "Endpoint":
+            self.alert = ("Error","TwoEndpoints")
+            self.event_generate("<<Alert>>")
+            return
 
         else:
-            self.nodes[node_1].connections += 1
-            self.nodes[node_2].connections += 1
-            self.connections[node_1].append(node_2)
-            self.connections[node_2].append(node_1)
+            self.alert = ("Success", "Connection")
+            self.event_generate("<<Alert>>")
+            self.connection_counter += 1
+            node_1.connections += 1
+            self.connections[node_1.name].append(node_2.name)
 
-    def select_node(self, event):
+
+    def select_object(self, event):
         
         node_ids = self.find_overlapping(event.x, event.y, event.x, event.y) # Finds canvas item closest to cursor
         
         if not node_ids:
-            self.event_generate("<<NetworkInfo>>")
-            self.deselect_node()
+            self.deselect_object()
             return
 
-        if self.selected_node:
-            self.deselect_node()
+        if self.selected_node: self.deselect_object()
         
-        self.event_generate("<<NodeInfo>>", x = event.x, y = event.y)
         node_id = node_ids[-1] # Takes the one most in top
         node = self.nodes[node_id]
-
         self.selected_node = node
+
+        self.event_generate("<<ObjControls>>")
         self.itemconfig(node.id, image = self.icons[node.type][1])
-    
         self.addtag_withtag("selected", node_id)
         self.bind("<B1-Motion>", self.move_node)
         
 
-    def deselect_node(self, *args):
+    def deselect_object(self, *args):
         if self.selected_node:
             self.itemconfig(self.selected_node.id, image = self.icons[self.selected_node.type][0])
+        self.selected_node = None
+        self.event_generate("<<ObjControls>>")
         self.dtag("selected")
 
 

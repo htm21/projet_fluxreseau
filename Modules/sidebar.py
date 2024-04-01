@@ -19,7 +19,14 @@ class SideBar(tk.Frame):
             "Endpoint" : load_to_size("endpoint_node", *self.icon_size),
             "Buffer" : load_to_size("buffer_node", *self.icon_size),
             "Link" : load_to_size("link", *self.icon_size), 
-            "Network" : load_to_size("network", *self.icon_size)}
+            "Network" : load_to_size("network", *self.icon_size),
+            "Save" : (load_to_size("save", *self.icon_size), load_to_size("highlighted_save", *self.icon_size)),
+            "Load" : (load_to_size("load", *self.icon_size), load_to_size("highlighted_load", *self.icon_size)),
+            "Paquet" : (load_to_size("paquet", *self.icon_size), load_to_size("highlighted_paquet", *self.icon_size)),
+            "Delete" : (load_to_size("delete", *self.icon_size), load_to_size("highlighted_delete", *self.icon_size))
+        }
+
+        # Frames =======================================================================
 
         self.controls = tk.Frame(self, background = kwargs.get("background"))
         self.buffer_frame_1 = tk.Frame(self, background = "#1D2123", height = 5)
@@ -28,34 +35,62 @@ class SideBar(tk.Frame):
         self.object_controls = tk.Frame(self, background = kwargs.get("background"))
 
 
-        self.controls.pack(side = "top", pady = 30, fill = "x")
+        self.controls.pack(side = "top", pady = 15, fill = "x")
         self.buffer_frame_1.pack(side = "top", fill = "x")
-        self.info.pack(side = "top", pady = (30, 0), anchor = "n", fill = "both", expand = True)
-        self.buffer_frame_2.pack(side = "top", )
-        self.object_controls.pack(side = "top", )
+        self.info.pack(side = "top", pady = 15, anchor = "n", fill = "both", expand = True)
+        self.buffer_frame_2.pack(side = "top", fill = "x")
+        self.object_controls.pack(side = "top", pady = 15, fill = "x")
+
+        # Widgets ======================================================================
 
         self.add_node = CustomButton(self.controls, event = "<<AddNode>>", icons = self.icons["Node"], image = self.icons["Node"][0], text = "        Add Node", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.add_connection = CustomButton(self.controls, image = self.icons["Link"], text = "    Add Connection", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.add_connection = CustomButton(self.controls, event = "<<AddConnection>>", image = self.icons["Link"], text = "    Add Connection", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.info_title = tk.Label(self.info, image = self.icons["Network"], text = "    Network Info", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.info_lable = tk.Label(self.info, justify = "left", anchor = "w", font = f"{font} 15 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        
+        self.save = CustomButton(self.object_controls, event = None, icons = self.icons["Save"], image = self.icons["Save"][0], background = kwargs.get("background"))
+        self.load = CustomButton(self.object_controls, event = None, icons = self.icons["Load"], image = self.icons["Load"][0], background = kwargs.get("background"))
+        self.add_paquet = CustomButton(self.object_controls, event = None, icons = self.icons["Paquet"], image = self.icons["Paquet"][0], background = kwargs.get("background"))
+        self.delete = CustomButton(self.object_controls, event = "<<DeleteNode>>", icons = self.icons["Delete"], image = self.icons["Delete"][0], background = kwargs.get("background"))
+
 
         self.add_node.pack(side = "top", padx = 5, pady = (0, 15))
-        self.add_connection.pack(side = "top", padx = 5, pady = (15, 0), fill = "x")
+        self.add_connection.pack(side = "top", padx = 5, fill = "x")
         self.info_title.pack(side = "top", padx = 5, pady = (0, 15))
         self.info_lable.pack(side = "left", anchor = "nw", padx = (25, 0))
+        self.delete.pack(side = "right", padx = 20)
+        self.save.pack(side = "right", padx = 20)
+        self.load.pack(side = "right", padx = 20)
 
-    
-    def set_info_data(self, data) -> None:
 
-        if isinstance(data, Network):
+    def reset_controls(self):
+        self.save.pack_forget()
+        self.load.pack_forget()
+        self.add_paquet.pack_forget()
+
+
+    def set_object_controls(self, data : object):
+        self.reset_controls()
+
+        if data == None: # Network Controls
+            self.save.pack(side = "right", padx = 20)
+            self.load.pack(side = "right", padx = 20)
+
+        elif isinstance(data, Node) and data.type != "Endpoint": # Node Controls
+            self.add_paquet.pack(side = "right", padx = 20)
+
+
+    def set_object_info(self, data : object) -> None:
+
+        if isinstance(data, Network): # Network Controls
+            
             network = data
             self.info_title.config(image = self.icons["Network"], text = f"    {data.name} Info")
-            info_text = f"Name : {network.name}\n\nNodes : {len(network.nodes) // 2}\n      Sources : {Source.instance_counter}\n      Endpoints : {Endpoint.instance_counter}\n      Buffers : {Buffer.instance_counter}\n\nConnections : {len(network.connections)}"
+            info_text = f"Name : {network.name}\n\nNodes : {len(network.nodes) // 2}\n      Sources : {Source.instance_counter}\n      Endpoints : {Endpoint.instance_counter}\n      Buffers : {Buffer.instance_counter}\n\nConnections : {network.connection_counter}"
             self.info_lable.config(text = info_text)
 
-        elif isinstance(data, Node):
+
+        elif isinstance(data, Node): # Node Controls
             node = data
             self.info_title.config(image = self.icons[node.type], text = f"    {node.name} Info")
-            info_text = f"Type : {node.type}\n\nName : {node.name}\n\nCanvas ID : {node.id}\n\nThroughput : {node.output_speed} bytes/s\n\nConnections : {node.connections}\n\nPaquet Queue :\n\n{node.paquet_queue[:5]}"
+            info_text = f"Type : {node.type}\nName : {node.name}\n\nThroughput : {node.output_speed} bytes/s\nConnections : {node.connections}\n\nPaquet Queue :\n{node.paquet_queue[:5]}"
             self.info_lable.config(text = info_text)
