@@ -35,52 +35,41 @@ class Network(tk.Canvas):
         self.connections : dict = {} # Links between nodes
         self.clock = time()
         self.parametre = sleep_time(2)
-
+        self.arrived_paquets = 0
+ 
 
 
     def update_network(self):
-        print("debut fonction")
         for node in self.connections:
-            
-            print(f" NODE TYPE : {self.nodes[node].type} ")
+    
             if self.nodes[node].type == "Source" :
                 paq = self.nodes[node].send_paquet()
-                print(f" PACKET TYPE : {type(paq)} ")
                 if not paq :
-                    print(" ----- IS NONE TYPE ----- ")
-                    print(f" NODE : {self.nodes[self.connections[node][0]]};    TYPE : {self.nodes[self.connections[node][0]].type}")
                     self.nodes[node].create_paquet(self.connections[node][0], "ABCD",2,False)          # probleme avec paquets
-                    print(f"      QUEUE ACTUELLE DE {node} :   {self.nodes[node].paquet_queue}")
                     paq = self.nodes[node].send_paquet()
-                    print(" ------ CREATED PACKET ------")
-                    print(f" TYPE OF PACKET : {type(paq)}")
-                    print( "-----------------------------------------------------")
 
                 if node in self.connections :
-                    print()
-                    print(f" NODES CONNECTIONS : {self.connections[node]}")
-                    print(f" NODE TYPE : {self.nodes[self.connections[node][0]].type}")
-                    print(f' EXISTING NODES : {self.nodes} ')
-                    self.nodes[self.connections[node][0]].receve_paquet(paq)
-                    print(" ------------ RECEIVED ------------ ")
-                    print(f" DESTINATION QUEUE de {self.connections[node][0]}  : {self.nodes[self.connections[node][0]].file} ")
-                    print(" ------------ DONE ------------ ")
-                    print()
-            
+                    if self.nodes[self.connections[node][0]].type == "Buffer":
+                        self.nodes[self.connections[node][0]].receve_paquet(paq)
+
+                    if self.nodes[self.connections[node][0]].type == "Endpoint" :
+                        self.nodes[self.connections[node][0]].receve_paquet(paq)
+                        self.arrived_paquets += 1
+                    
 
             elif self.nodes[node].type == "Buffer" :
                 paq = self.nodes[node].send_paquet()
-                print(f" PACKET TYPE : {type(paq)} ")
                 if not paq :
                     continue
                 if node in self.connections :
-                    print()
-                    print(f" NODES CONNECTIONS : {self.connections[node]}")
-                    self.nodes[self.connections[node][0]].receve_paquet(paq)
-                    print(" ------------ DONE ------------ ")
-            
 
-        
+                    if self.nodes[self.connections[node][0]].type == "Source" :
+                        continue
+                    self.nodes[self.connections[node][0]].receve_paquet(paq)
+
+                    if self.nodes[self.connections[node][0]].type == "Endpoint" :
+                        self.arrived_paquets += 1
+            
     
     def create_node(self) -> None:
         if NodeCreationMenu.instance_counter == 0:
