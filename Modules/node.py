@@ -86,7 +86,7 @@ class Buffer(Node):
 
 
     def receve_paquet(self, paquet : Paquet) -> None:
-        if self.number_element < self.capacity :
+        if self.number_element < self.capacity:
             self.file.append(paquet)
             self.number_element += 1
         else:

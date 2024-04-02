@@ -52,7 +52,7 @@ def monitor_dimensions() -> tuple[int, int]:
 
 def load_to_size(icon : str, width : int, height : int) -> ImageTk.PhotoImage:
     icon = Image.open(f"{app_folder_path}/Icons/{icon}.png")
-    icon = icon.resize((width, height), Image.ANTIALIAS)
+    icon = icon.resize((width, height))
 
     return ImageTk.PhotoImage(icon)
 

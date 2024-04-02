@@ -9,3 +9,6 @@ class Paquet:
         self.data : str = data # can be anything (Symbols, Numbers etc...)
         self.size : int = size # in bits (8 bits = 1 byte)
         self.tracking : bool = tracking # if true it will show up in the GUI
+
+    def __repr__(self):
+        return f"{self.data : self.size}"
