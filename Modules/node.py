@@ -82,12 +82,12 @@ class Buffer(Node):
         
         self.capacity = 10  # Comme ce buffer est de capacité finie, notée C ici je prends 10 pour l'exemple
         self.number_element = 0
-        self.file = []
+        self.paquet_queue = []
 
 
     def receve_paquet(self, paquet : Paquet) -> None:
-        if self.number_element < self.capacity:
-            self.file.append(paquet)
+        if self.number_element < self.capacity :
+            self.paquet_queue.append(paquet)
             self.number_element += 1
         else:
             del paquet
@@ -95,7 +95,7 @@ class Buffer(Node):
 
     def send_paquet(self) -> Paquet:
         if self.number_element :
-            return self.file.pop(0)       
+            return self.paquet_queue.pop(0)       
 
 
     def create_paquet(self, *args, **kwargs) -> Paquet:

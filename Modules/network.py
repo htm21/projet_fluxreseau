@@ -45,32 +45,52 @@ class Network(tk.Canvas):
     def update_network(self):
         
         for node in self.connections:
+
             if self.nodes[node].type == "Source" :
                 paq = self.nodes[node].send_paquet()
+                print(f" ACTUAL PAQUET : {paq}")
+
                 if not paq :
-                    self.nodes[node].create_paquet(self.connections[node][0], "ABCD",2,False)          # probleme avec paquets
+                    self.nodes[node].create_paquet(self.connections[node][0], "ABCD",2,False)
+                    print(f" ACTUAL QUEUE OF '{self.nodes[node].name}' : {self.nodes[node].paquet_queue}")         # probleme avec paquets
                     paq = self.nodes[node].send_paquet()
+                    print(f" NEW PACKET CREATED : {paq}")
+                    print(f" ACTUAL QUEUE OF '{self.nodes[node].name}' AFTER : {self.nodes[node].paquet_queue}")
 
-                if node in self.connections :
-                    if self.nodes[self.connections[node][0]].type == "Buffer":
-                        self.nodes[self.connections[node][0]].receve_paquet(paq)
 
-                    if self.nodes[self.connections[node][0]].type == "Endpoint" :
-                        self.nodes[self.connections[node][0]].receve_paquet(paq)
+
+                for exit in self.connections[node] :
+                    print(f"THE EXIT IS : {exit}")
+                    if self.nodes[exit].type == "Buffer":
+                        print(f" IS BUFFER : {self.nodes[exit]} ")
+                        e = self.nodes[exit]
+                        print(f" BUFFER BEFORE : {e.paquet_queue}")
+                        e.receve_paquet(paq)
+                        print(f" BUFFER AFTER RECEPTION : {e.paquet_queue}")
+                        
+
+                    if self.nodes[exit].type == "Endpoint" :
+                        self.nodes[exit].receve_paquet(paq)
                         self.arrived_paquets += 1
+                    print(" ---------- FIRST TEST DONE ----------")
+                    print()
                     
 
             elif self.nodes[node].type == "Buffer" :
+                print(f" BUFFER QUEUE BEFORE SENDING : {self.nodes[node].paquet_queue}")
                 paq = self.nodes[node].send_paquet()
+                print(f" THE PACKET SENT : {paq}")
                 if not paq :
                     continue
-                if node in self.connections :
-
-                    if self.nodes[self.connections[node][0]].type == "Source" :
+                print(f" BUFFER QUEUE AFTER SENDING : {self.nodes[node].paquet_queue}")
+                
+                for exit in self.connections[node] :
+                    if self.nodes[exit].type == "Source" :
                         continue
-                    self.nodes[self.connections[node][0]].receve_paquet(paq)
+                    print(f" THE DESTINATION TYPE : {self.nodes[exit].type}")
+                    self.nodes[exit].receve_paquet(paq)
 
-                    if self.nodes[self.connections[node][0]].type == "Endpoint" :
+                    if self.nodes[exit].type == "Endpoint" :
                         self.arrived_paquets += 1
             
     
@@ -241,8 +261,17 @@ class Network(tk.Canvas):
                 x2, y2 = self.coords(self.nodes[nodes[1]].id)
                 self.coords(line, x1, y1, x2, y2)
         
-
+    
+    def test(self):
+        self.add_node("Source", "S")
+        self.add_node("Buffer", "B")
+        self.add_node("Endpoint", "E")
+        self.add_connection(self.nodes["S"], self.nodes["B"])
+        print(self.connections)
+        self.update_network()
+                
+        
 
 # How to click and drag canvas items:
     # https://stackoverflow.com/questions/61834886/how-to-make-a-drag-and-drop-animation-in-tkinter-canvas
-
+                

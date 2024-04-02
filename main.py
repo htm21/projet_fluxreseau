@@ -11,26 +11,23 @@ def main() -> None:
         ctypes.windll.shcore.SetProcessDpiAwareness(0)
 
     root = tk.Tk()
-    app = App(root)
+    app  = App(root)
 
-    # app.network_sandbox.add_node("Source", "TEST S")
-    # app.network_sandbox.add_node("Buffer", "TEST B")
-    # app.network_sandbox.create_link("TEST S", "TEST B")
-    # app.network_sandbox.update_network()
+    app.network_sandbox.test()
 
-    while app:
+    # while app:
         
-        if app.alert_lable.winfo_ismapped():
-            if (time() - app.alert_create_time) > app.alert_on_screen_time:
-                app.alert_lable.place_forget()
+    #     if app.alert_lable.winfo_ismapped():
+    #         if (time() - app.alert_create_time) > app.alert_on_screen_time:
+    #             app.alert_lable.place_forget()
         
         
-        if node := app.network_sandbox.selected_node: # to be moved into the update function
-            app.side_bar.set_object_info(node)
-        else:
-            app.side_bar.set_object_info(app.network_sandbox)
+    #     if node := app.network_sandbox.selected_node: # to be moved into the update function
+    #         app.side_bar.set_object_info(node)
+    #     else:
+    #         app.side_bar.set_object_info(app.network_sandbox)
 
-        root.update()
+    #     root.update()
 
 
 
