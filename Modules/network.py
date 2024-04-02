@@ -28,6 +28,7 @@ class Network(tk.Canvas):
         self.selected_node = None
         self.alert = None
         self.bind('<Button-1>', self.select_object)
+        self.bind("<B1-Motion>", self.move_node)
         
         # Logic Stuff ==================================================================
         
@@ -40,7 +41,6 @@ class Network(tk.Canvas):
         self.parametre = sleep_time(2)
         self.arrived_paquets = 0
  
-
 
     def update_network(self):
         
@@ -74,7 +74,7 @@ class Network(tk.Canvas):
                         self.arrived_paquets += 1
             
     
-    def create_node(self) -> None:
+    def create_node(self, *args) -> None:
         if NodeCreationMenu.instance_counter == 0:
             menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
             menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
@@ -94,7 +94,7 @@ class Network(tk.Canvas):
             self.event_generate("<<Alert>>")
             return
 
-        canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0])
+        canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0], tags = "node")
         # Creating canvas object with "node_type" in the middle of the Canvas
         
         node = NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, *args, **kwargs)
@@ -105,9 +105,15 @@ class Network(tk.Canvas):
         self.connections[name] = []
         # Use Node name or canvas_id to acces the node object in the dict of nodes
 
+        self.tag_raise("node")
         self.alert = ("Success", "CreateNode")
         self.event_generate("<<Alert>>")
 
+    
+    def delete_object(self, *args) -> None:
+        if self.selected_node:
+            self.del_node(self.selected_node)
+        pass
 
     def del_node(self, node : str) -> None:
         '''
@@ -117,18 +123,21 @@ class Network(tk.Canvas):
         
         if not node: return
 
-        del self.connections[node.name]
-        
+
+        NODE_TYPES[node.type].instance_counter -= 1
+        self.connection_counter -= len(self.connections[node.name])
+        del self.connections[node.name]        
         for main_node in self.connections:
-    
             for sub_node in self.connections[main_node]:
                 if sub_node == node.name:
                     self.connections[main_node].remove(node.name)
-                    self.nodes[main_node].connections -=1 
+                    self.nodes[main_node].connections -=1
                     self.connection_counter -= 1
-        
-        NODE_TYPES[node.type].instance_counter -= 1
 
+
+        canvas_lines = self.find_withtag(self.selected_node.name)
+        for line in canvas_lines:
+            self.delete(line)
         self.delete(node.id)
         del self.nodes[node.name]
         del self.nodes[node.id]
@@ -138,7 +147,7 @@ class Network(tk.Canvas):
         self.deselect_object()
 
 
-    def create_connection(self) -> None:
+    def create_connection(self, *args) -> None:
         if len(self.connections) < 2:
             self.alert = ("Error", "NotEnoughNodes")
             self.event_generate("<<Alert>>")
@@ -153,8 +162,14 @@ class Network(tk.Canvas):
                 nodes.append(self.selected_node)
                 self.deselect_object()
             self.parent.update()
-        
+
         self.config(highlightthickness = 0)
+
+        if nodes[0] == nodes[1]:
+            self.alert = ("Error", "SelfConnection")
+            self.event_generate("<<Alert>>")
+            return
+        
         self.add_connection(*nodes)
 
 
@@ -186,31 +201,29 @@ class Network(tk.Canvas):
             self.alert = ("Success", "Connection")
             self.event_generate("<<Alert>>")
             self.connection_counter += 1
+           
+            self.create_line((*self.coords(node_1.id), *self.coords(node_2.id)), width = 10, fill = "#1D2123", activefill = "#22282a", smooth = True, tags = [node_1.name, node_2.name])
+            self.tag_raise("node")
+
             node_1.connections += 1
             self.connections[node_1.name].append(node_2.name)
 
 
-    def select_object(self, event):
-        
-        node_ids = self.find_overlapping(event.x, event.y, event.x, event.y) # Finds canvas item closest to cursor
-        
-        if not node_ids:
-            self.deselect_object()
-            return
-
+    def select_object(self, event):   
+        object_ids = self.find_overlapping(event.x, event.y, event.x, event.y) # Finds canvas item closest to cursor      
+        if not object_ids: self.deselect_object(); return
         if self.selected_node: self.deselect_object()
-        
-        node_id = node_ids[-1] # Takes the one most in top
-        node = self.nodes[node_id]
+        if not "node" in self.gettags(object_ids[-1]): self.deselect_object(); return
+
+        node = self.nodes[object_ids[-1]]
         self.selected_node = node
 
         self.event_generate("<<ObjControls>>")
         self.itemconfig(node.id, image = self.icons[node.type][1])
-        self.addtag_withtag("selected", node_id)
-        self.bind("<B1-Motion>", self.move_node)
+        self.addtag_withtag("selected", node.id)
         
 
-    def deselect_object(self, *args):
+    def deselect_object(self):
         if self.selected_node:
             self.itemconfig(self.selected_node.id, image = self.icons[self.selected_node.type][0])
         self.selected_node = None
@@ -219,7 +232,14 @@ class Network(tk.Canvas):
 
 
     def move_node(self, event):
+        if not self.selected_node: return
         self.coords("selected", event.x, event.y)
+        if canvas_lines := self.find_withtag(self.selected_node.name):
+            for line in canvas_lines:
+                nodes = self.gettags(line)
+                x1, y1 = self.coords(self.nodes[nodes[0]].id)
+                x2, y2 = self.coords(self.nodes[nodes[1]].id)
+                self.coords(line, x1, y1, x2, y2)
         
 
 

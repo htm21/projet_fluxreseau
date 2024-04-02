@@ -20,7 +20,7 @@ NODE_TYPES : dict[str : Node]= {
     }
 
 ALERTS = {
-    
+
     "Success": {
         "Connection" : "Connection created!",
         "DeletedNode" : "Node deleted!",
@@ -32,7 +32,8 @@ ALERTS = {
         "TwoSources" : "You can't connect two Sources",
         "TwoEndpoints" : "You can't connect two Endpoints",
         "ExistingConnection" : "Nodes are already connected!",
-        "SameName" : "Two nodes can't have the same name!"
+        "SameName" : "Two nodes can't have the same name!",
+        "SelfConnection" : "You can't connect a node to itself"
         }
     }
 

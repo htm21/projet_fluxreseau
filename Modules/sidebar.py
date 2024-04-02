@@ -50,7 +50,7 @@ class SideBar(tk.Frame):
         self.save = CustomButton(self.object_controls, event = None, icons = self.icons["Save"], image = self.icons["Save"][0], background = kwargs.get("background"))
         self.load = CustomButton(self.object_controls, event = None, icons = self.icons["Load"], image = self.icons["Load"][0], background = kwargs.get("background"))
         self.add_paquet = CustomButton(self.object_controls, event = None, icons = self.icons["Paquet"], image = self.icons["Paquet"][0], background = kwargs.get("background"))
-        self.delete = CustomButton(self.object_controls, event = "<<DeleteNode>>", icons = self.icons["Delete"], image = self.icons["Delete"][0], background = kwargs.get("background"))
+        self.delete = CustomButton(self.object_controls, event = "<<DeleteObject>>", icons = self.icons["Delete"], image = self.icons["Delete"][0], background = kwargs.get("background"))
 
 
         self.add_node.pack(side = "top", padx = 5, pady = (0, 15))

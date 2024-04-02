@@ -46,7 +46,7 @@ class App(object):
 
         # Frames =======================================================================
 
-        self.Main_Frame = tk.Frame(self.parent, highlightthickness = 5, highlightbackground = "#1D2123")
+        self.Main_Frame = tk.Frame(self.parent, highlightthickness = 5, highlightbackground = "#1D2123", highlightcolor = "#1D2123")
         self.side_bar = SideBar(self.Main_Frame, background = "#22282a", width = 400)
         self.buffer_frame = tk.Frame(self.Main_Frame, background = "#1D2123", width = 5)
         self.network_sandbox = Network(self.Main_Frame, border = 0, highlightthickness = 0, background = "#171a1c")
@@ -63,10 +63,10 @@ class App(object):
 
         # Binds ========================================================================
 
-        self.parent.bind("<<AddNode>>", lambda args : self.network_sandbox.create_node())
+        self.parent.bind("<<AddNode>>", self.network_sandbox.create_node)
         self.parent.bind("<<ObjControls>>", lambda args : self.side_bar.set_object_controls(self.network_sandbox.selected_node))
-        self.parent.bind("<<DeleteNode>>", lambda args : self.network_sandbox.del_node(self.network_sandbox.selected_node))
-        self.parent.bind("<<AddConnection>>", lambda args : self.network_sandbox.create_connection())
+        self.parent.bind("<<DeleteObject>>", self.network_sandbox.delete_object)
+        self.parent.bind("<<AddConnection>>", self.network_sandbox.create_connection)
         self.parent.bind("<<Alert>>", lambda args : self.create_alert(self.network_sandbox.alert))
 
 
@@ -98,7 +98,10 @@ class App(object):
 
 # Colors ========================================================================
 
-# highlight = "#ffcc22"
+# highlight : "#ffcc22"
+# main color = "#22282a"
+# blending color : "#1D2123"
+# darker color : "#171a1c"
 
 # Connection : #394642
 
