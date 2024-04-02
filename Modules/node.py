@@ -37,6 +37,9 @@ class Node(object):
         return self.file
 
 
+    def __repr__(self):
+        return f"'{self.type}:{self.name}'"
+
 
 class Source(Node): 
 
