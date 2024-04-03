@@ -97,7 +97,7 @@ class Buffer(Node):
 
 
     def send_paquet(self) -> Paquet:
-        if self.number_element :
+        if self.paquet_queue :
             return self.paquet_queue.pop(0)       
 
 
