@@ -317,18 +317,23 @@ class Network(tk.Canvas):
 
 
     def test(self):
-        self.add_node("Source", "S")
+        self.add_node("Source", "S1")
+        self.add_node("Source", "S2")
         self.add_node("Buffer", "B1")
         self.add_node("Buffer", "B2")
         self.add_node("Endpoint", "E1")
+        self.add_node("Buffer", "B3")
         self.add_node("Endpoint", "E2")
         self.add_node("Endpoint", "E3")
-        self.add_connection(self.nodes["S"], self.nodes["B1"])
-        self.add_connection(self.nodes["B1"], self.nodes["E1"])
-        self.add_connection(self.nodes["B1"], self.nodes["E2"])
+        self.add_connection(self.nodes["S1"], self.nodes["B1"])
+        self.add_connection(self.nodes["S2"], self.nodes["B1"])
         self.add_connection(self.nodes["B1"], self.nodes["B2"])
-        self.add_connection(self.nodes["B2"], self.nodes["E3"])
-        print(self.connections)
+        self.add_connection(self.nodes["B2"], self.nodes["E1"])
+        self.add_connection(self.nodes["B2"], self.nodes["B3"])
+        self.add_connection(self.nodes["B3"], self.nodes["E2"])
+        self.add_connection(self.nodes["B3"], self.nodes["E3"])
+
+
         self.update_network()
                 
         
