@@ -2,7 +2,7 @@ import tkinter as tk
 
 from time import time
 from Modules.node import Node
-from Modules.menus import NodeCreationMenu, DelNetMenu
+from Modules.menus import NodeCreationMenu, DelNetMenu, PaquetCreationMenu
 from Modules.utils import *
 from Modules.paquet import *
 
@@ -232,7 +232,13 @@ class Network(tk.Canvas):
 
 
     # GUI Functions ====================================================================
+
+
     
+    def create_paquet(self, node : Node) -> None:
+        if NodeCreationMenu.instance_counter == 0:
+            menu = PaquetCreationMenu(self, node = node, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
+            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
 
     
     def create_node(self, *args) -> None:

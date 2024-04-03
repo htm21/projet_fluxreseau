@@ -319,8 +319,39 @@ class DelNetMenu(tk.Frame):
 
 class PaquetCreationMenu(tk.Frame):
     
-    nstance_counter = 0
+    instance_counter = 0
 
     def __init__(self, parent, network, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         PaquetCreationMenu.instance_counter += 1
+
+        self.icon_size = 75, 75
+        self.icons = {
+            "Paquet" : (load_to_size("paquet", *self.icon_size), load_to_size("highlighted_paquet", *self.icon_size))
+            }
+        
+
+        self.data_lable = tk.Label(self.settings, text = "Paquet Data (Mb)",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.size_lable = tk.Label(self.settings, text = "",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.endpoint_lable = tk.Label(self.settings, text = "",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.tracking_lable = tk.Label(self.settings, text = "",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+
+    def create_paquet(self, *args) -> None:
+        PaquetCreationMenu.instance_counter -= 1
+        
+        self.node.create_paquet(endpoint = None, data = None, size = None, tracking = None)
+        self.destroy()
+
+
+    def cancel_creation(self, *args) -> None:
+        PaquetCreationMenu.instance_counter -= 1
+        self.destroy()
+
+
+    def on_enter(self, button):
+        button.config(foreground = "#ffcc22")
+
+
+    def on_leave(self, button):
+        button.config(foreground = "#FFFFFF")
+
