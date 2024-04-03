@@ -14,7 +14,6 @@ class NodeCreationMenu(tk.Frame):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         NodeCreationMenu.instance_counter += 1
 
-        self.parent = parent
         self.network = network
         
         self.icon_size : tuple = 75, 75
@@ -211,3 +210,117 @@ class NodeCreationMenu(tk.Frame):
             self.lambda_setting_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
 
         self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 20)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class DelNetMenu(tk.Frame):
+
+    instance_counter = 0
+
+    def __init__(self, parent, network, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        DelNetMenu.instance_counter += 1
+
+        self.warning_text = "Your are about to delete all of the networks nodes and connections."
+        self.confirmation_text = "Are you sure you want to continue?"
+        self.network = network
+        self.icon_size : tuple = 75, 75
+        self.icons : dict[str : tuple] = {
+            "Network" : load_to_size("network", *self.icon_size),
+            "Delete" : (load_to_size("delete", 35, 35)),
+            "Success" : load_to_size("success", 35, 35),
+            "Error" : load_to_size("error", 35, 35)
+            }
+
+        # Frames =======================================================================
+
+        self.info_frame = tk.Frame(self, background = kwargs.get("background"))
+        self.buffer_frame = tk.Frame(self, background = "#1D2123", height = 5)
+        self.controls = tk.Frame(self, background = kwargs.get("background"))
+        
+        self.info_frame.pack(side = "top", fill = "both", expand = True)  
+        self.buffer_frame.pack(side = "top", fill = "x") 
+        self.controls.pack(side = "top", fill = "x", pady = 20)
+
+        # Widgets ======================================================================
+
+        self.info_label = tk.Label(self.info_frame, text = self.warning_text, justify = "center", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"), wraplength = "575")
+        self.confirmation_label = tk.Label(self.info_frame, text = self.confirmation_text, justify = "center", font = f"{font} 20 bold", foreground = "#ffcc22", background = kwargs.get("background"), wraplength = "575")
+        self.delete_button = tk.Button(self.controls, image = self.icons["Delete"], compound = "left", justify = "left", text = "  Delete", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", highlightbackground = "#ffcc22", relief = "sunken", border = 0, command = self.delete_network)
+        self.cancel_button = tk.Button(self.controls, image = self.icons["Success"], compound = "left", justify = "left", text = "  Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", highlightbackground = "#ffcc22", relief = "sunken", border = 0, command = self.cancel_deletion)
+
+        self.info_label.pack(side = "top", pady = (20, 0))
+        self.confirmation_label.pack(side = "top", pady = 20)
+        self.delete_button.pack(side = "right", expand = True, ipadx = 15)
+        self.cancel_button.pack(side = "right", expand = True, ipadx = 15)
+
+        # Binds ======================================================================
+
+        self.delete_button.bind("<Enter>", lambda args, button = self.delete_button: self.on_enter(button))
+        self.delete_button.bind("<Leave>", lambda args, button = self.delete_button: self.on_leave(button))
+        self.cancel_button.bind("<Enter>", lambda args, button = self.cancel_button: self.on_enter(button))
+        self.cancel_button.bind("<Leave>", lambda args, button = self.cancel_button: self.on_leave(button))
+
+
+    def delete_network(self, *args) -> None:
+        DelNetMenu.instance_counter -= 1
+
+        self.network.delete_network()
+        self.destroy()
+
+
+    def cancel_deletion(self, *args) -> None:
+        DelNetMenu.instance_counter -= 1
+        self.destroy()
+
+    def on_enter(self, button):
+        button.config(foreground = "#ffcc22")
+
+
+    def on_leave(self, button):
+        button.config(foreground = "#FFFFFF")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class PaquetCreationMenu(tk.Frame):
+    
+    nstance_counter = 0
+
+    def __init__(self, parent, network, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        PaquetCreationMenu.instance_counter += 1

@@ -13,21 +13,23 @@ def main() -> None:
     root = tk.Tk()
     app  = App(root)
 
-    app.network_sandbox.test()
-
-    # while app:
+    while app:
         
-    #     if app.alert_lable.winfo_ismapped():
-    #         if (time() - app.alert_create_time) > app.alert_on_screen_time:
-    #             app.alert_lable.place_forget()
+        try:
+            
+            if app.alert_lable.winfo_ismapped():
+                if (time() - app.alert_create_time) > app.alert_on_screen_time:
+                    app.alert_lable.place_forget()
+            
+            if node := app.network_sandbox.selected_node: # to be moved into the update function
+                app.side_bar.set_object_info(node)
+            else:
+                app.side_bar.set_object_info(app.network_sandbox)
         
+        except: 
+            pass
         
-    #     if node := app.network_sandbox.selected_node: # to be moved into the update function
-    #         app.side_bar.set_object_info(node)
-    #     else:
-    #         app.side_bar.set_object_info(app.network_sandbox)
-
-    #     root.update()
+        root.update()
 
 
 

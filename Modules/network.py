@@ -1,9 +1,8 @@
-import PIL
 import tkinter as tk
 
 from time import time
-from Modules.node_creation_menu import NodeCreationMenu
-from Modules.node import Node, Source, Buffer, Endpoint
+from Modules.node import Node
+from Modules.menus import NodeCreationMenu, DelNetMenu
 from Modules.utils import *
 from Modules.paquet import *
 
@@ -41,6 +40,11 @@ class Network(tk.Canvas):
         self.parametre = sleep_time(2)
         self.arrived_paquets = 0
  
+
+
+    # Logic Functions ====================================================================
+
+
 
     def update_network(self):
         
@@ -92,14 +96,6 @@ class Network(tk.Canvas):
 
                     if self.nodes[exit].type == "Endpoint" :
                         self.arrived_paquets += 1
-            
-    
-    def create_node(self, *args) -> None:
-        if NodeCreationMenu.instance_counter == 0:
-            menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
-            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
-        else:
-            return
 
 
     def add_node(self, node_type, name, *args, **kwargs) -> None:
@@ -129,20 +125,15 @@ class Network(tk.Canvas):
         self.alert = ("Success", "CreateNode")
         self.event_generate("<<Alert>>")
 
-    
-    def delete_object(self, *args) -> None:
-        if self.selected_node:
-            self.del_node(self.selected_node)
-        pass
 
-    def del_node(self, node : str) -> None:
+    def del_node(self, node : Node) -> None:
         '''
         Deletes a Node from the network by deleting the node from the "self.nodes" dictionary 
         and deleting all existing links to the deleted node from the "self.links" set.
         '''
         
+        self.deselect_object()
         if not node: return
-
 
         NODE_TYPES[node.type].instance_counter -= 1
         self.connection_counter -= len(self.connections[node.name])
@@ -155,42 +146,25 @@ class Network(tk.Canvas):
                     self.connection_counter -= 1
 
 
-        canvas_lines = self.find_withtag(self.selected_node.name)
-        for line in canvas_lines:
-            self.delete(line)
+        if canvas_lines := self.find_withtag(node.name):
+            for line in canvas_lines:
+                self.delete(line)
+        
         self.delete(node.id)
         del self.nodes[node.name]
         del self.nodes[node.id]
 
         self.alert = ("Success", "DeletedNode")
         self.event_generate("<<Alert>>")
+
+
+    def delete_network(self) -> None:
+        for node_name in list(self.connections.keys()):
+            self.del_node(self.nodes[node_name])
+    
+        self.alert = ("Success", "DeletedNetwork")
+        self.event_generate("<<Alert>>")
         self.deselect_object()
-
-
-    def create_connection(self, *args) -> None:
-        if len(self.connections) < 2:
-            self.alert = ("Error", "NotEnoughNodes")
-            self.event_generate("<<Alert>>")
-            return
-        
-        self.deselect_object()
-        self.config(highlightbackground = "#ffcc22", highlightthickness = 5) 
-        nodes = []
-
-        while len(nodes) < 2:
-            if self.selected_node:
-                nodes.append(self.selected_node)
-                self.deselect_object()
-            self.parent.update()
-
-        self.config(highlightthickness = 0)
-
-        if nodes[0] == nodes[1]:
-            self.alert = ("Error", "SelfConnection")
-            self.event_generate("<<Alert>>")
-            return
-        
-        self.add_connection(*nodes)
 
 
     def add_connection(self, node_1 : object, node_2 : object) -> None:
@@ -229,6 +203,57 @@ class Network(tk.Canvas):
             self.connections[node_1.name].append(node_2.name)
 
 
+
+    # GUI Functions ====================================================================
+    
+
+    
+    def create_node(self, *args) -> None:
+        if NodeCreationMenu.instance_counter == 0:
+            menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
+            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
+
+    
+    def delete_object(self, *args) -> None:
+        if self.selected_node:
+            self.del_node(self.selected_node)
+        
+        else:
+            if len(self.connections):
+                if DelNetMenu.instance_counter == 0:
+                    menu = DelNetMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
+                    menu.place(relx = 0.5, rely = 0.5, anchor = "center", width = 600, height = 330)
+            else:
+                self.alert = ("Error", "EmptyNetwork")
+                self.event_generate("<<Alert>>")
+
+
+    def create_connection(self, *args) -> None:
+        if len(self.connections) < 2:
+            self.alert = ("Error", "NotEnoughNodes")
+            self.event_generate("<<Alert>>")
+            return
+        
+        self.deselect_object()
+        self.config(highlightbackground = "#ffcc22", highlightthickness = 5) 
+        nodes = []
+
+        while len(nodes) < 2:
+            if self.selected_node:
+                nodes.append(self.selected_node)
+                self.deselect_object()
+            self.parent.update()
+
+        self.config(highlightthickness = 0)
+
+        if nodes[0] == nodes[1]:
+            self.alert = ("Error", "SelfConnection")
+            self.event_generate("<<Alert>>")
+            return
+        
+        self.add_connection(*nodes)
+
+
     def select_object(self, event):   
         object_ids = self.find_overlapping(event.x, event.y, event.x, event.y) # Finds canvas item closest to cursor      
         if not object_ids: self.deselect_object(); return
@@ -261,7 +286,9 @@ class Network(tk.Canvas):
                 x2, y2 = self.coords(self.nodes[nodes[1]].id)
                 self.coords(line, x1, y1, x2, y2)
         
-    
+
+
+
     def test(self):
         self.add_node("Source", "S")
         self.add_node("Buffer", "B")

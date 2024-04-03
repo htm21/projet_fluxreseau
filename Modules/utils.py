@@ -24,16 +24,18 @@ ALERTS = {
     "Success": {
         "Connection" : "Connection created!",
         "DeletedNode" : "Node deleted!",
-        "CreateNode" :  "Node created!"
+        "CreateNode" :  "Node created!",
+        "DeletedNetwork" : "Network deleted!"
         },
     
     "Error" : {
         "NotEnoughNodes" : "There are not enough nodes to connect!",
-        "TwoSources" : "You can't connect two Sources",
-        "TwoEndpoints" : "You can't connect two Endpoints",
+        "TwoSources" : "You can't connect two Sources!",
+        "TwoEndpoints" : "You can't connect two Endpoints!",
         "ExistingConnection" : "Nodes are already connected!",
         "SameName" : "Two nodes can't have the same name!",
-        "SelfConnection" : "You can't connect a node to itself"
+        "SelfConnection" : "You can't connect a node to itself!",
+        "EmptyNetwork" : "Network is already empty!"
         }
     }
 

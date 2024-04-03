@@ -66,6 +66,7 @@ class App(object):
         self.parent.bind("<<AddNode>>", self.network_sandbox.create_node)
         self.parent.bind("<<ObjControls>>", lambda args : self.side_bar.set_object_controls(self.network_sandbox.selected_node))
         self.parent.bind("<<DeleteObject>>", self.network_sandbox.delete_object)
+        self.parent.bind("<<DeleteNetwork>>", self.network_sandbox.delete_network)
         self.parent.bind("<<AddConnection>>", self.network_sandbox.create_connection)
         self.parent.bind("<<Alert>>", lambda args : self.create_alert(self.network_sandbox.alert))
 
