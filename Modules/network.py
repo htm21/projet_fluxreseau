@@ -1,7 +1,7 @@
 import PIL
 import tkinter as tk
 
-from time import time
+from time import time, sleep
 from Modules.node_creation_menu import NodeCreationMenu
 from Modules.node import Node, Source, Buffer, Endpoint
 from Modules.utils import *
@@ -51,7 +51,7 @@ class Network(tk.Canvas):
                 print(f" ACTUAL PAQUET : {paq}")
 
                 if not paq :
-                    self.nodes[node].create_paquet(self.connections[node][0], "ABCD",2,False)
+                    self.nodes[node].create_paquet("E", "ABCD",2,False)
                     print(f" ACTUAL QUEUE OF '{self.nodes[node].name}' : {self.nodes[node].paquet_queue}")         # probleme avec paquets
                     paq = self.nodes[node].send_paquet()
                     print(f" NEW PACKET CREATED : {paq}")
@@ -79,20 +79,26 @@ class Network(tk.Canvas):
             elif self.nodes[node].type == "Buffer" :
                 print(f" BUFFER QUEUE BEFORE SENDING : {self.nodes[node].paquet_queue}")
                 paq = self.nodes[node].send_paquet()
+                destination_name = paq.endpoint
+                print(f" THE DESTINATION NAME OF THE PACKET : {destination_name}")
                 print(f" THE PACKET SENT : {paq}")
                 if not paq :
                     continue
                 print(f" BUFFER QUEUE AFTER SENDING : {self.nodes[node].paquet_queue}")
+                print(" ---------------- SECOND TEST DONE ---------------")
+                print()
                 
                 for exit in self.connections[node] :
                     if self.nodes[exit].type == "Source" :
                         continue
-                    print(f" THE DESTINATION TYPE : {self.nodes[exit].type}")
-                    self.nodes[exit].receve_paquet(paq)
-
-                    if self.nodes[exit].type == "Endpoint" :
-                        self.arrived_paquets += 1
-            
+                    if self.nodes[exit].name == destination_name :
+                            print(f"THE DESTINATION HAS BEEN FOUND :    {self.nodes[exit].type} ")
+                            print("         SENDING INFORMATION     ")
+                            self.nodes[exit].receve_paquet(paq)
+                            self.arrived_paquets += 1
+                            print("   INFORMATION RECEVEIVED, THE PACKET IS NOW AT DESTINATION. ")
+                            print(f"  THE NUMBER OF PACKET THAT HAVE REACHED DESTINATION IS ----> {self.arrived_paquets}")
+                            print("--------------- THIRD TEST DONE ------------")
     
     def create_node(self, *args) -> None:
         if NodeCreationMenu.instance_counter == 0:
@@ -267,6 +273,7 @@ class Network(tk.Canvas):
         self.add_node("Buffer", "B")
         self.add_node("Endpoint", "E")
         self.add_connection(self.nodes["S"], self.nodes["B"])
+        self.add_connection(self.nodes["B"], self.nodes["E"])
         print(self.connections)
         self.update_network()
                 
