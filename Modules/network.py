@@ -55,7 +55,7 @@ class Network(tk.Canvas):
                 print(f" ACTUAL PAQUET : {paq}")
 
                 if not paq :
-                    self.nodes[node].create_paquet(self.connections[node][0], "ABCD",2,False)
+                    self.nodes[node].create_paquet("E3", "ABCD",2,False)
                     print(f" ACTUAL QUEUE OF '{self.nodes[node].name}' : {self.nodes[node].paquet_queue}")         # probleme avec paquets
                     paq = self.nodes[node].send_paquet()
                     print(f" NEW PACKET CREATED : {paq}")
@@ -81,21 +81,48 @@ class Network(tk.Canvas):
                     
 
             elif self.nodes[node].type == "Buffer" :
-                print(f" BUFFER QUEUE BEFORE SENDING : {self.nodes[node].paquet_queue}")
+                print(f" BUFFER QUEUE of '{self.nodes[node].name}'  BEFORE SENDING : {self.nodes[node].paquet_queue}")
                 paq = self.nodes[node].send_paquet()
+                destination_name = paq.endpoint
+                print(f" THE DESTINATION NAME OF THE PACKET : {destination_name}")
                 print(f" THE PACKET SENT : {paq}")
                 if not paq :
                     continue
                 print(f" BUFFER QUEUE AFTER SENDING : {self.nodes[node].paquet_queue}")
+                print(" ---------------- SECOND TEST DONE ---------------")
+                print()
                 
+
+                print(f" THE POSSIBLE CONNECTIONS ARE : {self.connections[node]}")
                 for exit in self.connections[node] :
                     if self.nodes[exit].type == "Source" :
                         continue
-                    print(f" THE DESTINATION TYPE : {self.nodes[exit].type}")
-                    self.nodes[exit].receve_paquet(paq)
-
-                    if self.nodes[exit].type == "Endpoint" :
-                        self.arrived_paquets += 1
+                    if self.nodes[exit].name == destination_name :
+                            print(f"THE DESTINATION HAS BEEN FOUND :    {self.nodes[exit].type} ---> {self.nodes[exit].name} ")
+                            print("         SENDING INFORMATION     ")
+                            self.nodes[exit].receve_paquet(paq)
+                            self.arrived_paquets += 1
+                            print(f"   INFORMATION RECEVEIVED, THE PACKET IS NOW AT DESTINATION :  '{self.nodes[exit]}' ")
+                            print(f"  THE NUMBER OF PACKET THAT HAVE REACHED DESTINATION IS ----> {self.arrived_paquets}")
+                            print("--------------- THIRD TEST DONE ------------")
+                            print()
+                    
+                    
+                    else :
+                        if self.nodes[exit].type == "Buffer":
+                            print(f" FOUND A BUFFER : {self.nodes[exit].name}")
+                            print(f" THE CONTENT OF THIS {self.nodes[node].type} IS ACTUALLY  : {self.nodes[node].paquet_queue}")
+                            self.nodes[exit].receve_paquet(paq)
+                            print(f" THE BUFFER '{self.nodes[exit].name}'  HAS RECEIVED THE PACKET, THE QUEUE IS NOW : {self.nodes[exit].paquet_queue}")
+                            print(" --------------------- FOURTH TEST DONE -------------------------")
+                            print()
+    
+    def create_node(self, *args) -> None:
+        if NodeCreationMenu.instance_counter == 0:
+            menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
+            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
+        else:
+            return
 
 
     def add_node(self, node_type, name, *args, **kwargs) -> None:
@@ -291,9 +318,16 @@ class Network(tk.Canvas):
 
     def test(self):
         self.add_node("Source", "S")
-        self.add_node("Buffer", "B")
-        self.add_node("Endpoint", "E")
-        self.add_connection(self.nodes["S"], self.nodes["B"])
+        self.add_node("Buffer", "B1")
+        self.add_node("Buffer", "B2")
+        self.add_node("Endpoint", "E1")
+        self.add_node("Endpoint", "E2")
+        self.add_node("Endpoint", "E3")
+        self.add_connection(self.nodes["S"], self.nodes["B1"])
+        self.add_connection(self.nodes["B1"], self.nodes["E1"])
+        self.add_connection(self.nodes["B1"], self.nodes["E2"])
+        self.add_connection(self.nodes["B1"], self.nodes["B2"])
+        self.add_connection(self.nodes["B2"], self.nodes["E3"])
         print(self.connections)
         self.update_network()
                 
