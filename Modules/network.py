@@ -234,13 +234,19 @@ class Network(tk.Canvas):
     # GUI Functions ====================================================================
 
 
-    
-    def create_paquet(self, node : Node) -> None:
-        if NodeCreationMenu.instance_counter == 0:
-            menu = PaquetCreationMenu(self, node = node, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
-            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
 
+    def create_paquet(self, node : Node) -> None:
+        if Endpoint.instance_counter > 0:
+            if NodeCreationMenu.instance_counter == 0:
+                menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
+                menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
+                while menu:
+                    self.update()
+        else:
+            self.alert = ("Error", "NoEndpoints")
+            self.event_generate("<<Alert>>")
     
+
     def create_node(self, *args) -> None:
         if NodeCreationMenu.instance_counter == 0:
             menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
@@ -255,7 +261,7 @@ class Network(tk.Canvas):
             if len(self.connections):
                 if DelNetMenu.instance_counter == 0:
                     menu = DelNetMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
-                    menu.place(relx = 0.5, rely = 0.5, anchor = "center", width = 600, height = 330)
+                    menu.place(relx = 0.5, rely = 0.5, anchor = "center", width = 600, height = 330) 
             else:
                 self.alert = ("Error", "EmptyNetwork")
                 self.event_generate("<<Alert>>")

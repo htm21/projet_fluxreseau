@@ -1,4 +1,6 @@
 import tkinter as tk
+
+from random import randint
 from Modules.utils import *
 from Modules.network import Network
 from Modules.node import Node, Source, Buffer, Endpoint
@@ -49,7 +51,7 @@ class SideBar(tk.Frame):
         self.info_lable = tk.Label(self.info, justify = "left", anchor = "w", font = f"{font} 15 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.save = CustomButton(self.object_controls, event = None, icons = self.icons["Save"], image = self.icons["Save"][0], background = kwargs.get("background"))
         self.load = CustomButton(self.object_controls, event = None, icons = self.icons["Load"], image = self.icons["Load"][0], background = kwargs.get("background"))
-        self.add_paquet = CustomButton(self.object_controls, event = None, icons = self.icons["Paquet"], image = self.icons["Paquet"][0], background = kwargs.get("background"))
+        self.add_paquet = CustomButton(self.object_controls, event = "<<CustomPaquet>>", icons = self.icons["Paquet"], image = self.icons["Paquet"][0], background = kwargs.get("background"))
         self.delete = CustomButton(self.object_controls, event = "<<DeleteObject>>", icons = self.icons["Delete"], image = self.icons["Delete"][0], background = kwargs.get("background"))
 
 
@@ -81,7 +83,7 @@ class SideBar(tk.Frame):
 
     def set_object_info(self, data : object) -> None:
 
-        if isinstance(data, Network): # Network Controls
+        if isinstance(data, Network): # Network Info
             
             network = data
             self.info_title.config(image = self.icons["Network"], text = f"    {data.name} Info")
@@ -89,8 +91,8 @@ class SideBar(tk.Frame):
             self.info_lable.config(text = info_text)
 
 
-        elif isinstance(data, Node): # Node Controls
+        elif isinstance(data, Node): # Node Info
             node = data
             self.info_title.config(image = self.icons[node.type], text = f"    {node.name} Info")
-            info_text = f"Type : {node.type}\nName : {node.name}\n\nThroughput : {node.output_speed} bytes/s\nConnections : {node.connections}\n\nPaquet Queue :\n{node.paquet_queue[:5]}"
+            info_text = f"Type : {node.type}\nName : {node.name}\n\nThroughput : {node.output_speed} bytes/s\nConnections : {node.connections}\n\nPaquet Queue :\n{str(node.paquet_queue[0:5])}"
             self.info_lable.config(text = info_text)

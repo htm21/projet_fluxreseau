@@ -1,4 +1,5 @@
 import tkinter as tk
+import customtkinter as ctk
 
 from Modules.node import Node, Source, Buffer, Endpoint
 from Modules.custom_button import CustomButton 
@@ -58,22 +59,22 @@ class NodeCreationMenu(tk.Frame):
         self.endpoint_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Endpoint", image = self.icons["Endpoint"][0], icons = self.icons["Endpoint"], text = "Endpoint Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.buffer_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Buffer", image = self.icons["Buffer"][0], icons = self.icons["Buffer"], text = "Buffer Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background")) 
         
-        self.node_type_lable = tk.Label(self.type_frame, text = "Node Type :", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.node_type_lable = tk.Label(self.type_frame, text = "Node Type : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.node_class_label = tk.Label(self.type_frame, font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
 
-        self.name_label = tk.Label(self.name_frame, text = "Node Name :", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.name_label = tk.Label(self.name_frame, text = "Node Name : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.name_entry = tk.Entry(self.name_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output Speed (Bytes) :", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output Speed (Bytes) : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.output_speed_entry = tk.Entry(self.output_speed_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.input_speed_label = tk.Label(self.input_speed_frame, text = "Input Speed (Bytes) :", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.input_speed_label = tk.Label(self.input_speed_frame, text = "Input Speed (Bytes) : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.input_speed_entry = tk.Entry(self.input_speed_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.send_paquets_label = tk.Label(self.send_paquets_frame, text = "Send Paquets :", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.send_paquets_label = tk.Label(self.send_paquets_frame, text = "Send Paquets : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.send_paquets_entry = tk.Entry(self.send_paquets_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.lambda_setting_label = tk.Label(self.lambda_setting_frame, text = "Lambda :", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.lambda_setting_label = tk.Label(self.lambda_setting_frame, text = "Lambda : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.lambda_setting_entry = tk.Entry(self.lambda_setting_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
 
         self.create_button = tk.Button(self.controls, image = self.icons["Success"], compound = "left", justify = "left", text = "  Create", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.create_node)
@@ -263,8 +264,8 @@ class DelNetMenu(tk.Frame):
 
         self.info_label = tk.Label(self.info_frame, text = self.warning_text, justify = "center", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"), wraplength = "575")
         self.confirmation_label = tk.Label(self.info_frame, text = self.confirmation_text, justify = "center", font = f"{font} 20 bold", foreground = "#ffcc22", background = kwargs.get("background"), wraplength = "575")
-        self.delete_button = tk.Button(self.controls, image = self.icons["Delete"], compound = "left", justify = "left", text = "  Delete", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", highlightbackground = "#ffcc22", relief = "sunken", border = 0, command = self.delete_network)
-        self.cancel_button = tk.Button(self.controls, image = self.icons["Success"], compound = "left", justify = "left", text = "  Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", highlightbackground = "#ffcc22", relief = "sunken", border = 0, command = self.cancel_deletion)
+        self.delete_button = tk.Button(self.controls, image = self.icons["Delete"], compound = "left", justify = "left", text = "  Delete", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", relief = "sunken", border = 0, command = self.delete_network)
+        self.cancel_button = tk.Button(self.controls, justify = "left", text = "Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.cancel_deletion)
 
         self.info_label.pack(side = "top", pady = (20, 0))
         self.confirmation_label.pack(side = "top", pady = 20)
@@ -321,29 +322,115 @@ class PaquetCreationMenu(tk.Frame):
     
     instance_counter = 0
 
-    def __init__(self, parent, network, *args, **kwargs):
+    def __init__(self, parent, node : Node, network, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         PaquetCreationMenu.instance_counter += 1
 
+        self.node = node
+        self.network = network
         self.icon_size = 75, 75
         self.icons = {
-            "Paquet" : (load_to_size("paquet", *self.icon_size), load_to_size("highlighted_paquet", *self.icon_size))
+            "Paquet" : load_to_size("paquet", *self.icon_size),
+            "Success" : load_to_size("success", 35, 35),
+            "Error" : load_to_size("error", 35, 35)
             }
-        
+        self.endpoint_nodes = self.get_all_endpoints()
+        self.endpoint = set()
 
-        self.data_lable = tk.Label(self.settings, text = "Paquet Data (Mb)",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.size_lable = tk.Label(self.settings, text = "",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.endpoint_lable = tk.Label(self.settings, text = "",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.tracking_lable = tk.Label(self.settings, text = "",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+
+        # Frames =======================================================================
+
+        self.window_title_frame = tk.Frame(self, background = kwargs.get("background"))
+        self.buffer_frame1 = tk.Frame(self, background = "#1D2123", height = 5)
+        self.paquet_settings = tk.Frame(self, background = kwargs.get("background"))
+        self.buffer_frame2 = tk.Frame(self, background = "#1D2123", height = 5)
+        self.controls = tk.Frame(self, background = kwargs.get("background"))
+
+        self.data_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
+        self.size_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
+        self.endpoint_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
+        self.tracking_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
+
+        self.window_title_frame.pack(side = "top", fill = "x", padx = 20, pady = 20)
+        self.buffer_frame1.pack(side = "top", fill = "x")
+        self.paquet_settings.pack(side = "top", fill = "x", expand = True, padx = 20, pady = 20)
+        self.buffer_frame2.pack(side = "top", fill = "x")
+        self.controls.pack(side = "top", fill = "x", padx = 20, pady = 20)
+
+        self.data_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+        self.size_frame.pack(padx = 20, pady = 10, fill = "x")
+        self.endpoint_frame.pack(padx = 20, pady = 10, fill = "x")
+        self.tracking_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+
+        # Widgets ======================================================================
+
+        self.window_title = tk.Label(self.window_title_frame, image = self.icons["Paquet"], compound = "left", justify = "right", text = "  Paquet Creation", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+
+        self.data_lable = tk.Label(self.data_frame, text = "Data : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.data_entry = tk.Entry(self.data_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+        self.data_entry.insert(0, f"Hello from {self.node.name}")
+
+        self.size_lable = tk.Label(self.size_frame, text = "Paquet Data (Mb) : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.size_entry = tk.Entry(self.size_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+        self.size_entry.insert(0, "10")
+
+        self.endpoint_lable = tk.Label(self.endpoint_frame, text = "Endpoint : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.endpoint_dropdown = ctk.CTkComboBox(self.endpoint_frame, state = "readonly", width = 323, height = 40, corner_radius = 0, border_width = 0, font = (f"{font} bold", 20), dropdown_font = (f"{font} bold", 15), text_color = "#FFFFFF", fg_color = "#171a1c", border_color = "#171a1c", button_hover_color = "#ffcc22", values = self.endpoint_nodes)
+        self.endpoint_dropdown.set(self.endpoint_nodes[0])
+
+        self.tracking_lable = tk.Label(self.tracking_frame, text = "Tracking : ",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.tracking_checkbox = ctk.CTkCheckBox(self.tracking_frame, width = 0, height = 0, checkbox_width = 40, checkbox_height = 40, text = None, corner_radius = 0, hover = False, checkmark_color = "#ffcc22", bg_color = kwargs.get("background"), fg_color = kwargs.get("background"), border_color = "#1D2123")
+
+        self.create_button = tk.Button(self.controls, image = self.icons["Success"], compound = "left", justify = "left", text = "  Create", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.create_paquet)
+        self.cancel_button = tk.Button(self.controls, image = self.icons["Error"], compound = "left", justify = "left", text = "  Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", relief = "sunken", border = 0, command = self.cancel_paquet)
+
+
+        self.window_title.pack(side = "left")
+
+        self.data_lable.pack(side = "left")
+        self.data_entry.pack(side = "right")
+        
+        self.size_lable.pack(side = "left")
+        self.size_entry.pack(side = "right")
+        
+        self.endpoint_lable.pack(side = "left")
+        self.endpoint_dropdown.pack(side = "right")
+        
+        self.tracking_lable.pack(side = "left")
+        self.tracking_checkbox.pack(side = "right")
+        
+        self.create_button.pack(side = "right", padx = (50, 10), ipadx = 15)
+        self.cancel_button.pack(side = "right", ipadx = 15)
+
+
+        # Binds ======================================================================
+
+        self.create_button.bind("<Enter>", lambda args, button = self.create_button: self.on_enter(button))
+        self.create_button.bind("<Leave>", lambda args, button = self.create_button: self.on_leave(button))
+        self.cancel_button.bind("<Enter>", lambda args, button = self.cancel_button: self.on_enter(button))
+        self.cancel_button.bind("<Leave>", lambda args, button = self.cancel_button: self.on_leave(button))
+
+
+    def get_all_endpoints(self):
+        endpoint_nodes = []      
+        for node_name in self.network.connections:
+            if self.network.nodes[node_name].type == "Endpoint":
+                endpoint_nodes.append(node_name)
+        return endpoint_nodes
+
 
     def create_paquet(self, *args) -> None:
+        data = self.data_entry.get()
+        size = float(self.size_entry.get()) if float(self.size_entry.get()) >= 0 else 0
+        endpoint = self.endpoint_dropdown.get()
+        tracking = self.tracking_checkbox.get()
+        self.node.create_paquet(endpoint = endpoint, data = data, size = size, tracking = tracking)
+
         PaquetCreationMenu.instance_counter -= 1
-        
-        self.node.create_paquet(endpoint = None, data = None, size = None, tracking = None)
         self.destroy()
 
 
-    def cancel_creation(self, *args) -> None:
+    def cancel_paquet(self, *args) -> None:
         PaquetCreationMenu.instance_counter -= 1
         self.destroy()
 

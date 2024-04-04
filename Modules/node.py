@@ -20,9 +20,10 @@ class Node(object):
         self.last_update_time : float = 0
 
 
-    def create_paquet(self, endpoint : str = None, data : str = None, size : int = None, tracking : bool = None) -> Paquet:
-        self.paquet_queue.append(Paquet(endpoint, data, size, tracking))
-    
+    def create_paquet(self, endpoint : str = None, data : str = None, size : int = None, tracking : bool = None) -> None:
+        paquet = Paquet(endpoint, data, size, tracking)
+        self.paquet_queue.append(paquet)
+        print(self.paquet_queue)
 
     def receve_paquet(self, paquet : Paquet) -> None:
         self.paquet_queue.append(paquet)
@@ -34,7 +35,7 @@ class Node(object):
 
 
     def show_paquet_queue(self) -> list[Paquet]:
-        return self.file
+        return self.paquet_queue
 
 
     def __repr__(self):

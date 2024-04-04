@@ -35,7 +35,8 @@ ALERTS = {
         "ExistingConnection" : "Nodes are already connected!",
         "SameName" : "Two nodes can't have the same name!",
         "SelfConnection" : "You can't connect a node to itself!",
-        "EmptyNetwork" : "Network is already empty!"
+        "EmptyNetwork" : "Network is already empty!",
+        "NoEndpoints" : "There are no Endpoint nodes!"
         }
     }
 
