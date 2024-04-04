@@ -240,8 +240,6 @@ class Network(tk.Canvas):
             if NodeCreationMenu.instance_counter == 0:
                 menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
                 menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
-                while menu:
-                    self.update()
         else:
             self.alert = ("Error", "NoEndpoints")
             self.event_generate("<<Alert>>")
