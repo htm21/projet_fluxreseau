@@ -60,7 +60,8 @@ def load_to_size(icon : str, width : int, height : int) -> ImageTk.PhotoImage:
     return ImageTk.PhotoImage(icon)
 
 
-def sleep_time(parameter):
+def poisson_process(parameter):
     U = rd.uniform(0.1,1)
     sleep = -(1/parameter)*log10(U)
     return sleep
+

@@ -1,11 +1,20 @@
 import tkinter as tk
 
+from time import sleep
 from time import time
 from Modules.node import Node
 from Modules.menus import NodeCreationMenu, DelNetMenu, PaquetCreationMenu
 from Modules.utils import *
 from Modules.paquet import *
 
+
+def source_to_buffer(paquet) :
+    size = paquet.size
+    return size / 100
+
+def buffer_to_buffer(paquet) :
+    size = paquet.size
+    return size / 2.5
 
 
 class Network(tk.Canvas):
@@ -37,10 +46,9 @@ class Network(tk.Canvas):
         self.connection_counter = 0
 
         self.clock = time()
-        self.parametre = sleep_time(2)
+        self.parametre = poisson_process(2)
         self.arrived_paquets = 0
  
-
 
     # Logic Functions ====================================================================
 
@@ -55,7 +63,7 @@ class Network(tk.Canvas):
                 print(f" ACTUAL PAQUET : {paq}")
 
                 if not paq :
-                    self.nodes[node].create_paquet("E3", "ABCD",2,False)
+                    self.nodes[node].create_paquet("E3", "ABCD",30,False)
                     print(f" ACTUAL QUEUE OF '{self.nodes[node].name}' : {self.nodes[node].paquet_queue}")         # probleme avec paquets
                     paq = self.nodes[node].send_paquet()
                     print(f" NEW PACKET CREATED : {paq}")
@@ -69,11 +77,13 @@ class Network(tk.Canvas):
                         print(f" IS BUFFER : {self.nodes[exit]} ")
                         e = self.nodes[exit]
                         print(f" BUFFER BEFORE : {e.paquet_queue}")
+                        sleep(source_to_buffer(paq))
                         e.receve_paquet(paq)
                         print(f" BUFFER AFTER RECEPTION : {e.paquet_queue}")
                         
 
                     if self.nodes[exit].type == "Endpoint" :
+                        sleep(self.parametre)
                         self.nodes[exit].receve_paquet(paq)
                         self.arrived_paquets += 1
                     print(" ---------- FIRST TEST DONE ----------")
@@ -100,6 +110,7 @@ class Network(tk.Canvas):
                     if self.nodes[exit].name == destination_name :
                             print(f"THE DESTINATION HAS BEEN FOUND :    {self.nodes[exit].type} ---> {self.nodes[exit].name} ")
                             print("         SENDING INFORMATION     ")
+                            sleep(self.parametre)
                             self.nodes[exit].receve_paquet(paq)
                             self.arrived_paquets += 1
                             print(f"   INFORMATION RECEVEIVED, THE PACKET IS NOW AT DESTINATION :  '{self.nodes[exit]}' ")
@@ -112,6 +123,7 @@ class Network(tk.Canvas):
                         if self.nodes[exit].type == "Buffer":
                             print(f" FOUND A BUFFER : {self.nodes[exit].name}")
                             print(f" THE CONTENT OF THIS {self.nodes[node].type} IS ACTUALLY  : {self.nodes[node].paquet_queue}")
+                            sleep(buffer_to_buffer(paq))
                             self.nodes[exit].receve_paquet(paq)
                             print(f" THE BUFFER '{self.nodes[exit].name}'  HAS RECEIVED THE PACKET, THE QUEUE IS NOW : {self.nodes[exit].paquet_queue}")
                             print(" --------------------- FOURTH TEST DONE -------------------------")
@@ -346,7 +358,6 @@ class Network(tk.Canvas):
 
         self.update_network()
                 
-        
 
 # How to click and drag canvas items:
     # https://stackoverflow.com/questions/61834886/how-to-make-a-drag-and-drop-animation-in-tkinter-canvas
