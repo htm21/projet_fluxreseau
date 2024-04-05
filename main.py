@@ -14,10 +14,10 @@ def main() -> None:
     app  = App(root)
 
 
-    while app:
+    while app.Running:
         
         try:
-            
+           
             if not app.network_sandbox.pause and (time() - app.network_sandbox.last_updated) >= 1:
                 app.network_sandbox.update_network()
             
@@ -30,7 +30,6 @@ def main() -> None:
             else:
                 app.side_bar.set_object_info(app.network_sandbox)
         
-
         except: 
             pass
         

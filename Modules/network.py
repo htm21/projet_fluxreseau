@@ -35,7 +35,7 @@ class Network(tk.Canvas):
             } # dictionary that holds the normal node image and also the highlighted node image
         self.selected_node = None
         self.alert = None
-        self.bind('<Button-1>', self.select_object)
+        self.bind("<Button-1>", self.select_object)
         self.bind("<B1-Motion>", self.move_node)
         
         # Logic Stuff ==================================================================
@@ -247,6 +247,7 @@ class Network(tk.Canvas):
 
 
     def create_paquet(self, node : Node) -> None:
+        self.pause = True
         if Endpoint.instance_counter > 0:
             if NodeCreationMenu.instance_counter == 0:
                 menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
@@ -254,15 +255,19 @@ class Network(tk.Canvas):
         else:
             self.alert = ("Error", "NoEndpoints")
             self.event_generate("<<Alert>>")
+        self.pause = False
 
 
     def create_node(self, *args) -> None:
+        self.pause = True
         if NodeCreationMenu.instance_counter == 0:
             menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
             menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
-
+        self.pause = False
     
+
     def delete_object(self, *args) -> None:
+        self.pause = True
         if self.selected_node:
             self.del_node(self.selected_node)
         
@@ -274,9 +279,10 @@ class Network(tk.Canvas):
             else:
                 self.alert = ("Error", "EmptyNetwork")
                 self.event_generate("<<Alert>>")
-
+        self.pause = False
 
     def create_connection(self, *args) -> None:
+        self.pause = True
         if len(self.connections) < 2:
             self.alert = ("Error", "NotEnoughNodes")
             self.event_generate("<<Alert>>")
@@ -300,6 +306,7 @@ class Network(tk.Canvas):
             return
         
         self.add_connection(*nodes)
+        self.pause = False
 
 
     def select_object(self, event):   

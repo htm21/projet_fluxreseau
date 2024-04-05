@@ -26,6 +26,7 @@ class App(object):
             }
         self.alert_on_screen_time = 5
         self.alert_create_time = 0
+        self.Running = True
 
         # Window Positioning ===========================================================
 
@@ -70,7 +71,7 @@ class App(object):
         self.parent.bind("<<CustomPaquet>>", lambda args : self.network_sandbox.create_paquet(self.network_sandbox.selected_node))
         self.parent.bind("<<AddConnection>>", self.network_sandbox.create_connection)
         self.parent.bind("<<Alert>>", lambda args : self.create_alert(self.network_sandbox.alert))
-
+        self.parent.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def create_alert(self, alert : tuple) -> None:
         image_padding = " "
@@ -82,6 +83,8 @@ class App(object):
         self.alert_lable.place(anchor = "sw", relx = 0, rely = 1)
         
 
+    def on_closing(self, *args):
+        self.Running = False
 
 
 
