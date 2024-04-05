@@ -11,4 +11,4 @@ class Paquet:
         self.tracking : bool = tracking # if true it will show up in the GUI
 
     def __repr__(self):
-        return f"'{self.data}:{self.size}'"
+        return f"'{self.data}'"

@@ -48,7 +48,8 @@ class Network(tk.Canvas):
         self.clock = time()
         self.parametre = poisson_process(2)
         self.arrived_paquets = 0
- 
+
+
 
     # Logic Functions ====================================================================
 
@@ -128,13 +129,6 @@ class Network(tk.Canvas):
                             print(f" THE BUFFER '{self.nodes[exit].name}'  HAS RECEIVED THE PACKET, THE QUEUE IS NOW : {self.nodes[exit].paquet_queue}")
                             print(" --------------------- FOURTH TEST DONE -------------------------")
                             print()
-    
-    def create_node(self, *args) -> None:
-        if NodeCreationMenu.instance_counter == 0:
-            menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
-            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
-        else:
-            return
 
 
     def add_node(self, node_type, name, *args, **kwargs) -> None:
@@ -255,7 +249,7 @@ class Network(tk.Canvas):
         else:
             self.alert = ("Error", "NoEndpoints")
             self.event_generate("<<Alert>>")
-    
+
 
     def create_node(self, *args) -> None:
         if NodeCreationMenu.instance_counter == 0:
