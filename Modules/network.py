@@ -222,6 +222,9 @@ class Network(tk.Canvas):
         if node_1.type == "Endpoint":
             node_1, node_2 = node_2, node_1
 
+        if node_1.type == "Buffer" and node_2.type == "Source":
+            node_1, node_2 = node_2, node_1
+
         if node_2.name in self.connections[node_1.name]:
             self.alert = ("Error", "ExistingConnection")
             self.event_generate("<<Alert>>")
@@ -293,6 +296,7 @@ class Network(tk.Canvas):
         self.net_controls.place_forget()
 
         if len(self.connections) < 2:
+            self.net_controls.place(anchor = "nw", x = 0, y = 0)
             self.alert = ("Error", "NotEnoughNodes")
             self.event_generate("<<Alert>>")
             return

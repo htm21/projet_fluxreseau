@@ -20,7 +20,7 @@ class SideBar(tk.Frame):
             "Source" : load_to_size("source_node", *self.icon_size),
             "Endpoint" : load_to_size("endpoint_node", *self.icon_size),
             "Buffer" : load_to_size("buffer_node", *self.icon_size),
-            "Link" : load_to_size("link", *self.icon_size), 
+            "Connection" : (load_to_size("connection", *self.icon_size), load_to_size("highlight_connection", *self.icon_size)), 
             "Info" : (load_to_size("info", *self.icon_size), load_to_size("highlight_info", *self.icon_size)),
             "Network" : load_to_size("network", *self.icon_size),
             "Save" : (load_to_size("save", *self.icon_size), load_to_size("highlighted_save", *self.icon_size)),
@@ -46,8 +46,8 @@ class SideBar(tk.Frame):
 
         # Widgets ======================================================================
 
-        self.add_node = CustomButton(self.controls, event = "<<AddNode>>", icons = self.icons["Node"], image = self.icons["Node"][0], text = "        Add Node", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.add_connection = CustomButton(self.controls, event = "<<AddConnection>>", image = self.icons["Link"], text = "    Add Connection", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.add_node = CustomButton(self.controls, event = "<<AddNode>>", icons = self.icons["Node"], image = self.icons["Node"][0], text = "    Add Node", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.add_connection = CustomButton(self.controls, event = "<<AddConnection>>", icons = self.icons["Connection"], image = self.icons["Connection"][0], text = "    Add Connection", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.info_title = tk.Label(self.info, image = self.icons["Network"], text = "    Network Info", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.info_lable = tk.Label(self.info, justify = "left", anchor = "w", font = f"{font} 15 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.save = CustomButton(self.object_controls, event = "<<SaveNet>>", icons = self.icons["Save"], image = self.icons["Save"][0], background = kwargs.get("background"))
@@ -57,9 +57,9 @@ class SideBar(tk.Frame):
         self.delete = CustomButton(self.object_controls, event = "<<DeleteObject>>", icons = self.icons["Delete"], image = self.icons["Delete"][0], background = kwargs.get("background"))
 
 
-        self.add_node.pack(side = "top", padx = 5, pady = (0, 15))
-        self.add_connection.pack(side = "top", padx = 5, fill = "x")
-        self.info_title.pack(side = "top", padx = 5, pady = (0, 15))
+        self.add_node.pack(side = "top", anchor = "w", padx = 15, pady = (0, 15))
+        self.add_connection.pack(side = "top", anchor = "w", padx = 15)
+        self.info_title.pack(side = "top", anchor = "w", padx = 15, pady = (0, 15))
         self.info_lable.pack(side = "left", anchor = "nw", padx = (25, 0))
         self.delete.pack(side = "right", padx = 10)
         self.save.pack(side = "right", padx = 10)
@@ -99,5 +99,5 @@ class SideBar(tk.Frame):
         elif isinstance(data, Node): # Node Info
             node = data
             self.info_title.config(image = self.icons[node.type], text = f"    {node.name} Info")
-            info_text = f"Type : {node.type}\nName : {node.name}\n\nThroughput : {node.output_speed} bytes/s\nConnections : {node.connections}\n\nPaquet Queue :\n{str(node.paquet_queue[0:5])}"
+            info_text = f"Type : {node.type}\nName : {node.name}\n\nThroughput : {node.output_speed} Mb/s\nConnections : {node.connections}\n\nPaquet Queue :\n{str(node.paquet_queue[0:5])}"
             self.info_lable.config(text = info_text)
