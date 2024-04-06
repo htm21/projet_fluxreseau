@@ -148,11 +148,13 @@ class NodeCreationMenu(tk.Frame):
         self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, input_speed = input_speed, max_send_paquets = send_paquets)
         # === === === === Lambda setting is not passed to node creation yet === === === ===
 
+        self.network.net_controls.place(anchor = "nw", x = 0, y = 0)
         NodeCreationMenu.instance_counter -= 1
         self.destroy()
 
 
     def cancel_node(self, *args):
+        self.network.net_controls.place(anchor = "nw", x = 0, y = 0)
         NodeCreationMenu.instance_counter -= 1
         self.destroy()
 
@@ -425,12 +427,14 @@ class PaquetCreationMenu(tk.Frame):
         endpoint = self.endpoint_dropdown.get()
         tracking = self.tracking_checkbox.get()
         self.node.create_paquet(endpoint = endpoint, data = data, size = size, tracking = tracking)
-
+        
+        self.network.net_controls.place(anchor = "nw", x = 0, y = 0)
         PaquetCreationMenu.instance_counter -= 1
         self.destroy()
 
 
     def cancel_paquet(self, *args) -> None:
+        self.network.net_controls.place(anchor = "nw", x = 0, y = 0)
         PaquetCreationMenu.instance_counter -= 1
         self.destroy()
 

@@ -51,7 +51,7 @@ class App(object):
         self.side_bar = SideBar(self.Main_Frame, background = "#22282a", width = 400)
         self.buffer_frame = tk.Frame(self.Main_Frame, background = "#1D2123", width = 5)
         self.network_sandbox = Network(self.Main_Frame, border = 0, highlightthickness = 0, background = "#171a1c")
-
+        
         self.Main_Frame.pack(anchor = "center", fill = "both", expand = True)  
         self.network_sandbox.pack(side = "left", fill = "both", expand = True)
         self.side_bar.pack(side = "right", fill = "y")
@@ -71,7 +71,13 @@ class App(object):
         self.parent.bind("<<CustomPaquet>>", lambda args : self.network_sandbox.create_paquet(self.network_sandbox.selected_node))
         self.parent.bind("<<AddConnection>>", self.network_sandbox.create_connection)
         self.parent.bind("<<Alert>>", lambda args : self.create_alert(self.network_sandbox.alert))
+        self.parent.bind("<<PlayNetwork>>", self.network_sandbox.play_network)
+        self.parent.bind("<<PauseNetwork>>", self.network_sandbox.pause_network)
+        self.parent.bind("<<SaveNet>>", self.network_sandbox.save_network)
+        self.parent.bind("<<LoadNet>>", self.network_sandbox.load_network)   
         self.parent.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+
 
     def create_alert(self, alert : tuple) -> None:
         image_padding = " "
@@ -102,6 +108,7 @@ class App(object):
 
 
 # Colors ========================================================================
+
 
 # highlight : "#ffcc22"
 # main color = "#22282a"

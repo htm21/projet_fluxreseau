@@ -1,8 +1,10 @@
+import json
 import tkinter as tk
 
 from time import sleep
 from time import time
 from Modules.node import Node
+from Modules.net_controls import NetControls
 from Modules.menus import NodeCreationMenu, DelNetMenu, PaquetCreationMenu
 from Modules.utils import *
 from Modules.paquet import *
@@ -26,18 +28,23 @@ class Network(tk.Canvas):
         tk.Canvas.__init__(self, parent, *args, **kwargs)
         
         self.parent = parent
+        self.kwargs =  kwargs
         self.icon_size : tuple = 90, 90
         self.icons : dict[str : tuple] = {
             "Node" : (load_to_size("node", *self.icon_size), load_to_size("highlight_node", *self.icon_size)),
             "Source" : (load_to_size("source_node", *self.icon_size), load_to_size("highlight_source_node", *self.icon_size)),
             "Buffer" : (load_to_size("buffer_node", *self.icon_size), load_to_size("highlight_buffer_node", *self.icon_size)),
             "Endpoint" : (load_to_size("endpoint_node", *self.icon_size), load_to_size("highlight_endpoint_node", *self.icon_size)),
-            } # dictionary that holds the normal node image and also the highlighted node image
+            "Pause" : (load_to_size("pause", 75, 75), load_to_size("highlight_pause", 75, 75)),
+            "Play" : (load_to_size("play", 75, 75), load_to_size("highlight_play", 75, 75)),
+            }
+        self.net_controls = NetControls(self, background = "#22282a")
+        self.net_controls.place(anchor = "nw", x = 0, y = 0)
         self.selected_node = None
         self.alert = None
         self.bind("<Button-1>", self.select_object)
         self.bind("<B1-Motion>", self.move_node)
-        
+
         # Logic Stuff ==================================================================
         
         self.name = name if name else f"Network"
@@ -45,7 +52,8 @@ class Network(tk.Canvas):
         self.connections : dict = {} # Links between nodes
         self.connection_counter = 0
 
-        self.pause = False
+        self.pause = True
+        self.update_speed = 1
         self.last_updated = time()
         self.parametre = poisson_process(2)
         self.arrived_paquets = 0
@@ -247,7 +255,8 @@ class Network(tk.Canvas):
 
 
     def create_paquet(self, node : Node) -> None:
-        self.pause = True
+        self.net_controls.place_forget()
+        
         if Endpoint.instance_counter > 0:
             if NodeCreationMenu.instance_counter == 0:
                 menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
@@ -255,34 +264,34 @@ class Network(tk.Canvas):
         else:
             self.alert = ("Error", "NoEndpoints")
             self.event_generate("<<Alert>>")
-        self.pause = False
 
 
     def create_node(self, *args) -> None:
-        self.pause = True
+        self.net_controls.place_forget()
+        
         if NodeCreationMenu.instance_counter == 0:
             menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
             menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
-        self.pause = False
-    
+
 
     def delete_object(self, *args) -> None:
-        self.pause = True
         if self.selected_node:
             self.del_node(self.selected_node)
         
         else:
             if len(self.connections):
                 if DelNetMenu.instance_counter == 0:
+                    self.pause = True
                     menu = DelNetMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
                     menu.place(relx = 0.5, rely = 0.5, anchor = "center", width = 600, height = 330) 
             else:
                 self.alert = ("Error", "EmptyNetwork")
                 self.event_generate("<<Alert>>")
-        self.pause = False
+
 
     def create_connection(self, *args) -> None:
-        self.pause = True
+        self.net_controls.place_forget()
+
         if len(self.connections) < 2:
             self.alert = ("Error", "NotEnoughNodes")
             self.event_generate("<<Alert>>")
@@ -306,7 +315,7 @@ class Network(tk.Canvas):
             return
         
         self.add_connection(*nodes)
-        self.pause = False
+        self.net_controls.place(anchor = "nw", x = 0, y = 0)
 
 
     def select_object(self, event):   
@@ -340,8 +349,68 @@ class Network(tk.Canvas):
                 x1, y1 = self.coords(self.nodes[nodes[0]].id)
                 x2, y2 = self.coords(self.nodes[nodes[1]].id)
                 self.coords(line, x1, y1, x2, y2)
-        
 
+
+    def play_network(self, *args) -> None:
+        self.pause = False
+
+
+    def pause_network(self, *args) -> None:
+        self.pause = True
+
+
+    def save_network(self, *args) -> None:
+        file_obj = tk.filedialog.asksaveasfile(filetypes = [('Json File', '*.json')], defaultextension = [('Json File', '*.json')])
+        if not file_obj:
+            self.alert = ("Error", "NoSavePath")
+            self.event_generate("<<Alert>>")
+        
+        nodes = []
+        for node_name in self.connections:
+            node_data = {
+                "type" : self.nodes[node_name].type,
+                "name" : self.nodes[node_name].name,
+                "output_speed" : self.nodes[node_name].output_speed,
+                "input_speed" : self.nodes[node_name].input_speed,
+                "max_send_paquets" : self.nodes[node_name].max_send_paquets,
+                "coords" : self.coords(self.nodes[node_name].id)
+                }
+            
+            nodes.append(node_data)
+
+        data = {
+            "nodes" : nodes,
+            "connections" : self.connections
+        }
+
+        with open(file_obj.name, "w") as file:
+            json.dump(data, file)
+        
+        self.alert = ("Success", "NetworkSaved")
+        self.event_generate("<<Alert>>")
+
+
+    def load_network(self, *args) -> None:
+        file_path = tk.filedialog.askopenfilename(filetypes = (('Json File', '*.json'), ("Tous les fichiers", "*.*")))
+        if not file_path:
+            self.alert = ("Error", "NoDataFile")
+            self.event_generate("<<Alert>>")
+
+        with open(file_path) as file:
+            data = json.load(file)
+
+        self.delete_network()
+        
+        for node_data in data["nodes"]:
+            self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"], input_speed = node_data["input_speed"], max_send_paquets = node_data["max_send_paquets"],)
+            self.moveto(self.nodes[node_data["name"]].id, *node_data["coords"])
+
+        for main_node in data["connections"]:
+            for sub_node in data["connections"][main_node]:
+                self.add_connection(self.nodes[main_node], self.nodes[sub_node])
+
+        self.alert = ("Success", "NetworkLoaded")
+        self.event_generate("<<Alert>>")
 
 
     def test(self):

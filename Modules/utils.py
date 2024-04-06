@@ -25,7 +25,9 @@ ALERTS = {
         "Connection" : "Connection created!",
         "DeletedNode" : "Node deleted!",
         "CreateNode" :  "Node created!",
-        "DeletedNetwork" : "Network deleted!"
+        "DeletedNetwork" : "Network deleted!",
+        "NetworkLoaded" : "Network loaded!",
+        "NetworkSaved" : "Network saved!"
         },
     
     "Error" : {
@@ -36,7 +38,9 @@ ALERTS = {
         "SameName" : "Two nodes can't have the same name!",
         "SelfConnection" : "You can't connect a node to itself!",
         "EmptyNetwork" : "Network is already empty!",
-        "NoEndpoints" : "There are no Endpoint nodes!"
+        "NoEndpoints" : "There are no Endpoint nodes!",
+        "NoSavePath" : "No save path given!",
+        "NoDataFile" : "No file given!"
         }
     }
 

@@ -18,7 +18,7 @@ def main() -> None:
         
         try:
            
-            if not app.network_sandbox.pause and (time() - app.network_sandbox.last_updated) >= 1:
+            if not app.network_sandbox.pause and (time() - app.network_sandbox.last_updated) >= app.network_sandbox.update_speed:
                 app.network_sandbox.update_network()
             
             if app.alert_lable.winfo_ismapped():
