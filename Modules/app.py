@@ -34,7 +34,7 @@ class App(object):
         monitor_width_center, monitor_height_center = monitor_width // 2, monitor_height // 2
         screen_width, screen_height = screen_dimensions(self.parent)
 
-        self.window_width, self.window_height = (screen_width * 65) // 100, (screen_height * 65) // 100
+        self.window_width, self.window_height = (screen_width * 75) // 100, (screen_height * 75) // 100
         self.window_width_center, self.window_height_center = self.window_width // 2, self.window_height // 2
         self.x, self.y = monitor_width_center - self.window_width_center, monitor_height_center - self.window_height_center
 
@@ -116,6 +116,10 @@ class App(object):
 # darker color : "#171a1c"
 
 # Connection : #394642
+
+# info
+# box : #394642
+# icon : #1E2422
 
 # success
 # box : #004d00

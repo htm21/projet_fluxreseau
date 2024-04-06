@@ -65,10 +65,10 @@ class NodeCreationMenu(tk.Frame):
         self.name_label = tk.Label(self.name_frame, text = "Node Name : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.name_entry = tk.Entry(self.name_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output Speed (Bytes) : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output Speed : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.output_speed_entry = tk.Entry(self.output_speed_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.input_speed_label = tk.Label(self.input_speed_frame, text = "Input Speed (Bytes) : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.input_speed_label = tk.Label(self.input_speed_frame, text = "Input Speed : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.input_speed_entry = tk.Entry(self.input_speed_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
         self.send_paquets_label = tk.Label(self.send_paquets_frame, text = "Send Paquets : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
@@ -173,7 +173,7 @@ class NodeCreationMenu(tk.Frame):
         # Widgets ======================================
         self.output_speed_entry.delete(0, "end")
         self.input_speed_entry.delete(0, "end")
-        self.input_speed_entry.insert(0, "1000000")
+        self.input_speed_entry.insert(0, "10")
         self.send_paquets_entry.delete(0, "end")
         self.lambda_setting_entry.delete(0, "end")
         self.lambda_setting_entry.insert(0, "0")
@@ -191,7 +191,7 @@ class NodeCreationMenu(tk.Frame):
             self.node_class_label.config(text = arg, foreground = "#354d33")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            self.output_speed_entry.insert(0, "100000000")
+            self.output_speed_entry.insert(0, "100")
             self.send_paquets_entry.insert(0, "0")
             self.output_speed_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
             self.send_paquets_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
@@ -208,7 +208,7 @@ class NodeCreationMenu(tk.Frame):
             self.node_class_label.config(text = arg, foreground = "#3d3829")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            self.output_speed_entry.insert(0, "1500000")
+            self.output_speed_entry.insert(0, "50")
             self.output_speed_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
             self.lambda_setting_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
 
@@ -446,3 +446,11 @@ class PaquetCreationMenu(tk.Frame):
     def on_leave(self, button):
         button.config(foreground = "#FFFFFF")
 
+
+
+# Network 
+# Nodes
+# Connections
+# Sidebar
+# Save Files
+# Telemetry

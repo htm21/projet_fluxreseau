@@ -21,6 +21,7 @@ class SideBar(tk.Frame):
             "Endpoint" : load_to_size("endpoint_node", *self.icon_size),
             "Buffer" : load_to_size("buffer_node", *self.icon_size),
             "Link" : load_to_size("link", *self.icon_size), 
+            "Info" : (load_to_size("info", *self.icon_size), load_to_size("highlight_info", *self.icon_size)),
             "Network" : load_to_size("network", *self.icon_size),
             "Save" : (load_to_size("save", *self.icon_size), load_to_size("highlighted_save", *self.icon_size)),
             "Load" : (load_to_size("load", *self.icon_size), load_to_size("highlighted_load", *self.icon_size)),
@@ -51,6 +52,7 @@ class SideBar(tk.Frame):
         self.info_lable = tk.Label(self.info, justify = "left", anchor = "w", font = f"{font} 15 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.save = CustomButton(self.object_controls, event = "<<SaveNet>>", icons = self.icons["Save"], image = self.icons["Save"][0], background = kwargs.get("background"))
         self.load = CustomButton(self.object_controls, event = "<<LoadNet>>", icons = self.icons["Load"], image = self.icons["Load"][0], background = kwargs.get("background"))
+        self.app_info = CustomButton(self.object_controls, event = "<<AppInfo>>", icons = self.icons["Info"], image = self.icons["Info"][0], background = kwargs.get("background"))
         self.add_paquet = CustomButton(self.object_controls, event = "<<CustomPaquet>>", icons = self.icons["Paquet"], image = self.icons["Paquet"][0], background = kwargs.get("background"))
         self.delete = CustomButton(self.object_controls, event = "<<DeleteObject>>", icons = self.icons["Delete"], image = self.icons["Delete"][0], background = kwargs.get("background"))
 
@@ -59,26 +61,29 @@ class SideBar(tk.Frame):
         self.add_connection.pack(side = "top", padx = 5, fill = "x")
         self.info_title.pack(side = "top", padx = 5, pady = (0, 15))
         self.info_lable.pack(side = "left", anchor = "nw", padx = (25, 0))
-        self.delete.pack(side = "right", padx = 20)
-        self.save.pack(side = "right", padx = 20)
-        self.load.pack(side = "right", padx = 20)
+        self.delete.pack(side = "right", padx = 10)
+        self.save.pack(side = "right", padx = 10)
+        self.load.pack(side = "right", padx = 10)
+        self.app_info.pack(side = "right", padx = 10)
 
 
     def reset_controls(self):
         self.save.pack_forget()
         self.load.pack_forget()
         self.add_paquet.pack_forget()
+        self.app_info.pack_forget()
 
 
     def set_object_controls(self, data : object):
         self.reset_controls()
 
         if data == None: # Network Controls
-            self.save.pack(side = "right", padx = 20)
-            self.load.pack(side = "right", padx = 20)
+            self.save.pack(side = "right", padx = 10)
+            self.load.pack(side = "right", padx = 10)
+            self.app_info.pack(side = "right", padx = 10)
 
         elif isinstance(data, Node) and data.type != "Endpoint": # Node Controls
-            self.add_paquet.pack(side = "right", padx = 20)
+            self.add_paquet.pack(side = "right", padx = 10)
 
 
     def set_object_info(self, data : object) -> None:
