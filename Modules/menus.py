@@ -1,6 +1,6 @@
 import tkinter as tk
 import customtkinter as ctk
-
+ 
 from Modules.node import Node, Source, Buffer, Endpoint
 from Modules.custom_button import CustomButton 
 from Modules.utils import *
@@ -59,16 +59,16 @@ class NodeCreationMenu(tk.Frame):
         self.endpoint_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Endpoint", image = self.icons["Endpoint"][0], icons = self.icons["Endpoint"], text = "Endpoint Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.buffer_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Buffer", image = self.icons["Buffer"][0], icons = self.icons["Buffer"], text = "Buffer Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background")) 
         
-        self.node_type_lable = tk.Label(self.type_frame, text = "Node Type : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.node_type_lable = tk.Label(self.type_frame, text = "Type : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.node_class_label = tk.Label(self.type_frame, font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
 
-        self.name_label = tk.Label(self.name_frame, text = "Node Name : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.name_label = tk.Label(self.name_frame, text = "Name : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.name_entry = tk.Entry(self.name_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output Speed : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.output_speed_entry = tk.Entry(self.output_speed_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.input_speed_label = tk.Label(self.input_speed_frame, text = "Input Speed : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.input_speed_label = tk.Label(self.input_speed_frame, text = "Throughput : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.input_speed_entry = tk.Entry(self.input_speed_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
         self.send_paquets_label = tk.Label(self.send_paquets_frame, text = "Send Paquets : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
@@ -372,7 +372,7 @@ class PaquetCreationMenu(tk.Frame):
         self.data_entry = tk.Entry(self.data_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         self.data_entry.insert(0, f"Hello from {self.node.name}")
 
-        self.size_lable = tk.Label(self.size_frame, text = "Paquet Data (Mb) : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.size_lable = tk.Label(self.size_frame, text = "Data Size (Mb) : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.size_entry = tk.Entry(self.size_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         self.size_entry.insert(0, "10")
 
@@ -448,9 +448,37 @@ class PaquetCreationMenu(tk.Frame):
 
 
 
-# Network 
-# Nodes
-# Connections
-# Sidebar
-# Save Files
-# Telemetry
+
+
+
+
+
+
+
+
+
+
+class AppInfoMenu(tk.Frame):
+    
+    instance_counter = 0
+    
+    def __init__(self, parent, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        PaquetCreationMenu.instance_counter += 1
+
+
+        self.info_book = ctk.CTkTabview(self, bg_color = "#171a1c", fg_color = "#22282a")
+        
+        self.info_book.add("Nodes")
+        self.info_book.add("Connections")
+        self.info_book.add("Side Bar")
+        self.info_book.add("Save Files")
+        
+        self.node_tab = tk.Frame(self.info_book.tab("Nodes"), background = "#FF0000")
+        self.connection_tab = tk.Frame(self.info_book.tab("Connections"), background = "#00FF00")
+        self.sidebar_tab = tk.Frame(self.info_book.tab("Side Bar"), background = "#0000FF")
+        self.save_files_tab = tk.Frame(self.info_book.tab("Save Files"), background = "#FF00FF")
+        
+
+
+        self.info_book.pack(fill = "both", expand = True)

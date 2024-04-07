@@ -265,6 +265,7 @@ class Network(tk.Canvas):
                 menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
                 menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
         else:
+            self.net_controls.place(anchor = "nw", x = 0, y = 0)
             self.alert = ("Error", "NoEndpoints")
             self.event_generate("<<Alert>>")
 
@@ -322,7 +323,7 @@ class Network(tk.Canvas):
         self.net_controls.place(anchor = "nw", x = 0, y = 0)
 
 
-    def select_object(self, event):   
+    def select_object(self, event): 
         object_ids = self.find_overlapping(event.x, event.y, event.x, event.y) # Finds canvas item closest to cursor      
         if not object_ids: self.deselect_object(); return
         if self.selected_node: self.deselect_object()
@@ -356,6 +357,7 @@ class Network(tk.Canvas):
 
 
     def play_network(self, *args) -> None:
+        if not self.nodes: return
         self.pause = False
 
 
@@ -364,10 +366,16 @@ class Network(tk.Canvas):
 
 
     def save_network(self, *args) -> None:
-        file_obj = tk.filedialog.asksaveasfile(filetypes = [('Json File', '*.json')], defaultextension = [('Json File', '*.json')])
+        if not self.nodes:
+            self.alert = ("Error", "EmptyNetToSave")
+            self.event_generate("<<Alert>>")
+            return
+        
+        file_obj = tk.filedialog.asksaveasfile(title = "Where sould we save the save file?", filetypes = [('Json File', '*.json')], defaultextension = [('Json File', '*.json')])
         if not file_obj:
             self.alert = ("Error", "NoSavePath")
             self.event_generate("<<Alert>>")
+            return
         
         nodes = []
         for node_name in self.connections:
@@ -395,10 +403,11 @@ class Network(tk.Canvas):
 
 
     def load_network(self, *args) -> None:
-        file_path = tk.filedialog.askopenfilename(filetypes = (('Json File', '*.json'), ("Tous les fichiers", "*.*")))
+        file_path = tk.filedialog.askopenfilename(title = "Gimme a save file", filetypes = (('Json File', '*.json'), ("Tous les fichiers", "*.*")))
         if not file_path:
             self.alert = ("Error", "NoDataFile")
             self.event_generate("<<Alert>>")
+            return
 
         with open(file_path) as file:
             data = json.load(file)

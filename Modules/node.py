@@ -11,8 +11,8 @@ class Node(object):
         self.id : int = node_id
         self.name : str = name
         self.type : str = node_type 
-        self.output_speed : int = output_speed # Bytes
-        self.input_speed : int = input_speed # Bytes
+        self.output_speed : int = output_speed
+        self.input_speed : int = input_speed
         self.max_send_paquets = max_send_paquets
 
         self.paquet_queue : list[Paquet] = []
@@ -23,7 +23,7 @@ class Node(object):
     def create_paquet(self, endpoint : str = None, data : str = None, size : int = None, tracking : bool = None) -> None:
         paquet = Paquet(endpoint, data, size, tracking)
         self.paquet_queue.append(paquet)
-        print(self.paquet_queue)
+
 
     def receve_paquet(self, paquet : Paquet) -> None:
         self.paquet_queue.append(paquet)
@@ -84,7 +84,7 @@ class Buffer(Node):
 
         Buffer.instance_counter += 1
         
-        self.capacity = 10  # Comme ce buffer est de capacité finie, notée C ici je prends 10 pour l'exemple
+        self.capacity = 10
         self.number_element = 0
         self.paquet_queue = []
 
@@ -99,8 +99,4 @@ class Buffer(Node):
 
     def send_paquet(self) -> Paquet:
         if self.paquet_queue :
-            return self.paquet_queue.pop(0)       
-
-
-    def create_paquet(self, *args, **kwargs) -> Paquet:
-        raise AttributeError( "'Buffer' object has no attribute 'cerate_paquet'" )
+            return self.paquet_queue.pop(0)

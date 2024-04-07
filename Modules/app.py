@@ -3,6 +3,7 @@ import platform
 import tkinter as tk
 
 from time import time
+from Modules.menus import AppInfoMenu
 from Modules.sidebar import SideBar
 from Modules.network import Network 
 from Modules.utils import *
@@ -34,7 +35,7 @@ class App(object):
         monitor_width_center, monitor_height_center = monitor_width // 2, monitor_height // 2
         screen_width, screen_height = screen_dimensions(self.parent)
 
-        self.window_width, self.window_height = (screen_width * 75) // 100, (screen_height * 75) // 100
+        self.window_width, self.window_height = (screen_width * 60) // 100, (screen_height * 60) // 100
         self.window_width_center, self.window_height_center = self.window_width // 2, self.window_height // 2
         self.x, self.y = monitor_width_center - self.window_width_center, monitor_height_center - self.window_height_center
 
@@ -74,7 +75,8 @@ class App(object):
         self.parent.bind("<<PlayNetwork>>", self.network_sandbox.play_network)
         self.parent.bind("<<PauseNetwork>>", self.network_sandbox.pause_network)
         self.parent.bind("<<SaveNet>>", self.network_sandbox.save_network)
-        self.parent.bind("<<LoadNet>>", self.network_sandbox.load_network)   
+        self.parent.bind("<<LoadNet>>", self.network_sandbox.load_network)
+        self.parent.bind("<<AppInfo>>", self.show_app_info)
         self.parent.protocol("WM_DELETE_WINDOW", self.on_closing)
 
 
@@ -84,7 +86,7 @@ class App(object):
         text = image_padding + ALERTS[alert[0]][alert[1]]
         color = "#4d0000" if alert[0] == "Error" else "#004d00"
 
-        self.alert_lable.config(image = self.icons[alert[0]], text = text, background = color)
+        self.alert_lable.config(image = self.icons[alert[0]], text = text, font = f"{font} 15 bold", foreground = "#FFFFFF", background = color)
         self.alert_create_time = time()
         self.alert_lable.place(anchor = "sw", relx = 0, rely = 1)
         
@@ -93,8 +95,13 @@ class App(object):
         self.Running = False
 
 
+    def show_app_info(self, *args) -> None:
+        self.network_sandbox.pause = True
+        self.Main_Frame.pack_forget()
 
 
+        menu = AppInfoMenu(self.parent)
+        menu.pack(anchor = "center", fill = "both", expand = True)
 
 
 

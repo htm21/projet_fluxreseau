@@ -40,7 +40,8 @@ ALERTS = {
         "EmptyNetwork" : "Network is already empty!",
         "NoEndpoints" : "There are no Endpoint nodes!",
         "NoSavePath" : "No save path given!",
-        "NoDataFile" : "No file given!"
+        "NoDataFile" : "No file given!",
+        "EmptyNetToSave" : "There is nothing to save!"
         }
     }
 

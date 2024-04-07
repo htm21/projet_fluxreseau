@@ -99,5 +99,23 @@ class SideBar(tk.Frame):
         elif isinstance(data, Node): # Node Info
             node = data
             self.info_title.config(image = self.icons[node.type], text = f"    {node.name} Info")
-            info_text = f"Type : {node.type}\nName : {node.name}\n\nThroughput : {node.output_speed} Mb/s\nConnections : {node.connections}\n\nPaquet Queue :\n{str(node.paquet_queue[0:5])}"
+            info_text = f"Type : {node.type}\nName : {node.name}\n"
+            
+            if node.type == "Source":
+                info_text += f"\nConnections : {node.connections}"
+                info_text += f"\nOutput : {node.output_speed} Units/s"
+            
+            elif node.type == "Endpoint":
+                info_text += f"\nThroughput : {node.input_speed} Units/s"
+            
+            elif node.type == "Buffer":
+                info_text += f"\nConnections : {node.connections}"
+                info_text += f"\nOutput : {node.output_speed} Units/s"
+                info_text += f"\nThroughput : {node.input_speed} Units/s"
+
+            paquets = "\n    " + "\n    ".join(str(paquet) for paquet in node.paquet_queue[:2])
+            if len(node.paquet_queue) > 2:
+                paquets += f"\n    And {len(node.paquet_queue) - 2} more..."
+            info_text += f"\nPaquet Queue : {paquets}"
+            
             self.info_lable.config(text = info_text)
