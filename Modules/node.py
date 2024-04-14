@@ -60,6 +60,11 @@ class Source(Node):
     def receve_paquet(self, *args, **kwargs) -> AttributeError:
         raise AttributeError( "'Source' object has no attribute 'receve_paquet'" )
 
+    def get_paquet(self) :
+        if self.paquet_queue :
+            paq = self.paquet_queue[0]
+            return paq
+
 
 
 class Endpoint(Node):
@@ -96,17 +101,13 @@ class Buffer(Node):
 
 
     def receve_paquet(self, node) -> None:
-        if node.type == "Endpoint" :
-            raise AttributeError (" L'objet 'Endpoint' ne peut être extrait ")
         
         if self.number_element < self.capacity :    # ajout possible seulement si la capacité nous le permet
             if node.paquet_queue : 
                 paquet = node.paquet_queue.pop(0)
-            else : 
-                raise AttributeError (" There is no paquet to be extracted ")
 
-            node.paquet_queue.append(paquet)
-            self.number_element += 1
+                self.paquet_queue.append(paquet)
+                self.number_element += 1
         
         else :
             del paquet                              # sinon on ignore le paquet

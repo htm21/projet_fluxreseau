@@ -14,26 +14,28 @@ def main() -> None:
     app  = App(root)
 
 
-    while app.Running:
+    app.network_sandbox.test()
+
+    # while app.Running:
         
-        try:
+    #     try:
            
-            if not app.network_sandbox.pause and (time() - app.network_sandbox.last_updated) >= app.network_sandbox.update_speed:
-                app.network_sandbox.update_network()
+    #         if not app.network_sandbox.pause and (time() - app.network_sandbox.last_updated) >= app.network_sandbox.update_speed:
+    #             app.network_sandbox.update_network()
             
-            if app.alert_lable.winfo_ismapped():
-                if (time() - app.alert_create_time) > app.alert_on_screen_time:
-                    app.alert_lable.place_forget()
+    #         if app.alert_lable.winfo_ismapped():
+    #             if (time() - app.alert_create_time) > app.alert_on_screen_time:
+    #                 app.alert_lable.place_forget()
             
-            if obj := app.network_sandbox.selected_node: # to be moved into the update function
-                app.side_bar.set_object_info(obj)
-            else:
-                app.side_bar.set_object_info(app.network_sandbox)
+    #         if obj := app.network_sandbox.selected_node: # to be moved into the update function
+    #             app.side_bar.set_object_info(obj)
+    #         else:
+    #             app.side_bar.set_object_info(app.network_sandbox)
         
-        except: 
-            pass
+    #     except: 
+    #         pass
         
-        root.update()
+    #     root.update()
 
 
 if __name__ == "__main__":
