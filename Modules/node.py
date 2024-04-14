@@ -52,9 +52,11 @@ class Source(Node):
 
     def __init__(self, *args, **kwargs) -> None:
         Node.__init__(self, *args, **kwargs)        # héritage de la class Nœud
-        Source.instance_counter += 1           
+        Source.instance_counter += 1  
 
-
+    def send_paquet(self) -> AttributeError:
+        return AttributeError (" L'objet 'Source' n'a pas de méthode 'send_paquet' ")
+    
     def receve_paquet(self, *args, **kwargs) -> AttributeError:
         raise AttributeError( "'Source' object has no attribute 'receve_paquet'" )
 
@@ -93,11 +95,20 @@ class Buffer(Node):
         self.paquet_queue = []                      # la liste qui représentera la file
 
 
-    def receve_paquet(self, paquet : Paquet) -> None:   
+    def receve_paquet(self, node) -> None:
+        if node.type == "Endpoint" :
+            raise AttributeError (" L'objet 'Endpoint' ne peut être extrait ")
+        
         if self.number_element < self.capacity :    # ajout possible seulement si la capacité nous le permet
-            self.paquet_queue.append(paquet)        
+            if node.paquet_queue : 
+                paquet = node.paquet_queue.pop(0)
+            else : 
+                raise AttributeError (" There is no paquet to be extracted ")
+
+            node.paquet_queue.append(paquet)
             self.number_element += 1
-        else:
+        
+        else :
             del paquet                              # sinon on ignore le paquet
 
 
