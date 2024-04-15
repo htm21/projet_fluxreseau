@@ -3,7 +3,6 @@ import tkinter as tk
 
 from time import sleep
 from time import time
-from Modules.node import Node
 from Modules.net_controls import NetControls
 from Modules.menus import NodeCreationMenu, DelNetMenu, PaquetCreationMenu
 from Modules.utils import *
@@ -21,12 +20,17 @@ def buffer_to_buffer(paquet) :
 
 class Network(tk.Canvas):
 
-    def __init__(self, parent, name : str = None, *args,**kwargs) -> None:
+    instance_counter = 0
+
+    def __init__(self, parent : tk.Widget, name : str, app : object, *args : tuple, **kwargs : dict) -> None:
+
+        Network.instance_counter += 1
         
         # GUI Stuff ====================================================================
         
         tk.Canvas.__init__(self, parent, *args, **kwargs)
         
+        self.app = app
         self.parent = parent
         self.kwargs =  kwargs
         self.icon_size : tuple = 90, 90
@@ -38,16 +42,16 @@ class Network(tk.Canvas):
             "Pause" : (load_to_size("pause", 75, 75), load_to_size("highlight_pause", 75, 75)),
             "Play" : (load_to_size("play", 75, 75), load_to_size("highlight_play", 75, 75)),
             }
+        
         self.net_controls = NetControls(self, background = "#22282a")
-        self.net_controls.place(anchor = "nw", x = 0, y = 0)
+        self.net_controls.place(anchor = "se", relx = 1, rely = 1)
         self.selected_node = None
-        self.alert = None
         self.bind("<Button-1>", self.select_object)
         self.bind("<B1-Motion>", self.move_node)
 
         # Logic Stuff ==================================================================
         
-        self.name = name if name else f"Network"
+        self.name = name
         self.nodes : dict[str or int: Node] = {} # Sources, Endpoints or Buffers in the network
         self.connections : dict = {} # Links between nodes
         self.connection_counter = 0
@@ -58,7 +62,6 @@ class Network(tk.Canvas):
         self.parametre = poisson_process(2)
         self.arrived_paquets = 0
         self.paquet_loss = 0
-
 
 
     # Logic Functions ====================================================================
@@ -152,7 +155,7 @@ class Network(tk.Canvas):
         '''
         
         if self.nodes.get(name):
-            self.alert = ("Error", "SameName")
+            self.app.alert = ("Error", "SameName")
             self.event_generate("<<Alert>>")
             return
 
@@ -168,7 +171,7 @@ class Network(tk.Canvas):
         # Use Node name or canvas_id to acces the node object in the dict of nodes
 
         self.tag_raise("node")
-        self.alert = ("Success", "CreateNode")
+        self.app.alert = ("Success", "CreateNode")
         self.event_generate("<<Alert>>")
 
 
@@ -200,7 +203,7 @@ class Network(tk.Canvas):
         del self.nodes[node.name]
         del self.nodes[node.id]
 
-        self.alert = ("Success", "DeletedNode")
+        self.app.alert = ("Success", "DeletedNode")
         self.event_generate("<<Alert>>")
 
 
@@ -208,7 +211,7 @@ class Network(tk.Canvas):
         for node_name in list(self.connections.keys()):
             self.del_node(self.nodes[node_name])
     
-        self.alert = ("Success", "DeletedNetwork")
+        self.app.alert = ("Success", "DeletedNetwork")
         self.event_generate("<<Alert>>")
         self.deselect_object()
 
@@ -226,22 +229,22 @@ class Network(tk.Canvas):
             node_1, node_2 = node_2, node_1
 
         if node_2.name in self.connections[node_1.name]:
-            self.alert = ("Error", "ExistingConnection")
+            self.app.alert = ("Error", "ExistingConnection")
             self.event_generate("<<Alert>>")
             return
 
         elif node_1.type == "Source" and node_2.type == "Source":
-            self.alert = ("Error", "TwoSources")
+            self.app.alert = ("Error", "TwoSources")
             self.event_generate("<<Alert>>")
             return
 
         elif node_1.type == "Endpoint" and node_2.type == "Endpoint":
-            self.alert = ("Error","TwoEndpoints")
+            self.app.alert = ("Error","TwoEndpoints")
             self.event_generate("<<Alert>>")
             return
 
         else:
-            self.alert = ("Success", "Connection")
+            self.app.alert = ("Success", "Connection")
             self.event_generate("<<Alert>>")
             self.connection_counter += 1
            
@@ -265,8 +268,8 @@ class Network(tk.Canvas):
                 menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
                 menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
         else:
-            self.net_controls.place(anchor = "nw", x = 0, y = 0)
-            self.alert = ("Error", "NoEndpoints")
+            self.net_controls.place(anchor = "se", relx = 1, rely = 1)
+            self.app.alert = ("Error", "NoEndpoints")
             self.event_generate("<<Alert>>")
 
 
@@ -289,7 +292,7 @@ class Network(tk.Canvas):
                     menu = DelNetMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
                     menu.place(relx = 0.5, rely = 0.5, anchor = "center", width = 600, height = 330) 
             else:
-                self.alert = ("Error", "EmptyNetwork")
+                self.app.alert = ("Error", "EmptyNetwork")
                 self.event_generate("<<Alert>>")
 
 
@@ -297,8 +300,8 @@ class Network(tk.Canvas):
         self.net_controls.place_forget()
 
         if len(self.connections) < 2:
-            self.net_controls.place(anchor = "nw", x = 0, y = 0)
-            self.alert = ("Error", "NotEnoughNodes")
+            self.net_controls.place(anchor = "se", relx = 1, rely = 1)
+            self.app.alert = ("Error", "NotEnoughNodes")
             self.event_generate("<<Alert>>")
             return
         
@@ -315,12 +318,13 @@ class Network(tk.Canvas):
         self.config(highlightthickness = 0)
 
         if nodes[0] == nodes[1]:
-            self.alert = ("Error", "SelfConnection")
+            self.net_controls.place(anchor = "se", relx = 1, rely = 1)
+            self.app.alert = ("Error", "SelfConnection")
             self.event_generate("<<Alert>>")
             return
         
         self.add_connection(*nodes)
-        self.net_controls.place(anchor = "nw", x = 0, y = 0)
+        self.net_controls.place(anchor = "se", relx = 1, rely = 1)
 
 
     def select_object(self, event): 
@@ -367,13 +371,13 @@ class Network(tk.Canvas):
 
     def save_network(self, *args) -> None:
         if not self.nodes:
-            self.alert = ("Error", "EmptyNetToSave")
+            self.app.alert = ("Error", "EmptyNetToSave")
             self.event_generate("<<Alert>>")
             return
         
         file_obj = tk.filedialog.asksaveasfile(title = "Where sould we save the save file?", filetypes = [('Json File', '*.json')], defaultextension = [('Json File', '*.json')])
         if not file_obj:
-            self.alert = ("Error", "NoSavePath")
+            self.app.alert = ("Error", "NoSavePath")
             self.event_generate("<<Alert>>")
             return
         
@@ -398,14 +402,14 @@ class Network(tk.Canvas):
         with open(file_obj.name, "w") as file:
             json.dump(data, file)
         
-        self.alert = ("Success", "NetworkSaved")
+        self.app.alert = ("Success", "NetworkSaved")
         self.event_generate("<<Alert>>")
 
 
     def load_network(self, *args) -> None:
         file_path = tk.filedialog.askopenfilename(title = "Gimme a save file", filetypes = (('Json File', '*.json'), ("Tous les fichiers", "*.*")))
         if not file_path:
-            self.alert = ("Error", "NoDataFile")
+            self.app.alert = ("Error", "NoDataFile")
             self.event_generate("<<Alert>>")
             return
 
@@ -422,7 +426,7 @@ class Network(tk.Canvas):
             for sub_node in data["connections"][main_node]:
                 self.add_connection(self.nodes[main_node], self.nodes[sub_node])
 
-        self.alert = ("Success", "NetworkLoaded")
+        self.app.alert = ("Success", "NetworkLoaded")
         self.event_generate("<<Alert>>")
 
 

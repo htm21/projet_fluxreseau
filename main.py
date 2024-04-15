@@ -2,6 +2,7 @@ import ctypes
 import platform
 import tkinter as tk
 
+from Modules.menus import NewNetworkMenu
 from time import time
 from Modules.app import App
 
@@ -17,15 +18,15 @@ def main() -> None:
     while app.Running:
         
         try:
-           
-            if not app.network_sandbox.pause and (time() - app.network_sandbox.last_updated) >= app.network_sandbox.update_speed:
-                app.network_sandbox.update_network()
+
+            if not app.current_network.pause and (time() - app.current_network.last_updated) >= app.current_network.update_speed:
+                app.current_network.update_network()
             
             if app.alert_lable.winfo_ismapped():
                 if (time() - app.alert_create_time) > app.alert_on_screen_time:
                     app.alert_lable.place_forget()
             
-            if obj := app.network_sandbox.selected_node: # to be moved into the update function
+            if obj := app.current_network.selected_node:
                 app.side_bar.set_object_info(obj)
             else:
                 app.side_bar.set_object_info(app.network_sandbox)
@@ -34,6 +35,8 @@ def main() -> None:
             pass
         
         root.update()
+
+    # root.mainloop()
 
 
 if __name__ == "__main__":

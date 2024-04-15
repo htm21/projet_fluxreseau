@@ -1,12 +1,12 @@
 import os
 import platform
-import random as rd
 import screeninfo
+import random as rd
 import tkinter as tk
 
 from math import log10
+from Modules.node import *
 from PIL import Image,ImageTk
-from Modules.node import Node, Source, Buffer, Endpoint
 
 
 app_folder_path = os.getcwd().replace("\\", "/")
@@ -20,14 +20,14 @@ NODE_TYPES : dict[str : Node]= {
     }
 
 ALERTS = {
-
     "Success": {
         "Connection" : "Connection created!",
         "DeletedNode" : "Node deleted!",
         "CreateNode" :  "Node created!",
         "DeletedNetwork" : "Network deleted!",
         "NetworkLoaded" : "Network loaded!",
-        "NetworkSaved" : "Network saved!"
+        "NetworkSaved" : "Network saved!",
+        "CreateNetwork" : "Network created!"
         },
     
     "Error" : {
@@ -41,7 +41,9 @@ ALERTS = {
         "NoEndpoints" : "There are no Endpoint nodes!",
         "NoSavePath" : "No save path given!",
         "NoDataFile" : "No file given!",
-        "EmptyNetToSave" : "There is nothing to save!"
+        "EmptyNetToSave" : "There is nothing to save!",
+        "OneNetAtATime" : "You can only create one network at a time!",
+        "ExitOfMenu" : "Exit out of the current menu before creating or switching to a new tab!"
         }
     }
 

@@ -2,7 +2,7 @@ import tkinter as tk
 import customtkinter as ctk
 
 from Modules.utils import *
-from Modules.custom_button import CustomButton
+from Modules.custom_button import *
 
 
 
@@ -10,8 +10,7 @@ class NetControls(tk.Frame):
 
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        
-        self.parent = parent
+
         self.kwargs = kwargs
         self.icon_size : tuple = 65, 65
         self.icons : dict[str : tuple] = {
@@ -24,8 +23,8 @@ class NetControls(tk.Frame):
         self.buffer_frame_1 = tk.Frame(self, background = "#1D2123", width = 5)
         self.buffer_frame_2 = tk.Frame(self, background = "#1D2123", height = 5)
 
-        self.buffer_frame_1.pack(side = "right", fill = "both")
-        self.buffer_frame_2.pack(side = "bottom", fill = "both")
+        self.buffer_frame_1.pack(side = "left", fill = "both")
+        self.buffer_frame_2.pack(side = "top", fill = "both")
 
         # Widgets ======================================================================
 
@@ -34,6 +33,6 @@ class NetControls(tk.Frame):
         self.update_speed = ctk.CTkSlider(self, from_ = 0, to = 200)
 
 
-        self.play_button.pack(side = "left", padx = (15, 0), pady = 15)
-        self.pause_button.pack(side = "left", padx = (15, 0), pady = 15)
-        self.update_speed.pack(side = "left", padx = 15, pady = 15)
+        self.pause_button.pack(side = "right", padx = (0, 15), pady = 15)
+        self.play_button.pack(side = "right", padx = (0, 15), pady = 15)
+        self.update_speed.pack(side = "right", padx = 15, pady = 15)

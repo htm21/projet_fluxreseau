@@ -1,8 +1,8 @@
 import tkinter as tk
 import customtkinter as ctk
  
-from Modules.node import Node, Source, Buffer, Endpoint
-from Modules.custom_button import CustomButton 
+from Modules.node import *
+from Modules.custom_button import * 
 from Modules.utils import *
 
 
@@ -44,11 +44,11 @@ class NodeCreationMenu(tk.Frame):
         self.lambda_setting_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
 
 
-        self.node_choice.pack(side = "top", fill = "x", padx = 20, pady = 20)
+        self.node_choice.pack(side = "top", fill = "x", padx = 20, pady = 15)
         self.buffer_frame1.pack(side = "top", fill = "x")
-        self.node_settings.pack(side = "top", fill = "both", expand = True, padx = 20, pady = 20)
+        self.node_settings.pack(side = "top", fill = "both", expand = True, padx = 20, pady = 15)
         self.buffer_frame2.pack(side = "top", fill = "x")
-        self.controls.pack(side = "top", fill = "x", padx = 20, pady = 20)
+        self.controls.pack(side = "top", fill = "x", padx = 20, pady = 15)
         
         
         # Widgets ======================================================================
@@ -148,13 +148,13 @@ class NodeCreationMenu(tk.Frame):
         self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, input_speed = input_speed, max_send_paquets = send_paquets)
         # === === === === Lambda setting is not passed to node creation yet === === === ===
 
-        self.network.net_controls.place(anchor = "nw", x = 0, y = 0)
+        self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         NodeCreationMenu.instance_counter -= 1
         self.destroy()
 
 
     def cancel_node(self, *args):
-        self.network.net_controls.place(anchor = "nw", x = 0, y = 0)
+        self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         NodeCreationMenu.instance_counter -= 1
         self.destroy()
 
@@ -193,26 +193,26 @@ class NodeCreationMenu(tk.Frame):
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
             self.output_speed_entry.insert(0, "100")
             self.send_paquets_entry.insert(0, "0")
-            self.output_speed_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
-            self.send_paquets_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
+            self.output_speed_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+            self.send_paquets_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
         
         elif arg == "Endpoint":
             self.node_class_label.config(text = arg, foreground = "#3d2932")
             
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            self.input_speed_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
-            self.lambda_setting_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
+            self.input_speed_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+            self.lambda_setting_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
         
         elif arg == "Buffer":
             self.node_class_label.config(text = arg, foreground = "#3d3829")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
             self.output_speed_entry.insert(0, "50")
-            self.output_speed_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
-            self.lambda_setting_frame.pack(padx = 20, pady = 10,fill = "x", expand = True)
+            self.output_speed_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+            self.lambda_setting_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
 
-        self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 20)
+        self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 15)
 
 
 
@@ -428,13 +428,13 @@ class PaquetCreationMenu(tk.Frame):
         tracking = self.tracking_checkbox.get()
         self.node.create_paquet(endpoint = endpoint, data = data, size = size, tracking = tracking)
         
-        self.network.net_controls.place(anchor = "nw", x = 0, y = 0)
+        self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         PaquetCreationMenu.instance_counter -= 1
         self.destroy()
 
 
     def cancel_paquet(self, *args) -> None:
-        self.network.net_controls.place(anchor = "nw", x = 0, y = 0)
+        self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         PaquetCreationMenu.instance_counter -= 1
         self.destroy()
 
@@ -458,27 +458,92 @@ class PaquetCreationMenu(tk.Frame):
 
 
 
-class AppInfoMenu(tk.Frame):
+class NewNetworkMenu(tk.Frame):
     
     instance_counter = 0
     
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, app, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        PaquetCreationMenu.instance_counter += 1
+        NewNetworkMenu.instance_counter += 1
+
+        self.app = app
+        self.kwargs = kwargs
+        self.icon_size : tuple = (85, 85)  
+        self.icons : dict = {
+            "Back" : load_to_size("back", 35, 35),
+            "Success" : load_to_size("success", 35, 35),
+            "NetworkTitle" : load_to_size("network", 100, 100),
+            "NetworkButton" : (load_to_size("network", *self.icon_size), load_to_size("highlight_network", *self.icon_size)),
+            "Load" : (load_to_size("load", *self.icon_size), load_to_size("highlight_load", *self.icon_size)),
+            }
+
+        # Frames =======================================================================
+
+        self.buffer_frame_1 = tk.Frame(self, background = "#1D2123", height = "5")
+        self.page_title = tk.Label(self, image = self.icons["NetworkTitle"], compound = "left", text = "  New Network", font = f"{font} 30 bold", foreground = "#FFFFFF", background = self.kwargs.get("background"))
+        self.buffer_frame_2 = tk.Frame(self, background = "#1D2123", height = "5")
+        self.option_frame = tk.Frame(self, background = self.kwargs.get("background"))
+        self.settings_frame = tk.Frame(self, background = self.kwargs.get("background"))
+        self.name_frame = tk.Frame(self.settings_frame, background = self.kwargs.get("background"))
+
+        self.buffer_frame_1.pack(side = "top", fill = "x")
+        self.page_title.pack(side = "top", anchor = "w", pady = 15, padx = 15)
+        self.buffer_frame_2.pack(side = "top", fill = "x")
+        self.option_frame.pack(side = "top", fill = "both")
+        self.name_frame.pack(side = "top", anchor = "w", pady = 60, padx = 15)
+
+        # Widgets ======================================================================
+
+        self.create_network_button = CustomButton(self.option_frame, parent_obj = self, func_arg = "new", icons = self.icons["NetworkButton"], image = self.icons["NetworkButton"][0], compound = "left", text = "  Create Network", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.load_network_button = CustomButton(self.option_frame, parent_obj = self, func_arg = "load", icons = self.icons["Load"], image = self.icons["Load"][0], compound = "left", text = "  Load Network", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))     
+        self.name_label = tk.Label(self.name_frame, text = "Name : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.name_entry = tk.Entry(self.name_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+        self.back_button = tk.Button(self.settings_frame, padx = 5, image = self.icons["Back"], compound = "left", justify = "left", text = "  Back", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#3D3029", activebackground = "#3D3029", relief = "sunken", border = 0, command = self.back_to_options)
+        self.create_button = tk.Button(self.settings_frame, padx = 5, image = self.icons["Success"], compound = "left", justify = "left", text = "  Create", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.create_network)
 
 
-        self.info_book = ctk.CTkTabview(self, bg_color = "#171a1c", fg_color = "#22282a")
+        self.create_network_button.pack(side = "top", anchor = "w", padx = 15, pady = (60, 15))
+        self.load_network_button.pack(side = "top", anchor = "w", padx = 15)
+        self.name_label.pack(side = "left")
+        self.name_entry.pack(side = "right")
+        self.create_button.pack(side = "right", anchor = "se", padx = 15, pady = 15)
+        self.back_button.pack(side = "right", anchor = "se", padx = 15, pady = 15)
         
-        self.info_book.add("Nodes")
-        self.info_book.add("Connections")
-        self.info_book.add("Side Bar")
-        self.info_book.add("Save Files")
-        
-        self.node_tab = tk.Frame(self.info_book.tab("Nodes"), background = "#FF0000")
-        self.connection_tab = tk.Frame(self.info_book.tab("Connections"), background = "#00FF00")
-        self.sidebar_tab = tk.Frame(self.info_book.tab("Side Bar"), background = "#0000FF")
-        self.save_files_tab = tk.Frame(self.info_book.tab("Save Files"), background = "#FF00FF")
-        
+        # Binds ======================================================================
+
+        self.back_button.bind("<Enter>", lambda args, button = self.back_button: self.on_enter(button))
+        self.back_button.bind("<Leave>", lambda args, button = self.back_button: self.on_leave(button))
+        self.create_button.bind("<Enter>", lambda args, button = self.create_button: self.on_enter(button))
+        self.create_button.bind("<Leave>", lambda args, button = self.create_button: self.on_leave(button))
 
 
-        self.info_book.pack(fill = "both", expand = True)
+    def back_to_options(self, *args) -> None:
+        self.settings_frame.pack_forget()
+        self.option_frame.pack(side = "top", fill = "both", expand = True)
+
+
+    def create_network(self) -> None:
+        self.app.add_network(self.name_entry.get(), self.app.tab_bar.selected_tab.name)
+        NewNetworkMenu.instance_counter -= 1
+        self.destroy()
+
+    def on_enter(self, button : tk.Widget):
+        button.config(foreground = "#ffcc22")
+
+
+    def on_leave(self, button : tk.Widget):
+        button.config(foreground = "#FFFFFF")
+
+
+    def passdown_func(self, arg : str):
+        if arg == "new":
+            self.name_entry.delete(0, "end")
+            self.name_entry.insert(0, f"{self.app.tab_bar.selected_tab.name}")
+            self.settings_frame.pack(side = "top", fill = "both", expand = True)
+            self.option_frame.pack_forget()
+
+
+        elif arg == "load":
+            # NewNetworkMenu.instance_counter -= 1
+            # self.destroy() 
+            pass
