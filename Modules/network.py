@@ -83,11 +83,11 @@ class Network(tk.Canvas):
                     paq = source.get_paquet()
                 print(f" LE PAQUET : {paq}")
 
-                for exit in self.connections[node] :
-                    print(f" LA SORTIE EST {exit} ")
+                for sortie in self.connections[node] :
+                    print(f" LA SORTIE EST {sortie} ")
 
-                    if self.nodes[exit].type == "Buffer" :
-                        ex = self.nodes[exit]
+                    if self.nodes[sortie].type == "Buffer" :
+                        ex = self.nodes[sortie]
                         print(f" BUFFER -> {ex} ")
                         print(f" LA FILE AVANT RECEPTION : {ex.paquet_queue} ")
                         ex.receve_paquet(source)
@@ -109,26 +109,26 @@ class Network(tk.Canvas):
                 
 
                 print(f" THE POSSIBLE CONNECTIONS ARE : {self.connections[node]}")
-                for exit in self.connections[node] :
-                    if self.nodes[exit].type == "Source" :
+                for sortie in self.connections[node] :
+                    if self.nodes[sortie].type == "Source" :
                         continue
-                    if self.nodes[exit].type == "Endpoint" :
-                            print(f"THE DESTINATION HAS BEEN FOUND :    {self.nodes[exit].type} ---> {self.nodes[exit].name} ")
+                    if self.nodes[sortie].type == "Endpoint" :
+                            print(f"THE DESTINATION HAS BEEN FOUND :    {self.nodes[sortie].type} ---> {self.nodes[sortie].name} ")
                             print("         SENDING INFORMATION     ")
-                            self.nodes[exit].receve_paquet(paq)
+                            self.nodes[sortie].receve_paquet(paq)
                             self.arrived_paquets += 1
-                            print(f"   INFORMATION RECEVEIVED, THE PACKET IS NOW AT DESTINATION :  '{self.nodes[exit]}' ")
+                            print(f"   INFORMATION RECEVEIVED, THE PACKET IS NOW AT DESTINATION :  '{self.nodes[sortie]}' ")
                             print(f"  THE NUMBER OF PACKET THAT HAVE REACHED DESTINATION IS ----> {self.arrived_paquets}")
                             print("--------------- THIRD TEST DONE ------------")
                             print()
                     
                     
                     else :
-                        if self.nodes[exit].type == "Buffer":
-                            print(f" FOUND A BUFFER : {self.nodes[exit].name}")
+                        if self.nodes[sortie].type == "Buffer":
+                            print(f" FOUND A BUFFER : {self.nodes[sortie].name}")
                             print(f" THE CONTENT OF THIS {self.nodes[node].type} IS ACTUALLY  : {self.nodes[node].paquet_queue}")
-                            self.nodes[exit].receve_paquet(self.nodes[node])
-                            print(f" THE BUFFER '{self.nodes[exit].name}'  HAS RECEIVED THE PACKET, THE QUEUE IS NOW : {self.nodes[exit].paquet_queue}")
+                            self.nodes[sortie].receve_paquet(self.nodes[node])
+                            print(f" THE BUFFER '{self.nodes[sortie].name}'  HAS RECEIVED THE PACKET, THE QUEUE IS NOW : {self.nodes[sortie].paquet_queue}")
                             print(" --------------------- FOURTH TEST DONE -------------------------")
                             print()
 
