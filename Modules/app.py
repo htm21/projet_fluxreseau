@@ -89,9 +89,9 @@ class App(object):
         if self.side_bar.winfo_ismapped():
             self.side_bar.pack_forget()
 
-        if self.current_network:
+        if self.current_network:   
             self.current_network.pause = True
-            self.current_network.deselect_object()
+            if self.current_network.selected_node: self.current_network.deselect_object()
             self.current_network.pack_forget()
             self.current_network = None
 
@@ -106,6 +106,7 @@ class App(object):
 
     def delete_network(self, network_name : str) -> None:
         if self.network_instances[network_name]:
+            
             self.network_instances[network_name].destroy()
             Network.instance_counter -= 1
         else:

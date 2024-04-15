@@ -2,7 +2,6 @@ import ctypes
 import platform
 import tkinter as tk
 
-from Modules.menus import NewNetworkMenu
 from time import time
 from Modules.app import App
 
