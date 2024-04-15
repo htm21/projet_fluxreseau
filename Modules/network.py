@@ -72,79 +72,65 @@ class Network(tk.Canvas):
         
         print(self.last_updated)
         self.last_updated = time()
-        
-        # for node in self.connections:
 
-        #     if self.nodes[node].type == "Source" :
-        #         paq = self.nodes[node].send_paquet()
-        #         print(f" ACTUAL PAQUET : {paq}")
+        for node in self.connections:
+            if self.nodes[node].type == "Source" :
+                print(f" SOURCE NAME : {self.nodes[node].name}")
+                source = self.nodes[node]
+                paq = source.get_paquet()
+                if not paq :
+                    source.create_paquet("ABCD",2,False)
+                    paq = source.get_paquet()
+                print(f" LE PAQUET : {paq}")
 
-        #         if not paq :
-        #             self.nodes[node].create_paquet("E3", "ABCD",30,False)
-        #             print(f" ACTUAL QUEUE OF '{self.nodes[node].name}' : {self.nodes[node].paquet_queue}")         # probleme avec paquets
-        #             paq = self.nodes[node].send_paquet()
-        #             print(f" NEW PACKET CREATED : {paq}")
-        #             print(f" ACTUAL QUEUE OF '{self.nodes[node].name}' AFTER : {self.nodes[node].paquet_queue}")
+                for exit in self.connections[node] :
+                    print(f" LA SORTIE EST {exit} ")
 
-
-
-        #         for exit in self.connections[node] :
-        #             print(f"THE EXIT IS : {exit}")
-        #             if self.nodes[exit].type == "Buffer":
-        #                 print(f" IS BUFFER : {self.nodes[exit]} ")
-        #                 e = self.nodes[exit]
-        #                 print(f" BUFFER BEFORE : {e.paquet_queue}")
-        #                 sleep(source_to_buffer(paq))
-        #                 e.receve_paquet(paq)
-        #                 print(f" BUFFER AFTER RECEPTION : {e.paquet_queue}")
-                        
-
-        #             if self.nodes[exit].type == "Endpoint" :
-        #                 sleep(self.parametre)
-        #                 self.nodes[exit].receve_paquet(paq)
-        #                 self.arrived_paquets += 1
-        #             print(" ---------- FIRST TEST DONE ----------")
-        #             print()
+                    if self.nodes[exit].type == "Buffer" :
+                        ex = self.nodes[exit]
+                        print(f" BUFFER -> {ex} ")
+                        print(f" LA FILE AVANT RECEPTION : {ex.paquet_queue} ")
+                        ex.receve_paquet(source)
+                        print(f" LA FILE APRES RECEPTION : {ex.paquet_queue} ")
+                    
+                    print(" ---------- FIRST TEST DONE ----------")
+                    print()
                     
 
-        #     elif self.nodes[node].type == "Buffer" :
-        #         print(f" BUFFER QUEUE of '{self.nodes[node].name}'  BEFORE SENDING : {self.nodes[node].paquet_queue}")
-        #         paq = self.nodes[node].send_paquet()
-        #         destination_name = paq.endpoint
-        #         print(f" THE DESTINATION NAME OF THE PACKET : {destination_name}")
-        #         print(f" THE PACKET SENT : {paq}")
-        #         if not paq :
-        #             continue
-        #         print(f" BUFFER QUEUE AFTER SENDING : {self.nodes[node].paquet_queue}")
-        #         print(" ---------------- SECOND TEST DONE ---------------")
-        #         print()
+            elif self.nodes[node].type == "Buffer" :
+                print(f" BUFFER QUEUE of '{self.nodes[node].name}'  BEFORE SENDING : {self.nodes[node].paquet_queue}")
+                paq = self.nodes[node].send_paquet()
+                print(f" THE PACKET SENT : {paq}")
+                if not paq :
+                    continue
+                print(f" BUFFER QUEUE AFTER SENDING : {self.nodes[node].paquet_queue}")
+                print(" ---------------- SECOND TEST DONE ---------------")
+                print()
                 
 
-        #         print(f" THE POSSIBLE CONNECTIONS ARE : {self.connections[node]}")
-        #         for exit in self.connections[node] :
-        #             if self.nodes[exit].type == "Source" :
-        #                 continue
-        #             if self.nodes[exit].name == destination_name :
-        #                     print(f"THE DESTINATION HAS BEEN FOUND :    {self.nodes[exit].type} ---> {self.nodes[exit].name} ")
-        #                     print("         SENDING INFORMATION     ")
-        #                     sleep(self.parametre)
-        #                     self.nodes[exit].receve_paquet(paq)
-        #                     self.arrived_paquets += 1
-        #                     print(f"   INFORMATION RECEVEIVED, THE PACKET IS NOW AT DESTINATION :  '{self.nodes[exit]}' ")
-        #                     print(f"  THE NUMBER OF PACKET THAT HAVE REACHED DESTINATION IS ----> {self.arrived_paquets}")
-        #                     print("--------------- THIRD TEST DONE ------------")
-        #                     print()
+                print(f" THE POSSIBLE CONNECTIONS ARE : {self.connections[node]}")
+                for exit in self.connections[node] :
+                    if self.nodes[exit].type == "Source" :
+                        continue
+                    if self.nodes[exit].type == "Endpoint" :
+                            print(f"THE DESTINATION HAS BEEN FOUND :    {self.nodes[exit].type} ---> {self.nodes[exit].name} ")
+                            print("         SENDING INFORMATION     ")
+                            self.nodes[exit].receve_paquet(paq)
+                            self.arrived_paquets += 1
+                            print(f"   INFORMATION RECEVEIVED, THE PACKET IS NOW AT DESTINATION :  '{self.nodes[exit]}' ")
+                            print(f"  THE NUMBER OF PACKET THAT HAVE REACHED DESTINATION IS ----> {self.arrived_paquets}")
+                            print("--------------- THIRD TEST DONE ------------")
+                            print()
                     
                     
-        #             else :
-        #                 if self.nodes[exit].type == "Buffer":
-        #                     print(f" FOUND A BUFFER : {self.nodes[exit].name}")
-        #                     print(f" THE CONTENT OF THIS {self.nodes[node].type} IS ACTUALLY  : {self.nodes[node].paquet_queue}")
-        #                     sleep(buffer_to_buffer(paq))
-        #                     self.nodes[exit].receve_paquet(paq)
-        #                     print(f" THE BUFFER '{self.nodes[exit].name}'  HAS RECEIVED THE PACKET, THE QUEUE IS NOW : {self.nodes[exit].paquet_queue}")
-        #                     print(" --------------------- FOURTH TEST DONE -------------------------")
-        #                     print()
+                    else :
+                        if self.nodes[exit].type == "Buffer":
+                            print(f" FOUND A BUFFER : {self.nodes[exit].name}")
+                            print(f" THE CONTENT OF THIS {self.nodes[node].type} IS ACTUALLY  : {self.nodes[node].paquet_queue}")
+                            self.nodes[exit].receve_paquet(self.nodes[node])
+                            print(f" THE BUFFER '{self.nodes[exit].name}'  HAS RECEIVED THE PACKET, THE QUEUE IS NOW : {self.nodes[exit].paquet_queue}")
+                            print(" --------------------- FOURTH TEST DONE -------------------------")
+                            print()
 
 
     def add_node(self, node_type, name, *args, **kwargs) -> None:
@@ -434,18 +420,15 @@ class Network(tk.Canvas):
         self.add_node("Source", "S1")
         self.add_node("Source", "S2")
         self.add_node("Buffer", "B1")
-        self.add_node("Buffer", "B2")
+        # self.add_node("Buffer", "B2")
         self.add_node("Endpoint", "E1")
-        self.add_node("Buffer", "B3")
-        self.add_node("Endpoint", "E2")
-        self.add_node("Endpoint", "E3")
         self.add_connection(self.nodes["S1"], self.nodes["B1"])
         self.add_connection(self.nodes["S2"], self.nodes["B1"])
-        self.add_connection(self.nodes["B1"], self.nodes["B2"])
-        self.add_connection(self.nodes["B2"], self.nodes["E1"])
-        self.add_connection(self.nodes["B2"], self.nodes["B3"])
-        self.add_connection(self.nodes["B3"], self.nodes["E2"])
-        self.add_connection(self.nodes["B3"], self.nodes["E3"])
+        self.add_connection(self.nodes["B1"], self.nodes["E1"])
+        # self.add_connection(self.nodes["B2"], self.nodes["E1"])
+        # self.add_connection(self.nodes["B2"], self.nodes["B3"])
+        # self.add_connection(self.nodes["B3"], self.nodes["E2"])
+        # self.add_connection(self.nodes["B3"], self.nodes["E3"])
 
 
         self.update_network()
