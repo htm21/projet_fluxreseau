@@ -14,7 +14,7 @@ class Node(object):
         self.output_speed : int = output_speed      # vitesse de transmisison, si output_speed = 100 (Mb/s) alors si paquet est de 10Mb on aura 
 
         self.paquet_queue : list[Paquet] = []       # permet de stocker les paquets contenus dans chaque Nœud
-        self.connections : int = 0
+        self.connections : list[Node] = []
 
 
     def create_paquet(self, data : str = None, size : int = None, tracking : bool = None) -> None:

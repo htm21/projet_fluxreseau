@@ -211,6 +211,7 @@ class Network(tk.Canvas):
 
             node_1.connections += 1
             self.connections[node_1.name].append(node_2.name)
+            node_2.connections.append(node_1)
 
 
 
