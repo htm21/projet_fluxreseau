@@ -40,8 +40,12 @@ class NodeCreationMenu(tk.Frame):
         self.name_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.output_speed_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.input_speed_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
-        self.send_paquets_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
-        self.lambda_setting_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
+        self.source_behaviour_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
+        # self.send_paquets_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
+        self.buffer_behaviour_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
+        self.capacity_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
+        # self.lambda_setting_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
+
 
 
         self.node_choice.pack(side = "top", fill = "x", padx = 20, pady = 15)
@@ -56,35 +60,42 @@ class NodeCreationMenu(tk.Frame):
         self.choose_node_lable = tk.Label(self.node_settings, text = "Choose A Node", font = f"{font} 40 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
 
         self.source_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Source", image = self.icons["Source"][0], icons = self.icons["Source"], text = "Source Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.endpoint_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Endpoint", image = self.icons["Endpoint"][0], icons = self.icons["Endpoint"], text = "Endpoint Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        # self.endpoint_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Endpoint", image = self.icons["Endpoint"][0], icons = self.icons["Endpoint"], text = "Endpoint Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.buffer_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Buffer", image = self.icons["Buffer"][0], icons = self.icons["Buffer"], text = "Buffer Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background")) 
         
-        self.node_type_lable = tk.Label(self.type_frame, text = "Type : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.node_class_label = tk.Label(self.type_frame, font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.node_type_lable = tk.Label(self.type_frame, text = "Type : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.node_class_label = tk.Label(self.type_frame, font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
 
-        self.name_label = tk.Label(self.name_frame, text = "Name : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.name_entry = tk.Entry(self.name_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+        self.name_label = tk.Label(self.name_frame, text = "Name : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.name_entry = tk.Entry(self.name_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.output_speed_entry = tk.Entry(self.output_speed_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
-        
-        self.input_speed_label = tk.Label(self.input_speed_frame, text = "Throughput : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.input_speed_entry = tk.Entry(self.input_speed_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
-        
-        self.send_paquets_label = tk.Label(self.send_paquets_frame, text = "Send Paquets : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.send_paquets_entry = tk.Entry(self.send_paquets_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
-        
-        self.lambda_setting_label = tk.Label(self.lambda_setting_frame, text = "Lambda : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.lambda_setting_entry = tk.Entry(self.lambda_setting_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.output_speed_entry = tk.Entry(self.output_speed_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
 
-        self.create_button = tk.Button(self.controls, image = self.icons["Success"], compound = "left", justify = "left", text = "  Create", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.create_node)
-        self.cancel_button = tk.Button(self.controls, image = self.icons["Error"], compound = "left", justify = "left", text = "  Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", relief = "sunken", border = 0, command = self.cancel_node)
+        self.source_behaviour_label = tk.Label(self.source_behaviour_frame, text = "Behaviour : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.source_behaviour_dropdown = ctk.CTkComboBox(self.source_behaviour_frame, state = "readonly", width = 323, height = 40, corner_radius = 0, border_width = 0, font = (f"{font} bold", 20), dropdown_font = (f"{font} bold", 15), text_color = "#FFFFFF", fg_color = "#171a1c", border_color = "#171a1c", button_hover_color = "#ffcc22", values = list(Source.behaviour_types.keys()), command = self.show_source_capacity)
+
+        # self.send_paquets_label = tk.Label(self.send_paquets_frame, text = "Paquet Limit : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        # self.send_paquets_entry = tk.Entry(self.send_paquets_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+        
+        self.buffer_behaviour_label = tk.Label(self.buffer_behaviour_frame, text = "Behaviour : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.buffer_behaviour_dropdown = ctk.CTkComboBox(self.buffer_behaviour_frame, state = "readonly", width = 323, height = 40, corner_radius = 0, border_width = 0, font = (f"{font} bold", 20), dropdown_font = (f"{font} bold", 15), text_color = "#FFFFFF", fg_color = "#171a1c", border_color = "#171a1c", button_hover_color = "#ffcc22", values = list(Buffer.behaviour_types.keys()))
+
+        self.capacity_label = tk.Label(self.capacity_frame, text = "Capacity : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.capacity_entry = tk.Entry(self.capacity_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+
+        # self.lambda_setting_label = tk.Label(self.lambda_setting_frame, text = "Lambda : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        # self.lambda_setting_entry = tk.Entry(self.lambda_setting_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+
+        self.create_button = tk.Button(self.controls, image = self.icons["Success"], compound = "left", justify = "left", text = "  Create", font = f"{font} 23 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.create_node)
+        self.cancel_button = tk.Button(self.controls, image = self.icons["Error"], compound = "left", justify = "left", text = "  Cancel", font = f"{font} 23 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", relief = "sunken", border = 0, command = self.cancel_node)
+
 
 
         self.choose_node_lable.pack(anchor = "center", fill = "x", expand = True)
         
         self.source_choice.pack(side = "left", fill = "x", expand = True)
-        self.endpoint_choice.pack(side = "left", fill = "x", expand = True)
+        # self.endpoint_choice.pack(side = "left", fill = "x", expand = True)
         self.buffer_choice.pack(side = "left", fill = "x", expand = True)
         
         self.node_type_lable.pack(side = "left")
@@ -95,15 +106,21 @@ class NodeCreationMenu(tk.Frame):
         
         self.output_speed_label.pack(side = "left")
         self.output_speed_entry.pack(side = "right")
+
+        self.source_behaviour_label.pack(side = "left")
+        self.source_behaviour_dropdown.pack(side = "right")
         
-        self.input_speed_label.pack(side = "left")
-        self.input_speed_entry.pack(side = "right")
+        # self.send_paquets_label.pack(side = "left")
+        # self.send_paquets_entry.pack(side = "right")
         
-        self.send_paquets_label.pack(side = "left")
-        self.send_paquets_entry.pack(side = "right")
-        
-        self.lambda_setting_label.pack(side = "left")
-        self.lambda_setting_entry.pack(side = "right")
+        self.buffer_behaviour_label.pack(side = "left")
+        self.buffer_behaviour_dropdown.pack(side = "right")
+
+        self.capacity_label.pack(side = "left")
+        self.capacity_entry.pack(side = "right")
+
+        # self.lambda_setting_label.pack(side = "left")
+        # self.lambda_setting_entry.pack(side = "right")
 
         self.create_button.pack(side = "right", padx = (50, 10), ipadx = 15)
         self.cancel_button.pack(side = "right", ipadx = 15)
@@ -127,26 +144,33 @@ class NodeCreationMenu(tk.Frame):
     def create_node(self, *args):
         
         node_type = self.node_class_label.cget("text")
-
         if not node_type: return
-
+        
         name = self.name_entry.get()
-        output_speed = 0
-        input_speed = 0
-        send_paquets = 0
 
         if node_type == "Source":
             output_speed = int(self.output_speed_entry.get()) if int(self.output_speed_entry.get()) >= 0 else 0
-            send_paquets = int(self.send_paquets_entry.get())
+            behaviour = self.source_behaviour_dropdown.get()  
+            if behaviour ==  "Normal":
+                self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, behaviour = behaviour)
+            elif behaviour ==  "Buffered":
+                capacity = int(self.capacity_entry.get()) if int(self.capacity_entry.get()) >= 0 else 10
+                self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, behaviour = behaviour, capacity = capacity)
+            # send_paquets = int(self.send_paquets_entry.get())
 
-        elif node_type == "Endpoint":
-            input_speed = int(self.input_speed_entry.get()) if int(self.input_speed_entry.get()) >= 0 else 0
+
+        # elif node_type == "Endpoint":
+        #     input_speed = int(self.input_speed_entry.get()) if int(self.input_speed_entry.get()) >= 0 else 0
+        
+        #     self.network.add_node(node_type = node_type, name = name)
+
 
         elif node_type == "Buffer":
+            behaviour = self.buffer_behaviour_dropdown.get()
             output_speed = int(self.output_speed_entry.get()) if int(self.output_speed_entry.get()) >= 0 else 0
-        
-        self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, input_speed = input_speed, max_send_paquets = send_paquets)
-        # === === === === Lambda setting is not passed to node creation yet === === === ===
+            capacity = int(self.capacity_entry.get()) if int(self.capacity_entry.get()) >= 0 else 0
+
+            self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, behaviour = behaviour, capacity = capacity)
 
         self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         NodeCreationMenu.instance_counter -= 1
@@ -167,50 +191,65 @@ class NodeCreationMenu(tk.Frame):
         self.name_frame.pack_forget()
         self.output_speed_frame.pack_forget()
         self.input_speed_frame.pack_forget()
-        self.send_paquets_frame.pack_forget()
-        self.lambda_setting_frame.pack_forget()
+        self.source_behaviour_frame.pack_forget()
+        # self.send_paquets_frame.pack_forget()
+        self.buffer_behaviour_frame.pack_forget()
+        self.capacity_frame.pack_forget()
+        # self.lambda_setting_frame.pack_forget()
         
         # Widgets ======================================
         self.output_speed_entry.delete(0, "end")
-        self.input_speed_entry.delete(0, "end")
-        self.input_speed_entry.insert(0, "10")
-        self.send_paquets_entry.delete(0, "end")
-        self.lambda_setting_entry.delete(0, "end")
-        self.lambda_setting_entry.insert(0, "0")
+        self.source_behaviour_dropdown.set(list(Source.behaviour_types.keys())[0])
+        # self.send_paquets_entry.delete(0, "end")
+        # self.lambda_setting_entry.delete(0, "end")
+        # self.lambda_setting_entry.insert(0, "0")
+        self.buffer_behaviour_dropdown.set(list(Buffer.behaviour_types.keys())[0])
+        self.capacity_entry.delete(0, "end")
+
+
+    def show_source_capacity(self, *args):
+        if self.source_behaviour_dropdown.get() == "Buffered":
+            self.capacity_entry.delete(0, "end")
+            self.capacity_entry.insert(0, "10")
+            self.capacity_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+        elif self.source_behaviour_dropdown.get() == "Normal":
+            if self.capacity_frame.winfo_ismapped(): self.capacity_frame.pack_forget()
 
 
     def passdown_func(self, arg):
         
         self.reset_settings()
-
-        self.type_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
-        self.name_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+        self.type_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+        self.name_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
         
-
         if arg == "Source":
             self.node_class_label.config(text = arg, foreground = "#354d33")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
             self.output_speed_entry.insert(0, "100")
-            self.send_paquets_entry.insert(0, "0")
-            self.output_speed_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
-            self.send_paquets_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
-        
-        elif arg == "Endpoint":
-            self.node_class_label.config(text = arg, foreground = "#3d2932")
+            # self.send_paquets_entry.insert(0, "0")
             
-            self.name_entry.delete(0, "end")
-            self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            self.input_speed_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
-            self.lambda_setting_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+            self.output_speed_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            self.source_behaviour_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            # self.send_paquets_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+        
+        # elif arg == "Endpoint":
+        #     self.node_class_label.config(text = arg, foreground = "#3d2932")     
+        #     self.name_entry.delete(0, "end")
+        #     self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
+            # self.lambda_setting_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
         
         elif arg == "Buffer":
             self.node_class_label.config(text = arg, foreground = "#3d3829")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
             self.output_speed_entry.insert(0, "50")
-            self.output_speed_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
-            self.lambda_setting_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+            self.capacity_entry.insert(0, "10")
+            
+            self.output_speed_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            self.buffer_behaviour_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            self.capacity_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            # self.lambda_setting_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
 
         self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 15)
 
@@ -336,9 +375,6 @@ class PaquetCreationMenu(tk.Frame):
             "Success" : load_to_size("success", 35, 35),
             "Error" : load_to_size("error", 35, 35)
             }
-        self.endpoint_nodes = self.get_all_endpoints()
-        self.endpoint = set()
-
 
         # Frames =======================================================================
 
@@ -350,7 +386,6 @@ class PaquetCreationMenu(tk.Frame):
 
         self.data_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
         self.size_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
-        self.endpoint_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
         self.tracking_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
 
         self.window_title_frame.pack(side = "top", fill = "x", padx = 20, pady = 20)
@@ -361,7 +396,6 @@ class PaquetCreationMenu(tk.Frame):
 
         self.data_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
         self.size_frame.pack(padx = 20, pady = 10, fill = "x")
-        self.endpoint_frame.pack(padx = 20, pady = 10, fill = "x")
         self.tracking_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
 
         # Widgets ======================================================================
@@ -372,13 +406,9 @@ class PaquetCreationMenu(tk.Frame):
         self.data_entry = tk.Entry(self.data_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         self.data_entry.insert(0, f"Hello from {self.node.name}")
 
-        self.size_lable = tk.Label(self.size_frame, text = "Data Size (Mb) : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.size_lable = tk.Label(self.size_frame, text = "Data Size : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.size_entry = tk.Entry(self.size_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         self.size_entry.insert(0, "10")
-
-        self.endpoint_lable = tk.Label(self.endpoint_frame, text = "Endpoint : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.endpoint_dropdown = ctk.CTkComboBox(self.endpoint_frame, state = "readonly", width = 323, height = 40, corner_radius = 0, border_width = 0, font = (f"{font} bold", 20), dropdown_font = (f"{font} bold", 15), text_color = "#FFFFFF", fg_color = "#171a1c", border_color = "#171a1c", button_hover_color = "#ffcc22", values = self.endpoint_nodes)
-        self.endpoint_dropdown.set(self.endpoint_nodes[0])
 
         self.tracking_lable = tk.Label(self.tracking_frame, text = "Tracking : ",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.tracking_checkbox = ctk.CTkCheckBox(self.tracking_frame, width = 0, height = 0, checkbox_width = 40, checkbox_height = 40, text = None, corner_radius = 0, hover = False, checkmark_color = "#ffcc22", bg_color = kwargs.get("background"), fg_color = kwargs.get("background"), border_color = "#1D2123")
@@ -395,9 +425,6 @@ class PaquetCreationMenu(tk.Frame):
         self.size_lable.pack(side = "left")
         self.size_entry.pack(side = "right")
         
-        self.endpoint_lable.pack(side = "left")
-        self.endpoint_dropdown.pack(side = "right")
-        
         self.tracking_lable.pack(side = "left")
         self.tracking_checkbox.pack(side = "right")
         
@@ -413,20 +440,11 @@ class PaquetCreationMenu(tk.Frame):
         self.cancel_button.bind("<Leave>", lambda args, button = self.cancel_button: self.on_leave(button))
 
 
-    def get_all_endpoints(self):
-        endpoint_nodes = []      
-        for node_name in self.network.connections:
-            if self.network.nodes[node_name].type == "Endpoint":
-                endpoint_nodes.append(node_name)
-        return endpoint_nodes
-
-
     def create_paquet(self, *args) -> None:
         data = self.data_entry.get()
         size = float(self.size_entry.get()) if float(self.size_entry.get()) >= 0 else 0
-        endpoint = self.endpoint_dropdown.get()
         tracking = self.tracking_checkbox.get()
-        self.node.create_paquet(endpoint = endpoint, data = data, size = size, tracking = tracking)
+        self.node.create_paquet(data = data, size = size, tracking = tracking)
         
         self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         PaquetCreationMenu.instance_counter -= 1

@@ -28,7 +28,7 @@ def main() -> None:
             if obj := app.current_network.selected_node:
                 app.side_bar.set_object_info(obj)
             else:
-                app.side_bar.set_object_info(app.network_sandbox)
+                app.side_bar.set_object_info(app.current_network)
         
         except: 
             pass

@@ -5,18 +5,16 @@ class Node(object):
 
     instance_counter : int = 0
 
-    def __init__(self, node_id : int, name : str, node_type : str = "Source", output_speed : int = 0, input_speed : int = 0, max_send_paquets : int = 0) -> None:
+    def __init__(self, node_id : int = None, name : str = None, node_type : str = None, output_speed : int = None) -> None:
         Node.instance_counter += 1
         
-        self.id : int = node_id                     # id du Nœud 
+        self.id : int = node_id                     # Canvas id du Nœud 
         self.name : str = name                      # nom du Nœud  
         self.type : str = node_type                 # le type du Nœud qui sera soit "Source", soit "Buffer", soit "Network"
         self.output_speed : int = output_speed      # vitesse de transmisison, si output_speed = 100 (Mb/s) alors si paquet est de 10Mb on aura 
-        self.max_send_paquets = max_send_paquets    # marge maximum de paquet envoyer
 
         self.paquet_queue : list[Paquet] = []       # permet de stocker les paquets contenus dans chaque Nœud
-        self.connections : int = 0                  # 
-        self.last_update_time : float = 0           # permet de juger le temps avant d'update
+        self.connections : int = 0
 
 
     def create_paquet(self, data : str = None, size : int = None, tracking : bool = None) -> None:
@@ -49,16 +47,26 @@ class Node(object):
 class Source(Node): 
 
     instance_counter : int = 0
+    behaviour_types : dict = {
+        "Normal" : 0,
+        "Buffered" : 1
+        }
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, behaviour : str, capacity : int = None, *args, **kwargs) -> None:
         Node.__init__(self, *args, **kwargs)        # héritage de la class Nœud
         Source.instance_counter += 1  
+        
+        self.behaviour : str = behaviour
+        self.buffer = Buffer(capacity = capacity) if self.behaviour == "Buffered" else None
+            
 
     def send_paquet(self) -> AttributeError:
         return AttributeError (" L'objet 'Source' n'a pas de méthode 'send_paquet' ")
     
+
     def receve_paquet(self, *args, **kwargs) -> AttributeError:
         raise AttributeError( "'Source' object has no attribute 'receve_paquet'" )
+
 
     def get_paquet(self) :
         if self.paquet_queue :
@@ -89,28 +97,31 @@ class Endpoint(Node):
 class Buffer(Node):
 
     instance_counter : int = 0
+    behaviour_types : dict = {
+        "Normal" : 0,
+        "Biggest Queue" : 1,
+        "Alternating" : 2,
+        "Random" : 3
+        }
 
-    def __init__(self, *args, **kwargs) -> None:
+
+    def __init__(self, behaviour : str = "Normal", capacity : int = 10, *args, **kwargs) -> None:
         Node.__init__(self, *args, **kwargs)       # héritage de la class Nœud
-
         Buffer.instance_counter += 1
-        
-        self.capacity = 10                          # capacité maximale du 'Buffer'
+
+        self.capacity = capacity                    # capacité maximale du 'Buffer'
         self.number_element = 0                     # le nombre d'élément pour vérifier si ajout possible ou non
         self.paquet_queue = []                      # la liste qui représentera la file
+        self.behaviour = behaviour
 
 
     def receve_paquet(self, node) -> None:
         
-        if self.number_element < self.capacity :    # ajout possible seulement si la capacité nous le permet
-            if node.paquet_queue : 
-                paquet = node.paquet_queue.pop(0)
-
-                self.paquet_queue.append(paquet)
-                self.number_element += 1
-        
-        else :
-            del paquet                              # sinon on ignore le paquet
+        if self.number_element < self.capacity and node.paquet_queue:  # ajout possible seulement si la capacité nous le permet
+            paquet = node.paquet_queue.pop(0)
+            self.paquet_queue.append(paquet)
+            self.number_element += 1
+        else : del paquet                           # sinon on ignore le paquet
 
 
     def send_paquet(self) -> Paquet:                # si l'inventaire n'est pas vide on envoie

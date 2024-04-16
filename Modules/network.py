@@ -75,62 +75,34 @@ class Network(tk.Canvas):
 
         for node in self.connections:
             if self.nodes[node].type == "Source" :
-                print(f" SOURCE NAME : {self.nodes[node].name}")
                 source = self.nodes[node]
                 paq = source.get_paquet()
                 if not paq :
                     source.create_paquet("ABCD",2,False)
                     paq = source.get_paquet()
-                print(f" LE PAQUET : {paq}")
 
                 for sortie in self.connections[node] :
-                    print(f" LA SORTIE EST {sortie} ")
 
                     if self.nodes[sortie].type == "Buffer" :
                         ex = self.nodes[sortie]
-                        print(f" BUFFER -> {ex} ")
-                        print(f" LA FILE AVANT RECEPTION : {ex.paquet_queue} ")
                         ex.receve_paquet(source)
-                        print(f" LA FILE APRES RECEPTION : {ex.paquet_queue} ")
-                    
-                    print(" ---------- FIRST TEST DONE ----------")
-                    print()
                     
 
             elif self.nodes[node].type == "Buffer" :
-                print(f" BUFFER QUEUE of '{self.nodes[node].name}'  BEFORE SENDING : {self.nodes[node].paquet_queue}")
                 paq = self.nodes[node].send_paquet()
-                print(f" THE PACKET SENT : {paq}")
                 if not paq :
                     continue
-                print(f" BUFFER QUEUE AFTER SENDING : {self.nodes[node].paquet_queue}")
-                print(" ---------------- SECOND TEST DONE ---------------")
-                print()
                 
-
-                print(f" THE POSSIBLE CONNECTIONS ARE : {self.connections[node]}")
                 for sortie in self.connections[node] :
                     if self.nodes[sortie].type == "Source" :
                         continue
                     if self.nodes[sortie].type == "Endpoint" :
-                            print(f"THE DESTINATION HAS BEEN FOUND :    {self.nodes[sortie].type} ---> {self.nodes[sortie].name} ")
-                            print("         SENDING INFORMATION     ")
-                            self.nodes[sortie].receve_paquet(paq)
-                            self.arrived_paquets += 1
-                            print(f"   INFORMATION RECEVEIVED, THE PACKET IS NOW AT DESTINATION :  '{self.nodes[sortie]}' ")
-                            print(f"  THE NUMBER OF PACKET THAT HAVE REACHED DESTINATION IS ----> {self.arrived_paquets}")
-                            print("--------------- THIRD TEST DONE ------------")
-                            print()
-                    
+                        self.nodes[sortie].receve_paquet(paq)
+                        self.arrived_paquets += 1
                     
                     else :
                         if self.nodes[sortie].type == "Buffer":
-                            print(f" FOUND A BUFFER : {self.nodes[sortie].name}")
-                            print(f" THE CONTENT OF THIS {self.nodes[node].type} IS ACTUALLY  : {self.nodes[node].paquet_queue}")
                             self.nodes[sortie].receve_paquet(self.nodes[node])
-                            print(f" THE BUFFER '{self.nodes[sortie].name}'  HAS RECEIVED THE PACKET, THE QUEUE IS NOW : {self.nodes[sortie].paquet_queue}")
-                            print(" --------------------- FOURTH TEST DONE -------------------------")
-                            print()
 
 
     def add_node(self, node_type, name, *args, **kwargs) -> None:
@@ -248,11 +220,10 @@ class Network(tk.Canvas):
 
     def create_paquet(self, node : Node) -> None:
         self.net_controls.place_forget()
-        
-        if Endpoint.instance_counter > 0:
-            if NodeCreationMenu.instance_counter == 0:
-                menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
-                menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
+
+        if NodeCreationMenu.instance_counter == 0:
+            menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
+            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
         else:
             self.net_controls.place(anchor = "se", relx = 1, rely = 1)
             self.app.alert = ("Error", "NoEndpoints")
@@ -415,24 +386,6 @@ class Network(tk.Canvas):
         self.app.alert = ("Success", "NetworkLoaded")
         self.event_generate("<<Alert>>")
 
-
-    def test(self):
-        self.add_node("Source", "S1")
-        self.add_node("Source", "S2")
-        self.add_node("Buffer", "B1")
-        # self.add_node("Buffer", "B2")
-        self.add_node("Endpoint", "E1")
-        self.add_connection(self.nodes["S1"], self.nodes["B1"])
-        self.add_connection(self.nodes["S2"], self.nodes["B1"])
-        self.add_connection(self.nodes["B1"], self.nodes["E1"])
-        # self.add_connection(self.nodes["B2"], self.nodes["E1"])
-        # self.add_connection(self.nodes["B2"], self.nodes["B3"])
-        # self.add_connection(self.nodes["B3"], self.nodes["E2"])
-        # self.add_connection(self.nodes["B3"], self.nodes["E3"])
-
-
-        self.update_network()
-                
 
 # How to click and drag canvas items:
     # https://stackoverflow.com/questions/61834886/how-to-make-a-drag-and-drop-animation-in-tkinter-canvas

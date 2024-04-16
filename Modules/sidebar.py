@@ -109,7 +109,7 @@ class SideBar(tk.Frame):
 
             network = obj
             self.info_title.config(image = self.icons["Network"], text = f"    {obj.name}")
-            info_text = f"Name : {network.name}\n\nNodes : {len(network.nodes) // 2}\n      Sources : {Source.instance_counter}\n      Endpoints : {Endpoint.instance_counter}\n      Buffers : {Buffer.instance_counter}\n\nConnections : {network.connection_counter}" 
+            info_text = f"Name : {network.name}\nConnections : {network.connection_counter}\n\nPaquets Sent : {network.arrived_paquets}\nPaquet Loss : {network.paquet_loss}" 
             self.info_lable.config(text = info_text)
 
 
@@ -120,17 +120,15 @@ class SideBar(tk.Frame):
             
             if node.type == "Source" or node.type == "Buffer":
                 info_text += f"\nConnections : {node.connections}"
-                info_text += f"\nOutput : {node.output_speed} Units/s"
+                info_text += f"\nOutput : {node.output_speed}"
             
-            if node.type == "Endpoint" or node.type == "Buffer":
-                info_text += f"\nThroughput : {node.input_speed} Units/s"
-
-            # Here we take only a maximum of 2 paquets to show onto the "SideBar".
-            # If there are more than 2 paquets present in the "Node" a number dispaying the total remaining paquets is shown.
-            paquets = "\n    " + "\n    ".join(str(paquet) for paquet in node.paquet_queue[:2])
-            if len(node.paquet_queue) > 2:
-                paquets += f"\n    And {len(node.paquet_queue) - 2} more..."
-            info_text += f"\nPaquet Queue : {paquets}"
+            if node.type == "Source" and node.behaviour == "Buffered" or node.type == "Buffer":
+                # Here we take only a maximum of 2 paquets to show onto the "SideBar".
+                # If there are more than 2 paquets present in the "Node" a number dispaying the total remaining paquets is shown.
+                paquets = "\n    " + "\n    ".join(str(paquet) for paquet in node.paquet_queue[:2])
+                if len(node.paquet_queue) > 2:
+                    paquets += f"\n    And {len(node.paquet_queue) - 2} more..."
+                info_text += f"\nPaquet Queue : {paquets}"
             
             # Updates the Info Label
             self.info_lable.config(text = info_text)
