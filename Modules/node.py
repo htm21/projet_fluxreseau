@@ -1,5 +1,6 @@
 from Modules.paquet import Paquet
 
+import random as rd
 
 class Node(object):
 
@@ -127,3 +128,32 @@ class Buffer(Node):
     def send_paquet(self) -> Paquet:                # si l'inventaire n'est pas vide on envoie
         if self.paquet_queue :  
             return self.paquet_queue.pop(0)
+    
+    def biggest_queue(self) :
+
+        node_max = self.connections[0]
+        len_max = len(self.connections[0].paquet_queue)
+
+        for node in self.connections[1:] :
+            if len_max < len(node.paquet_queue) : 
+                node_max, len_max = node, len(node.paquet_queue)
+        
+        self.receve_paquet(node_max)
+        
+
+    def alternating(self) :
+
+        for i in range(len(self.connections)) :
+            self.receve_paquet(self.connections[i])
+
+
+    def random_choice(self) :
+
+        self.receve_paquet(self.connections[rd.randint(0,len(self.connections))])
+    
+    behaviour_types : dict = {
+        "Normal" : 0,
+        "Biggest Queue" : biggest_queue(),
+        "Alternating" : alternating(),
+        "Random" : random_choice()
+        }
