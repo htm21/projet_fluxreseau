@@ -41,17 +41,17 @@ class Tab(tk.Frame):
 
 
     def select(self) -> None:
-        self.tab_name.config(foreground = "#ffcc22", background = "#22282a")
+        self.tab_name.config(foreground = "#ffcc22", background = "#1E2422")
         self.tab_highlight.config(background = "#ffcc22")
-        self.close.config(background = "#22282a")
-        self.config(background = "#22282a")
+        self.close.config(background = "#1E2422")
+        self.config(background = "#1E2422")
 
 
     def deselect(self) -> None:
-        self.tab_name.config(foreground = "#FFFFFF", background = "#171a1c")
-        self.tab_highlight.config(background = "#171a1c")
-        self.close.config(background = "#171a1c")
-        self.config(background = "#171a1c")
+        self.tab_name.config(foreground = "#FFFFFF", background = "#22282a")
+        self.tab_highlight.config(background = "#22282a")
+        self.close.config(background = "#22282a")
+        self.config(background = "#22282a")
     
 
     def passdown_func(self, arg) -> None:

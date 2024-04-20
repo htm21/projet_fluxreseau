@@ -1,4 +1,5 @@
 import tkinter as tk
+import customtkinter as ctk
 
 from Modules.node import *
 from Modules.utils import *
@@ -24,6 +25,7 @@ class SideBar(tk.Frame):
             "Source" : load_to_size("source_node", *self.icon_size),
             "Buffer" : load_to_size("buffer_node", *self.icon_size),
             "Endpoint" : load_to_size("endpoint_node", *self.icon_size),
+            "Compare" : (load_to_size("compare", *self.icon_size), load_to_size("highlight_compare", *self.icon_size)),
             "Info" : (load_to_size("info", *self.icon_size), load_to_size("highlight_info", *self.icon_size)),
             "Node" : (load_to_size("node", *self.icon_size), load_to_size("highlight_node", *self.icon_size)),
             "Save" : (load_to_size("save", *self.icon_size), load_to_size("highlight_save", *self.icon_size)),
@@ -39,7 +41,7 @@ class SideBar(tk.Frame):
         self.buffer_frame_1 = tk.Frame(self, background = "#1D2123", width = 5)
         self.controls = tk.Frame(self, background = kwargs.get("background"))
         self.buffer_frame_2 = tk.Frame(self, background = "#1D2123", height = 5)
-        self.info = tk.Frame(self, background = kwargs.get("background"))
+        self.info = ctk.CTkScrollableFrame(self, fg_color = kwargs.get("background"), corner_radius = 0)
         self.buffer_frame_3 = tk.Frame(self, background = "#1D2123", height = 5)
         self.object_controls = tk.Frame(self, background = kwargs.get("background"))
 
@@ -58,7 +60,7 @@ class SideBar(tk.Frame):
         self.info_lable = tk.Label(self.info, justify = "left", anchor = "w", font = f"{font} 15 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.save = CustomButton(self.object_controls, event = "<<SaveNet>>", icons = self.icons["Save"], image = self.icons["Save"][0], background = kwargs.get("background"))
         self.load = CustomButton(self.object_controls, event = "<<LoadNet>>", icons = self.icons["Load"], image = self.icons["Load"][0], background = kwargs.get("background"))
-        self.app_info = CustomButton(self.object_controls, event = "<<AppInfo>>", icons = self.icons["Info"], image = self.icons["Info"][0], background = kwargs.get("background"))
+        self.compare = CustomButton(self.object_controls, event = "<<Compare>>", icons = self.icons["Compare"], image = self.icons["Compare"][0], background = kwargs.get("background"))
         self.add_paquet = CustomButton(self.object_controls, event = "<<CustomPaquet>>", icons = self.icons["Paquet"], image = self.icons["Paquet"][0], background = kwargs.get("background"))
         self.delete = CustomButton(self.object_controls, event = "<<DeleteObject>>", icons = self.icons["Delete"], image = self.icons["Delete"][0], background = kwargs.get("background"))
 
@@ -69,7 +71,7 @@ class SideBar(tk.Frame):
         self.delete.pack(side = "right", padx = 10)
         self.save.pack(side = "right", padx = 10)
         self.load.pack(side = "right", padx = 10)
-        self.app_info.pack(side = "right", padx = 10)
+        self.compare.pack(side = "right", padx = 10)
 
 
     def reset_controls(self) -> None:
@@ -81,7 +83,7 @@ class SideBar(tk.Frame):
         self.save.pack_forget()
         self.load.pack_forget()
         self.add_paquet.pack_forget()
-        self.app_info.pack_forget()
+        self.compare.pack_forget()
 
 
     def set_object_controls(self, data : object) -> None:
@@ -94,7 +96,7 @@ class SideBar(tk.Frame):
         if data == None: # Network Controls
             self.save.pack(side = "right", padx = 10)
             self.load.pack(side = "right", padx = 10)
-            self.app_info.pack(side = "right", padx = 10)
+            self.compare.pack(side = "right", padx = 10)
 
         elif isinstance(data, Node) and data.type != "Endpoint": # Node Controls
             self.add_paquet.pack(side = "right", padx = 10)
@@ -109,7 +111,7 @@ class SideBar(tk.Frame):
 
             network = obj
             self.info_title.config(image = self.icons["Network"], text = f"    {obj.name}")
-            info_text = f"Name : {network.name}\nConnections : {network.connection_counter}\n\nPaquets Sent : {network.arrived_paquets}\nPaquet Loss : {network.paquet_loss}" 
+            info_text = f"Name : {network.name}\nConnections : {network.connection_counter}\n\nPaquets Created : {network.total_paquets_created}\nPaquets Sent : {network.total_paquets_transfered}\nPaquets Lost : {network.total_paquets_lost}" 
             self.info_lable.config(text = info_text)
 
 
@@ -119,15 +121,15 @@ class SideBar(tk.Frame):
             info_text = f"Type : {node.type}\nName : {node.name}\n"
             
             if node.type == "Source" or node.type == "Buffer":
-                info_text += f"\nConnections : {node.connections}"
+                info_text += f"\nConnections : {len(node.connections)}"
                 info_text += f"\nOutput : {node.output_speed}"
             
             if node.type == "Source" and node.behaviour == "Buffered" or node.type == "Buffer":
-                # Here we take only a maximum of 2 paquets to show onto the "SideBar".
-                # If there are more than 2 paquets present in the "Node" a number dispaying the total remaining paquets is shown.
-                paquets = "\n    " + "\n    ".join(str(paquet) for paquet in node.paquet_queue[:2])
-                if len(node.paquet_queue) > 2:
-                    paquets += f"\n    And {len(node.paquet_queue) - 2} more..."
+                # Here we take only a maximum of 5 paquets to show onto the "SideBar".
+                # If there are more than 5 paquets present in the "Node" a number dispaying the total remaining paquets is shown.
+                paquets = "\n       " + "\n       ".join(str(paquet) for paquet in node.paquet_queue[:5])
+                if len(node.paquet_queue) > 5:
+                    paquets += f"\n       And {len(node.paquet_queue) - 5} more..."
                 info_text += f"\nPaquet Queue : {paquets}"
             
             # Updates the Info Label

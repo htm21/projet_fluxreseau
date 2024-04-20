@@ -1,28 +1,20 @@
 import json
 import tkinter as tk
 
-from time import sleep
+
 from time import time
-from Modules.net_controls import NetControls
-from Modules.menus import NodeCreationMenu, DelNetMenu, PaquetCreationMenu
+from Modules.net_controls import *
+from Modules.menus import *
 from Modules.utils import *
 from Modules.paquet import *
 
-
-def source_to_buffer(paquet) :
-    size = paquet.size
-    return size / 100
-
-def buffer_to_buffer(paquet) :
-    size = paquet.size
-    return size / 2.5
 
 
 class Network(tk.Canvas):
 
     instance_counter = 0
 
-    def __init__(self, parent : tk.Widget, name : str, app : object, *args : tuple, **kwargs : dict) -> None:
+    def __init__(self, parent : tk.Widget, name : str, app : object, paquet_size : int = 10, *args : tuple, **kwargs : dict) -> None:
 
         Network.instance_counter += 1
         
@@ -31,8 +23,8 @@ class Network(tk.Canvas):
         tk.Canvas.__init__(self, parent, *args, **kwargs)
         
         self.app = app
-        self.parent = parent
-        self.kwargs =  kwargs
+        self.parent : tk.Frame = parent
+        self.kwargs : dict =  kwargs
         self.icon_size : tuple = 90, 90
         self.icons : dict[str : tuple] = {
             "Node" : (load_to_size("node", *self.icon_size), load_to_size("highlight_node", *self.icon_size)),
@@ -43,9 +35,9 @@ class Network(tk.Canvas):
             "Play" : (load_to_size("play", 75, 75), load_to_size("highlight_play", 75, 75)),
             }
         
-        self.net_controls = NetControls(self, background = "#22282a")
+        self.net_controls : tk.Frame = NetControls(self, network = self, background = "#22282a")
         self.net_controls.place(anchor = "se", relx = 1, rely = 1)
-        self.selected_node = None
+        self.selected_node : Node = None
         self.bind("<Button-1>", self.select_object)
         self.bind("<B1-Motion>", self.move_node)
 
@@ -54,14 +46,16 @@ class Network(tk.Canvas):
         self.name = name
         self.nodes : dict[str or int: Node] = {} # Sources, Endpoints or Buffers in the network
         self.connections : dict = {} # Links between nodes
-        self.connection_counter = 0
+        self.connection_counter :int = 0
+        self.paquet_size : int = paquet_size
 
-        self.pause = True
-        self.update_speed = 1
-        self.last_updated = time()
-        self.parametre = poisson_process(2)
-        self.arrived_paquets = 0
-        self.paquet_loss = 0
+        self.pause : bool = True
+        self.last_updated : float = time()
+        
+        self.total_paquets_created : int = 0
+        self.total_paquets_transfered : int = 0
+        self.total_paquets_lost : int = 0
+        self.mean_paquet_wait_time : float = 0
 
 
     # Logic Functions ====================================================================
@@ -70,39 +64,39 @@ class Network(tk.Canvas):
 
     def update_network(self):
         
-        print(self.last_updated)
+        if not self.connections:
+            self.pause_network()
+        
         self.last_updated = time()
 
-        for node in self.connections:
-            if self.nodes[node].type == "Source" :
-                source = self.nodes[node]
-                paq = source.get_paquet()
-                if not paq :
-                    source.create_paquet("ABCD",2,False)
-                    paq = source.get_paquet()
+        for node_name in self.connections:
+            node = self.nodes[node_name]  
+            if node.type == "Source":
+                node.create_paquets()
 
-                for sortie in self.connections[node] :
+                self.total_paquets_created += node.paquet_output
+                if node.behaviour == "Buffered":
+                    self.total_paquets_lost += node.paquet_loss
+        
+            # print("Finished Updating Sources")
+        
+        for node_name in self.connections:
+            node = self.nodes[node_name]    
 
-                    if self.nodes[sortie].type == "Buffer" :
-                        ex = self.nodes[sortie]
-                        ex.receve_paquet(source)
-                    
+            if node.type == "Buffer" and node.connections:
+                print("buffer found")
+                node.send_paquets()
+                node.collect_paquets()
 
-            elif self.nodes[node].type == "Buffer" :
-                paq = self.nodes[node].send_paquet()
-                if not paq :
-                    continue
-                
-                for sortie in self.connections[node] :
-                    if self.nodes[sortie].type == "Source" :
-                        continue
-                    if self.nodes[sortie].type == "Endpoint" :
-                        self.nodes[sortie].receve_paquet(paq)
-                        self.arrived_paquets += 1
-                    
-                    else :
-                        if self.nodes[sortie].type == "Buffer":
-                            self.nodes[sortie].receve_paquet(self.nodes[node])
+                self.total_paquets_lost += node.paquet_loss
+                self.total_paquets_transfered += node.paquet_transfer
+
+                if self.mean_paquet_wait_time == 0:
+                    self.mean_paquet_wait_time = node.mean_paquet_wait_time
+                else:
+                    self.mean_paquet_wait_time = (self.mean_paquet_wait_time + node.mean_paquet_wait_time) / 2
+
+            print("Finished Updating Buffers")
 
 
     def add_node(self, node_type, name, *args, **kwargs) -> None:
@@ -120,7 +114,7 @@ class Network(tk.Canvas):
         canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0], tags = "node")
         # Creating canvas object with "node_type" in the middle of the Canvas
         
-        node = NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, *args, **kwargs)
+        node = NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, paquet_size = self.paquet_size, *args, **kwargs)
         # Creating the node object with "node_type"
 
         self.nodes[canvas_node] = node
@@ -149,7 +143,7 @@ class Network(tk.Canvas):
             for sub_node in self.connections[main_node]:
                 if sub_node == node.name:
                     self.connections[main_node].remove(node.name)
-                    self.nodes[main_node].connections -=1
+                    # self.nodes[main_node].connections -=1
                     self.connection_counter -= 1
 
 
@@ -209,7 +203,7 @@ class Network(tk.Canvas):
             self.create_line((*self.coords(node_1.id), *self.coords(node_2.id)), width = 10, fill = "#1D2123", activefill = "#22282a", smooth = True, tags = [node_1.name, node_2.name])
             self.tag_raise("node")
 
-            node_1.connections += 1
+            # node_1.connections += 1
             self.connections[node_1.name].append(node_2.name)
             node_2.connections.append(node_1)
 
@@ -247,6 +241,7 @@ class Network(tk.Canvas):
             if len(self.connections):
                 if DelNetMenu.instance_counter == 0:
                     self.pause = True
+                    self.net_controls.set_play_button()
                     menu = DelNetMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
                     menu.place(relx = 0.5, rely = 0.5, anchor = "center", width = 600, height = 330) 
             else:
@@ -319,11 +314,15 @@ class Network(tk.Canvas):
 
 
     def play_network(self, *args) -> None:
-        if not self.nodes: return
+        if not self.nodes:
+            self.net_controls.set_play_button()
+            return
         self.pause = False
 
 
     def pause_network(self, *args) -> None:
+        if self.net_controls.pause_button.winfo_ismapped():
+            self.net_controls.set_play_button()
         self.pause = True
 
 
@@ -345,14 +344,14 @@ class Network(tk.Canvas):
                 "type" : self.nodes[node_name].type,
                 "name" : self.nodes[node_name].name,
                 "output_speed" : self.nodes[node_name].output_speed,
-                "input_speed" : self.nodes[node_name].input_speed,
-                "max_send_paquets" : self.nodes[node_name].max_send_paquets,
                 "coords" : self.coords(self.nodes[node_name].id)
                 }
             
             nodes.append(node_data)
 
         data = {
+            "network_name" : self.name,
+            "paquet_size" : self.paquet_size, 
             "nodes" : nodes,
             "connections" : self.connections
         }
@@ -364,12 +363,13 @@ class Network(tk.Canvas):
         self.event_generate("<<Alert>>")
 
 
-    def load_network(self, *args) -> None:
-        file_path = tk.filedialog.askopenfilename(title = "Gimme a save file", filetypes = (('Json File', '*.json'), ("Tous les fichiers", "*.*")))
+    def load_network(self,*, file_path : str) -> None:
         if not file_path:
-            self.app.alert = ("Error", "NoDataFile")
-            self.event_generate("<<Alert>>")
-            return
+            file_path = tk.filedialog.askopenfilename(title = "Gimme a save file", filetypes = (('Json File', '*.json'), ("Tous les fichiers", "*.*")))
+            if not file_path:
+                self.app.alert = ("Error", "NoDataFile")
+                self.event_generate("<<Alert>>")
+                return
 
         with open(file_path) as file:
             data = json.load(file)
@@ -377,7 +377,7 @@ class Network(tk.Canvas):
         self.delete_network()
         
         for node_data in data["nodes"]:
-            self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"], input_speed = node_data["input_speed"], max_send_paquets = node_data["max_send_paquets"],)
+            self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"])
             self.moveto(self.nodes[node_data["name"]].id, *node_data["coords"])
 
         for main_node in data["connections"]:

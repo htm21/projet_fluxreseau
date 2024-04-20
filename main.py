@@ -18,7 +18,7 @@ def main() -> None:
         
         try:
 
-            if not app.current_network.pause and (time() - app.current_network.last_updated) >= app.current_network.update_speed:
+            if not app.current_network.pause and (time() - app.current_network.last_updated) >= app.update_speed:
                 app.current_network.update_network()
             
             if app.alert_lable.winfo_ismapped():
@@ -34,8 +34,6 @@ def main() -> None:
             pass
         
         root.update()
-
-    # root.mainloop()
 
 
 if __name__ == "__main__":

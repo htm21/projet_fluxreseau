@@ -19,6 +19,7 @@ NODE_TYPES : dict[str : Node]= {
     "Node" : Node
     }
 
+
 ALERTS = {
     "Success": {
         "Connection" : "Connection created!",
@@ -71,4 +72,3 @@ def poisson_process(parameter):
     U = rd.uniform(0.1,1)
     sleep = -(1/parameter)*log10(U)
     return sleep
-

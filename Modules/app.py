@@ -8,6 +8,7 @@ from Modules.menus import *
 from Modules.sidebar import *
 from Modules.network import *
 from Modules.tab_bar import *
+from Modules.data_analysis import *
 
 
 
@@ -21,17 +22,20 @@ class App(object):
     def __init__(self, parent : tk.Tk) -> None:
         
         self.parent = parent
+        self.Running = True
+        self.update_speed = 1
+
         self.icon_size = 15, 15
         self.icons = {
             "Success" : load_to_size("success", *self.icon_size),
             "Error" : load_to_size("error", *self.icon_size)
             }
-        self.network_instances = dict()
 
         self.alert = None
         self.alert_on_screen_time = 5
         self.alert_create_time = 0
-        self.Running = True
+
+        self.network_instances = dict()
         self.current_network = None
 
         # Window Positioning ===========================================================
@@ -53,7 +57,7 @@ class App(object):
         # Frames =======================================================================
 
         self.Main_Frame = tk.Frame(self.parent, highlightthickness = 5, highlightbackground = "#1D2123", highlightcolor = "#1D2123")
-        self.tab_bar = TabBar(self.Main_Frame, app = self, background = "#171a1c")
+        self.tab_bar = TabBar(self.Main_Frame, app = self, background = "#22282a")
         self.side_bar = SideBar(self.Main_Frame, background = "#22282a", width = 375)
         self.side_bar.pack_propagate(0)
 
@@ -89,7 +93,8 @@ class App(object):
         if self.side_bar.winfo_ismapped():
             self.side_bar.pack_forget()
 
-        if self.current_network:   
+        if self.current_network:
+            self.current_network.net_controls.set_play_button()
             self.current_network.pause = True
             if self.current_network.selected_node: self.current_network.deselect_object()
             self.current_network.pack_forget()
@@ -117,8 +122,8 @@ class App(object):
 
 
 
-    def add_network(self, name : str, temp_name : str):
-        self.network_instances[name] = Network(self.Main_Frame, name = name, app = self, border = 0, highlightthickness = 0, background = "#171a1c")
+    def add_network(self, name : str, temp_name : str, paquet_size : int):
+        self.network_instances[name] = Network(self.Main_Frame, name = name, paquet_size = paquet_size, app = self, border = 0, highlightthickness = 0, background = "#171a1c")
         
         self.tab_bar.tabs[name] = self.tab_bar.tabs.pop(temp_name)
         self.tab_bar.tabs[name].name = name
@@ -139,6 +144,7 @@ class App(object):
     def switch_network(self, network_name : str) -> None:
      
         if self.current_network:
+            self.current_network.net_controls.set_play_button()
             self.current_network.pause = True
             self.current_network.deselect_object()
             self.current_network.pack_forget()
@@ -156,6 +162,26 @@ class App(object):
         else:
             self.create_network(network_name)
 
+    
+    def compare_networks(self, *args):
+        self.current_network.pause = True
+        
+        self.current_network.pack_forget()
+        self.side_bar.pack_forget()
+        self.tab_bar.pack_forget()
+
+        self.compare_networks_menu = DataAnalysisMenu(self.Main_Frame, app = self, background = "#171a1c")
+        self.compare_networks_menu.pack(anchor = "center", fill = "both", expand = True)
+
+
+    def close_comparison_menu(self) -> None:
+        self.compare_networks_menu.pack_forget()
+        self.compare_networks_menu = None
+        
+        self.tab_bar.pack(side = "top", fill = "x")
+        self.side_bar.pack(side = "right", fill = "y")
+        self.current_network.pack(side = "left", fill = "both", expand = True)
+
 
     def bind_events(self) -> None:
         self.parent.bind("<<AddNode>>", self.current_network.create_node)
@@ -164,10 +190,9 @@ class App(object):
         self.parent.bind("<<DeleteNetwork>>", self.current_network.delete_network)
         self.parent.bind("<<CustomPaquet>>", lambda args : self.current_network.create_paquet(self.current_network.selected_node))
         self.parent.bind("<<AddConnection>>", self.current_network.create_connection)
-        self.parent.bind("<<PlayNetwork>>", self.current_network.play_network)
-        self.parent.bind("<<PauseNetwork>>", self.current_network.pause_network)
         self.parent.bind("<<SaveNet>>", self.current_network.save_network)
         self.parent.bind("<<LoadNet>>", self.current_network.load_network)
+        self.parent.bind("<<Compare>>", self.compare_networks)
 
 
     def unbind_events(self) -> None:
@@ -177,10 +202,9 @@ class App(object):
         self.parent.unbind("<<DeleteNetwork>>")
         self.parent.unbind("<<CustomPaquet>>")
         self.parent.unbind("<<AddConnection>>")
-        self.parent.unbind("<<PlayNetwork>>")
-        self.parent.unbind("<<PauseNetwork>>")
         self.parent.unbind("<<SaveNet>>")
         self.parent.unbind("<<LoadNet>>")
+        self.parent.unbind("<<Compare>>")
 
 
 
