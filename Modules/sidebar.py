@@ -26,7 +26,6 @@ class SideBar(tk.Frame):
             "Buffer" : load_to_size("buffer_node", *self.icon_size),
             "Endpoint" : load_to_size("endpoint_node", *self.icon_size),
             "Compare" : (load_to_size("compare", *self.icon_size), load_to_size("highlight_compare", *self.icon_size)),
-            "Info" : (load_to_size("info", *self.icon_size), load_to_size("highlight_info", *self.icon_size)),
             "Node" : (load_to_size("node", *self.icon_size), load_to_size("highlight_node", *self.icon_size)),
             "Save" : (load_to_size("save", *self.icon_size), load_to_size("highlight_save", *self.icon_size)),
             "Load" : (load_to_size("load", *self.icon_size), load_to_size("highlight_load", *self.icon_size)),
@@ -106,31 +105,57 @@ class SideBar(tk.Frame):
         '''
         Sets Selected Object information and displays it onto the "SideBar"
         '''
+        info_text = ""
         
         if isinstance(obj, Network): # Network Info
-
             network = obj
-            self.info_title.config(image = self.icons["Network"], text = f"    {obj.name}")
-            info_text = f"Name : {network.name}\nConnections : {network.connection_counter}\n\nPaquets Created : {network.total_paquets_created}\nPaquets Sent : {network.total_paquets_transfered}\nPaquets Lost : {network.total_paquets_lost}" 
-            self.info_lable.config(text = info_text)
-
-
+            self.info_title.config(image = self.icons["Network"], text = f"    {network.name}")
+            
+            info_text += f"Name : {network.name}\n"
+            info_text += f"Connections : {network.connection_counter}\n\n"
+            
+            info_text += f"Paquet Size : {network.paquet_size}\n"
+            info_text += f"Paquet Wait Time : {network.mean_paquet_wait_time : 0.2f}\n\n"
+            
+            info_text += f"Paquets Created : {network.total_paquets_created}\n"
+            info_text += f"Paquets Sent : {network.total_paquets_transfered}\n"
+            info_text += f"Paquets Lost : {network.total_paquets_lost}" 
+            
+            
         elif isinstance(obj, Node): # Node Info
             node = obj
             self.info_title.config(image = self.icons[node.type], text = f"    {node.name}")
-            info_text = f"Type : {node.type}\nName : {node.name}\n"
             
-            if node.type == "Source" or node.type == "Buffer":
-                info_text += f"\nConnections : {len(node.connections)}"
-                info_text += f"\nOutput : {node.output_speed}"
+            info_text += f"Type : {node.type}\n"
+            info_text += f"Name : {node.name}\n"
+            info_text += f"Behaviour : {node.behaviour}\n\n"
+
+            info_text += f"Output Speed : {node.output_speed}/s\n"
+            info_text += f"Paquet Output : {node.paquet_output}/s\n\n"
             
+            if node.type == "Source":               
+                info_text += f"Paquets Created : {node.paquets_created}\n"
+                info_text += f"Paquets Lost : {node.paquets_lost}\n"
+
+                if node.behaviour == "Buffered":
+                    info_text += f"Buffer Capacity : {node.capacity}\n"
+            
+            elif node.type == "Buffer":
+                info_text += f"Paquets Sent : {node.paquets_transfered}\n"
+                info_text += f"Paquets Lost : {node.paquets_lost}\n\n"
+
+                info_text += f"Buffer Capacity : {node.capacity}\n"
+                info_text += f"Current Size : {node.number_element}\n"
+
+
             if node.type == "Source" and node.behaviour == "Buffered" or node.type == "Buffer":
                 # Here we take only a maximum of 5 paquets to show onto the "SideBar".
                 # If there are more than 5 paquets present in the "Node" a number dispaying the total remaining paquets is shown.
-                paquets = "\n       " + "\n       ".join(str(paquet) for paquet in node.paquet_queue[:5])
+                paquets = "\n● " + "\n● ".join(str(paquet) for paquet in node.paquet_queue[:5])
                 if len(node.paquet_queue) > 5:
-                    paquets += f"\n       And {len(node.paquet_queue) - 5} more..."
-                info_text += f"\nPaquet Queue : {paquets}"
+                    paquets += f"\n And {len(node.paquet_queue) - 5} more..."
+                info_text += f"Paquet Queue : {paquets}"
             
-            # Updates the Info Label
-            self.info_lable.config(text = info_text)
+
+        # Updates the Info Label
+        self.info_lable.config(text = info_text)

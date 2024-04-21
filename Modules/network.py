@@ -3,7 +3,6 @@ import tkinter as tk
 
 
 from time import time
-from Modules.net_controls import *
 from Modules.menus import *
 from Modules.utils import *
 from Modules.paquet import *
@@ -52,6 +51,8 @@ class Network(tk.Canvas):
         self.pause : bool = True
         self.last_updated : float = time()
         
+        self.paquet_loss_over_time = []
+
         self.total_paquets_created : int = 0
         self.total_paquets_transfered : int = 0
         self.total_paquets_lost : int = 0
@@ -59,7 +60,6 @@ class Network(tk.Canvas):
 
 
     # Logic Functions ====================================================================
-
 
 
     def update_network(self):
@@ -77,14 +77,12 @@ class Network(tk.Canvas):
                 self.total_paquets_created += node.paquet_output
                 if node.behaviour == "Buffered":
                     self.total_paquets_lost += node.paquet_loss
-        
-            # print("Finished Updating Sources")
-        
+
+
         for node_name in self.connections:
             node = self.nodes[node_name]    
 
             if node.type == "Buffer" and node.connections:
-                print("buffer found")
                 node.send_paquets()
                 node.collect_paquets()
 
@@ -96,7 +94,13 @@ class Network(tk.Canvas):
                 else:
                     self.mean_paquet_wait_time = (self.mean_paquet_wait_time + node.mean_paquet_wait_time) / 2
 
-            print("Finished Updating Buffers")
+        for node_name in self.connections:
+            node = self.nodes[node_name]  
+            if node.type == "Source" and node.behaviour == "Normal":
+                if node.paquet_queue:
+                    node.paquets_lost += len(node.paquet_queue)
+                    self.total_paquets_lost += len(node.paquet_queue)
+                    node.paquet_queue.clear()
 
 
     def add_node(self, node_type, name, *args, **kwargs) -> None:
@@ -135,6 +139,16 @@ class Network(tk.Canvas):
         
         self.deselect_object()
         if not node: return
+
+        
+        if node.type == "Source":
+            self.total_paquets_created -= node.paquets_created
+            self.total_paquets_lost -= node.paquets_lost
+        
+        elif node.type == "Buffer":
+            self.total_paquets_lost -= node.paquets_lost
+            self.total_paquets_transfered -= node.paquets_transfered
+
 
         NODE_TYPES[node.type].instance_counter -= 1
         self.connection_counter -= len(self.connections[node.name])
@@ -192,6 +206,11 @@ class Network(tk.Canvas):
 
         elif node_1.type == "Endpoint" and node_2.type == "Endpoint":
             self.app.alert = ("Error","TwoEndpoints")
+            self.event_generate("<<Alert>>")
+            return
+
+        elif node_1.type == "Buffer" and node_2.type == "Buffer":
+            self.app.alert = ("Error","TwoBuffers")
             self.event_generate("<<Alert>>")
             return
 

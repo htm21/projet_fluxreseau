@@ -110,8 +110,9 @@ class TabBar(tk.Frame):
 
         if right_tab := tab_names[tab_index + 1 : tab_index + 2]:
             self.switch_tabs(right_tab[0])
-        elif left_tab := tab_names[tab_index - 1 : tab_index] and left_tab != tab_name:
-            self.switch_tabs(left_tab[0])
+        elif left_tab := tab_names[tab_index - 1 : tab_index]:
+            if left_tab != tab_name:
+                self.switch_tabs(left_tab[0])
         else:
             self.selected_tab = None
 

@@ -44,21 +44,15 @@ ALERTS = {
         "NoDataFile" : "No file given!",
         "EmptyNetToSave" : "There is nothing to save!",
         "OneNetAtATime" : "You can only create one network at a time!",
-        "ExitOfMenu" : "Exit out of the current menu before creating or switching to a new tab!"
+        "ExitOfMenu" : "Exit out of the current menu before creating or switching to a new tab!",
+        "TwoBuffers" : "You can't connect two Buffers!",
+        "SameNetworkName" : "You can't have two networks with the same name!"
         }
     }
 
 
 def screen_dimensions(root : tk.Tk) -> tuple[int, int]:
-    
     return root.winfo_screenwidth(), root.winfo_screenheight()
-
-
-def monitor_dimensions() -> tuple[int, int]:
-    monitor = screeninfo.get_monitors()[0]
-    monitor_width, monitor_height = monitor.width, monitor.height
-    
-    return monitor_width, monitor_height
 
 
 def load_to_size(icon : str, width : int, height : int) -> ImageTk.PhotoImage:
@@ -68,7 +62,67 @@ def load_to_size(icon : str, width : int, height : int) -> ImageTk.PhotoImage:
     return ImageTk.PhotoImage(icon)
 
 
-def poisson_process(parameter):
-    U = rd.uniform(0.1,1)
-    sleep = -(1/parameter)*log10(U)
-    return sleep
+
+
+
+
+
+
+
+
+
+
+
+# Colors ========================================================================
+
+
+# highlight : "#ffcc22"
+# main color = "#22282a"
+# blending color : "#1D2123"
+# darker color : "#171a1c"
+
+# Connection : #394642
+
+# info
+# box : #394642
+# icon : #1E2422
+
+# success
+# box : #004d00
+# icon : #003300
+
+# error
+# box : #4d0000
+# icon : #330000
+
+# paquet
+# box : #2E293D
+# icon : #221F2E
+
+# save / load
+# box : #3D3029
+# icon : #2E241F
+
+# delete
+# box : #3d2932
+# icon : #2a2226
+
+# network
+# box : #2E293D
+# network_icon : #221F2E
+
+# node
+# box : #394642
+# icon : #1E2422
+
+# source
+# box : #354d33
+# arrow : #232a22
+
+# endpoint
+# box : #3d2932
+# arrow : #2a2226
+
+# buffer:
+# box : #3d3829
+# icon : #2a2822

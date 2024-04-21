@@ -8,7 +8,6 @@ from Modules.menus import *
 from Modules.sidebar import *
 from Modules.network import *
 from Modules.tab_bar import *
-from Modules.data_analysis import *
 
 
 
@@ -52,11 +51,11 @@ class App(object):
         self.parent.geometry(f"{self.gui_w}x{self.gui_h}+{self.x}+{self.y}")      
         self.parent.title("Project Transmission")
         self.parent.minsize(1280, 720)
-        # self.parent.iconbitmap(default = f"{app_folder_path}/Icons/icon.ico") Need to fix later
+        self.parent.iconbitmap(f"{app_folder_path}/Icons/icon.ico")
 
         # Frames =======================================================================
 
-        self.Main_Frame = tk.Frame(self.parent, highlightthickness = 5, highlightbackground = "#1D2123", highlightcolor = "#1D2123")
+        self.Main_Frame = tk.Frame(self.parent, background = "#171a1c", highlightthickness = 5, highlightbackground = "#1D2123", highlightcolor = "#1D2123")
         self.tab_bar = TabBar(self.Main_Frame, app = self, background = "#22282a")
         self.side_bar = SideBar(self.Main_Frame, background = "#22282a", width = 375)
         self.side_bar.pack_propagate(0)
@@ -73,6 +72,7 @@ class App(object):
 
         self.parent.bind("<<Alert>>", self.create_alert)
         self.parent.protocol("WM_DELETE_WINDOW", self.on_closing)
+
 
 
     def create_alert(self, *args) -> None:
@@ -94,19 +94,19 @@ class App(object):
             self.side_bar.pack_forget()
 
         if self.current_network:
-            self.current_network.net_controls.set_play_button()
             self.current_network.pause = True
             if self.current_network.selected_node: self.current_network.deselect_object()
             self.current_network.pack_forget()
             self.current_network = None
 
         if temp_name in list(self.network_instances.keys()):
-            self.create_network_menu.pack(side = "top", fill = "both", expand = True)
+            # self.create_network_menu.pack(side = "top", fill = "both", expand = True)
+            self.create_network_menu.place(anchor = "center", relwidth = 0.6, relheight = 0.85, relx = 0.5, rely = 0.5)
             return
 
         self.network_instances[temp_name] = None
-        self.create_network_menu = NewNetworkMenu(self.Main_Frame, app = self, background = "#22282a")
-        self.create_network_menu.pack(side = "top", fill = "both", expand = True)
+        self.create_network_menu = NewNetworkMenu(self.Main_Frame, app = self, background = "#22282a", highlightthickness = 5, highlightbackground = "#1D2123", highlightcolor = "#1D2123")
+        self.create_network_menu.place(anchor = "center", relwidth = 0.6, relheight = 0.85, relx = 0.5, rely = 0.5)
 
 
     def delete_network(self, network_name : str) -> None:
@@ -116,7 +116,7 @@ class App(object):
             Network.instance_counter -= 1
         else:
             NewNetworkMenu.instance_counter -= 1
-            self.create_network_menu.pack_forget()
+            self.create_network_menu.place_forget()
         
         del self.network_instances[network_name]
 
@@ -205,62 +205,3 @@ class App(object):
         self.parent.unbind("<<SaveNet>>")
         self.parent.unbind("<<LoadNet>>")
         self.parent.unbind("<<Compare>>")
-
-
-
-
-
-
-# Colors ========================================================================
-
-
-# highlight : "#ffcc22"
-# main color = "#22282a"
-# blending color : "#1D2123"
-# darker color : "#171a1c"
-
-# Connection : #394642
-
-# info
-# box : #394642
-# icon : #1E2422
-
-# success
-# box : #004d00
-# icon : #003300
-
-# error
-# box : #4d0000
-# icon : #330000
-
-# paquet
-# box : #2E293D
-# icon : #221F2E
-
-# save / load
-# box : #3D3029
-# icon : #2E241F
-
-# delete
-# box : #3d2932
-# icon : #2a2226
-
-# network
-# box : #2E293D
-# network_icon : #221F2E
-
-# node
-# box : #394642
-# icon : #1E2422
-
-# source
-# box : #354d33
-# arrow : #232a22
-
-# endpoint
-# box : #3d2932
-# arrow : #2a2226
-
-# buffer:
-# box : #3d3829
-# icon : #2a2822

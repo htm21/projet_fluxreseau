@@ -1,10 +1,14 @@
 import json
+import pandas as pd
 import tkinter as tk
 import customtkinter as ctk
+import matplotlib.pyplot as plt
  
 from Modules.node import *
 from Modules.custom_button import * 
 from Modules.utils import *
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 
 
@@ -24,10 +28,9 @@ class NodeCreationMenu(tk.Frame):
             "Source" : (load_to_size("source_node", *self.icon_size), load_to_size("highlight_source_node", *self.icon_size)),
             "Buffer" : (load_to_size("buffer_node", *self.icon_size), load_to_size("highlight_buffer_node", *self.icon_size)),
             "Endpoint" : (load_to_size("endpoint_node", *self.icon_size), load_to_size("highlight_endpoint_node", *self.icon_size)),
-            "Success" : load_to_size("success", 35, 35),
-            "Error" : load_to_size("error", 35, 35)
-            } # dictionary that holds the normal node image and also the highlighted node image
-
+            "Yes" : (load_to_size("yes", *self.icon_size), load_to_size("highlight_yes", *self.icon_size)),
+            "No" : (load_to_size("no", *self.icon_size), load_to_size("highlight_no", *self.icon_size)),
+            }
 
         # Frames =======================================================================
 
@@ -36,17 +39,13 @@ class NodeCreationMenu(tk.Frame):
         self.node_settings = tk.Frame(self, background = kwargs.get("background"))
         self.buffer_frame2 = tk.Frame(self, background = "#1D2123", height = 5)
         self.controls = tk.Frame(self, background = kwargs.get("background"))
-
         self.type_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.name_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.output_speed_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.input_speed_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.source_behaviour_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
-        # self.send_paquets_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.buffer_behaviour_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
         self.capacity_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
-        # self.lambda_setting_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
-
 
 
         self.node_choice.pack(side = "top", fill = "x", padx = 20, pady = 15)
@@ -61,7 +60,6 @@ class NodeCreationMenu(tk.Frame):
         self.choose_node_lable = tk.Label(self.node_settings, text = "Choose A Node", font = f"{font} 40 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
 
         self.source_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Source", image = self.icons["Source"][0], icons = self.icons["Source"], text = "Source Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        # self.endpoint_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Endpoint", image = self.icons["Endpoint"][0], icons = self.icons["Endpoint"], text = "Endpoint Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.buffer_choice = CustomButton(self.node_choice, parent_obj = self, func_arg = "Buffer", image = self.icons["Buffer"][0], icons = self.icons["Buffer"], text = "Buffer Node", compound = "top", font = f"{font} 18 bold", foreground = "#FFFFFF", background = kwargs.get("background")) 
         
         self.node_type_lable = tk.Label(self.type_frame, text = "Type : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
@@ -76,27 +74,19 @@ class NodeCreationMenu(tk.Frame):
         self.source_behaviour_label = tk.Label(self.source_behaviour_frame, text = "Behaviour : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.source_behaviour_dropdown = ctk.CTkComboBox(self.source_behaviour_frame, state = "readonly", width = 323, height = 40, corner_radius = 0, border_width = 0, font = (f"{font} bold", 20), dropdown_font = (f"{font} bold", 15), text_color = "#FFFFFF", fg_color = "#171a1c", border_color = "#171a1c", button_hover_color = "#ffcc22", values = Source.behaviour_types, command = self.show_source_capacity)
 
-        # self.send_paquets_label = tk.Label(self.send_paquets_frame, text = "Paquet Limit : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        # self.send_paquets_entry = tk.Entry(self.send_paquets_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
-        
         self.buffer_behaviour_label = tk.Label(self.buffer_behaviour_frame, text = "Behaviour : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.buffer_behaviour_dropdown = ctk.CTkComboBox(self.buffer_behaviour_frame, state = "readonly", width = 323, height = 40, corner_radius = 0, border_width = 0, font = (f"{font} bold", 20), dropdown_font = (f"{font} bold", 15), text_color = "#FFFFFF", fg_color = "#171a1c", border_color = "#171a1c", button_hover_color = "#ffcc22", values = Buffer.behaviour_types)
 
         self.capacity_label = tk.Label(self.capacity_frame, text = "Capacity : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.capacity_entry = tk.Entry(self.capacity_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
 
-        # self.lambda_setting_label = tk.Label(self.lambda_setting_frame, text = "Lambda : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        # self.lambda_setting_entry = tk.Entry(self.lambda_setting_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
-
-        self.create_button = tk.Button(self.controls, image = self.icons["Success"], compound = "left", justify = "left", text = "  Create", font = f"{font} 23 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.create_node)
-        self.cancel_button = tk.Button(self.controls, image = self.icons["Error"], compound = "left", justify = "left", text = "  Cancel", font = f"{font} 23 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", relief = "sunken", border = 0, command = self.cancel_node)
-
+        self.create_button = CustomButton(self.controls, parent_obj = self, func_arg = "create", icons = self.icons["Yes"], image = self.icons["Yes"][0], compound = "right", text = "Create  ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.cancel_button = CustomButton(self.controls, parent_obj = self, func_arg = "cancel", icons = self.icons["No"], image = self.icons["No"][0], compound = "left", text = "  Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
 
 
         self.choose_node_lable.pack(anchor = "center", fill = "x", expand = True)
         
         self.source_choice.pack(side = "left", fill = "x", expand = True)
-        # self.endpoint_choice.pack(side = "left", fill = "x", expand = True)
         self.buffer_choice.pack(side = "left", fill = "x", expand = True)
         
         self.node_type_lable.pack(side = "left")
@@ -111,35 +101,14 @@ class NodeCreationMenu(tk.Frame):
         self.source_behaviour_label.pack(side = "left")
         self.source_behaviour_dropdown.pack(side = "right")
         
-        # self.send_paquets_label.pack(side = "left")
-        # self.send_paquets_entry.pack(side = "right")
-        
         self.buffer_behaviour_label.pack(side = "left")
         self.buffer_behaviour_dropdown.pack(side = "right")
 
         self.capacity_label.pack(side = "left")
         self.capacity_entry.pack(side = "right")
 
-        # self.lambda_setting_label.pack(side = "left")
-        # self.lambda_setting_entry.pack(side = "right")
-
-        self.create_button.pack(side = "right", padx = (50, 10), ipadx = 15)
-        self.cancel_button.pack(side = "right", ipadx = 15)
-
-        # Binds ======================================================================
-
-        self.create_button.bind("<Enter>", lambda args, button = self.create_button: self.on_enter(button))
-        self.create_button.bind("<Leave>", lambda args, button = self.create_button: self.on_leave(button))
-        self.cancel_button.bind("<Enter>", lambda args, button = self.cancel_button: self.on_enter(button))
-        self.cancel_button.bind("<Leave>", lambda args, button = self.cancel_button: self.on_leave(button))
-
-
-    def on_enter(self, button):
-        button.config(foreground = "#ffcc22")
-
-
-    def on_leave(self, button):
-        button.config(foreground = "#FFFFFF")
+        self.create_button.pack(side = "right", padx = (30, 0))
+        self.cancel_button.pack(side = "left", padx = (0, 30))
 
 
     def create_node(self, *args):
@@ -157,14 +126,6 @@ class NodeCreationMenu(tk.Frame):
             elif behaviour ==  "Buffered":
                 capacity = int(self.capacity_entry.get()) if int(self.capacity_entry.get()) >= 0 else 10
                 self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, behaviour = behaviour, capacity = capacity)
-            # send_paquets = int(self.send_paquets_entry.get())
-
-
-        # elif node_type == "Endpoint":
-        #     input_speed = int(self.input_speed_entry.get()) if int(self.input_speed_entry.get()) >= 0 else 0
-        
-        #     self.network.add_node(node_type = node_type, name = name)
-
 
         elif node_type == "Buffer":
             behaviour = self.buffer_behaviour_dropdown.get()
@@ -193,17 +154,12 @@ class NodeCreationMenu(tk.Frame):
         self.output_speed_frame.pack_forget()
         self.input_speed_frame.pack_forget()
         self.source_behaviour_frame.pack_forget()
-        # self.send_paquets_frame.pack_forget()
         self.buffer_behaviour_frame.pack_forget()
         self.capacity_frame.pack_forget()
-        # self.lambda_setting_frame.pack_forget()
         
         # Widgets ======================================
         self.output_speed_entry.delete(0, "end")
         self.source_behaviour_dropdown.set(Source.behaviour_types[0])
-        # self.send_paquets_entry.delete(0, "end")
-        # self.lambda_setting_entry.delete(0, "end")
-        # self.lambda_setting_entry.insert(0, "0")
         self.buffer_behaviour_dropdown.set(Buffer.behaviour_types[0])
         self.capacity_entry.delete(0, "end")
 
@@ -218,29 +174,26 @@ class NodeCreationMenu(tk.Frame):
 
 
     def passdown_func(self, arg):
-        
-        self.reset_settings()
-        self.type_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
-        self.name_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+    
         
         if arg == "Source":
+            self.reset_settings()
+            self.type_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            self.name_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.node_class_label.config(text = arg, foreground = "#354d33")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
             self.output_speed_entry.insert(0, "100")
-            # self.send_paquets_entry.insert(0, "0")
             
             self.output_speed_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.source_behaviour_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
-            # self.send_paquets_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
-        
-        # elif arg == "Endpoint":
-        #     self.node_class_label.config(text = arg, foreground = "#3d2932")     
-        #     self.name_entry.delete(0, "end")
-        #     self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            # self.lambda_setting_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+
+            self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 15)
         
         elif arg == "Buffer":
+            self.reset_settings()
+            self.type_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            self.name_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.node_class_label.config(text = arg, foreground = "#3d3829")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
@@ -250,11 +203,14 @@ class NodeCreationMenu(tk.Frame):
             self.output_speed_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.buffer_behaviour_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.capacity_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
-            # self.lambda_setting_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
 
-        self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 15)
+            self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 15)
 
-
+        elif arg == "create":
+            self.create_node()
+        
+        elif arg == "cancel":
+            self.cancel_node()
 
 
 
@@ -286,10 +242,9 @@ class DelNetMenu(tk.Frame):
         self.network = network
         self.icon_size : tuple = 75, 75
         self.icons : dict[str : tuple] = {
-            "Network" : load_to_size("network", *self.icon_size),
-            "Delete" : (load_to_size("delete", 35, 35)),
-            "Success" : load_to_size("success", 35, 35),
-            "Error" : load_to_size("error", 35, 35)
+            "Back" : (load_to_size("back", *self.icon_size), load_to_size("highlight_back", *self.icon_size)),
+            "Delete" : (load_to_size("delete", *self.icon_size), load_to_size("highlight_delete", *self.icon_size))
+
             }
 
         # Frames =======================================================================
@@ -306,21 +261,14 @@ class DelNetMenu(tk.Frame):
 
         self.info_label = tk.Label(self.info_frame, text = self.warning_text, justify = "center", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"), wraplength = "575")
         self.confirmation_label = tk.Label(self.info_frame, text = self.confirmation_text, justify = "center", font = f"{font} 20 bold", foreground = "#ffcc22", background = kwargs.get("background"), wraplength = "575")
-        self.delete_button = tk.Button(self.controls, image = self.icons["Delete"], compound = "left", justify = "left", text = "  Delete", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", relief = "sunken", border = 0, command = self.delete_network)
-        self.cancel_button = tk.Button(self.controls, justify = "left", text = "Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.cancel_deletion)
+        self.back_button = CustomButton(self.controls, parent_obj = self, func_arg = "back", icons = self.icons["Back"], image = self.icons["Back"][0], compound = "left", text = "  Back", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.delete_button = CustomButton(self.controls, parent_obj = self, func_arg = "delete", icons = self.icons["Delete"], image = self.icons["Delete"][0], compound = "right", text = "Delete  ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+
 
         self.info_label.pack(side = "top", pady = (20, 0))
         self.confirmation_label.pack(side = "top", pady = 20)
-        self.delete_button.pack(side = "right", expand = True, ipadx = 15)
-        self.cancel_button.pack(side = "right", expand = True, ipadx = 15)
-
-        # Binds ======================================================================
-
-        self.delete_button.bind("<Enter>", lambda args, button = self.delete_button: self.on_enter(button))
-        self.delete_button.bind("<Leave>", lambda args, button = self.delete_button: self.on_leave(button))
-        self.cancel_button.bind("<Enter>", lambda args, button = self.cancel_button: self.on_enter(button))
-        self.cancel_button.bind("<Leave>", lambda args, button = self.cancel_button: self.on_leave(button))
-
+        self.back_button.pack(side = "left", padx = 20)
+        self.delete_button.pack(side = "right", padx = 20)
 
     def delete_network(self, *args) -> None:
         DelNetMenu.instance_counter -= 1
@@ -333,13 +281,13 @@ class DelNetMenu(tk.Frame):
         DelNetMenu.instance_counter -= 1
         self.destroy()
 
-    def on_enter(self, button):
-        button.config(foreground = "#ffcc22")
+    def passdown_func(self, arg) -> None:
 
-
-    def on_leave(self, button):
-        button.config(foreground = "#FFFFFF")
-
+        if arg == "back":
+            self.cancel_deletion()
+        
+        elif arg == "delete":
+            self.delete_network()
 
 
 
@@ -370,75 +318,65 @@ class PaquetCreationMenu(tk.Frame):
 
         self.node = node
         self.network = network
+
+        # Icons ========================================================================
+
         self.icon_size = 75, 75
         self.icons = {
             "Paquet" : load_to_size("paquet", *self.icon_size),
-            "Success" : load_to_size("success", 35, 35),
-            "Error" : load_to_size("error", 35, 35)
+            "Yes" : (load_to_size("yes", *self.icon_size), load_to_size("highlight_yes", *self.icon_size)),
+            "No" : (load_to_size("no", *self.icon_size), load_to_size("highlight_no", *self.icon_size))
             }
 
-        # Frames =======================================================================
+        # Page Title ===================================================================
 
         self.window_title_frame = tk.Frame(self, background = kwargs.get("background"))
         self.buffer_frame1 = tk.Frame(self, background = "#1D2123", height = 5)
-        self.paquet_settings = tk.Frame(self, background = kwargs.get("background"))
-        self.buffer_frame2 = tk.Frame(self, background = "#1D2123", height = 5)
-        self.controls = tk.Frame(self, background = kwargs.get("background"))
+        self.window_title = tk.Label(self.window_title_frame, image = self.icons["Paquet"], compound = "left", justify = "right", text = "  Paquet Creation", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        
+        self.window_title_frame.pack(side = "top", fill = "x", padx = 20, pady = 20)
+        self.buffer_frame1.pack(side = "top", fill = "x")
+        self.window_title.pack(side = "left")
+        
+        # Paquet Settings ==============================================================
 
+        self.paquet_settings = tk.Frame(self, background = kwargs.get("background"))
         self.data_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
         self.size_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
         self.tracking_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
-
-        self.window_title_frame.pack(side = "top", fill = "x", padx = 20, pady = 20)
-        self.buffer_frame1.pack(side = "top", fill = "x")
-        self.paquet_settings.pack(side = "top", fill = "x", expand = True, padx = 20, pady = 20)
-        self.buffer_frame2.pack(side = "top", fill = "x")
-        self.controls.pack(side = "top", fill = "x", padx = 20, pady = 20)
-
-        self.data_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
-        self.size_frame.pack(padx = 20, pady = 10, fill = "x")
-        self.tracking_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
-
-        # Widgets ======================================================================
-
-        self.window_title = tk.Label(self.window_title_frame, image = self.icons["Paquet"], compound = "left", justify = "right", text = "  Paquet Creation", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-
         self.data_lable = tk.Label(self.data_frame, text = "Data : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.data_entry = tk.Entry(self.data_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         self.data_entry.insert(0, f"Hello from {self.node.name}")
-
         self.size_lable = tk.Label(self.size_frame, text = "Data Size : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.size_entry = tk.Entry(self.size_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         self.size_entry.insert(0, "10")
-
         self.tracking_lable = tk.Label(self.tracking_frame, text = "Tracking : ",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.tracking_checkbox = ctk.CTkCheckBox(self.tracking_frame, width = 0, height = 0, checkbox_width = 40, checkbox_height = 40, text = None, corner_radius = 0, hover = False, checkmark_color = "#ffcc22", bg_color = kwargs.get("background"), fg_color = kwargs.get("background"), border_color = "#1D2123")
 
-        self.create_button = tk.Button(self.controls, image = self.icons["Success"], compound = "left", justify = "left", text = "  Create", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.create_paquet)
-        self.cancel_button = tk.Button(self.controls, image = self.icons["Error"], compound = "left", justify = "left", text = "  Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#4d0000", activebackground = "#4d0000", relief = "sunken", border = 0, command = self.cancel_paquet)
 
-
-        self.window_title.pack(side = "left")
-
+        self.paquet_settings.pack(side = "top", fill = "x", expand = True, padx = 20, pady = 20)
+        self.data_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
+        self.size_frame.pack(padx = 20, pady = 10, fill = "x")
+        self.tracking_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)  
         self.data_lable.pack(side = "left")
         self.data_entry.pack(side = "right")
-        
         self.size_lable.pack(side = "left")
         self.size_entry.pack(side = "right")
-        
         self.tracking_lable.pack(side = "left")
-        self.tracking_checkbox.pack(side = "right")
-        
-        self.create_button.pack(side = "right", padx = (50, 10), ipadx = 15)
-        self.cancel_button.pack(side = "right", ipadx = 15)
+        self.tracking_checkbox.pack(side = "right")      
 
+        # Controls =====================================================================
 
-        # Binds ======================================================================
+        self.buffer_frame2 = tk.Frame(self, background = "#1D2123", height = 5)
+        self.controls = tk.Frame(self, background = kwargs.get("background"))
+        self.create_button = CustomButton(self.controls, parent_obj = self, func_arg = "create", icons = self.icons["Yes"], image = self.icons["Yes"][0], compound = "right", text = "Create  ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.cancle_button = CustomButton(self.controls, parent_obj = self, func_arg = "cancel", icons = self.icons["No"], image = self.icons["No"][0], compound = "left", text = "  Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
 
-        self.create_button.bind("<Enter>", lambda args, button = self.create_button: self.on_enter(button))
-        self.create_button.bind("<Leave>", lambda args, button = self.create_button: self.on_leave(button))
-        self.cancel_button.bind("<Enter>", lambda args, button = self.cancel_button: self.on_enter(button))
-        self.cancel_button.bind("<Leave>", lambda args, button = self.cancel_button: self.on_leave(button))
+        self.buffer_frame2.pack(side = "top", fill = "x")
+        self.controls.pack(side = "top", fill = "x")
+        self.create_button.pack(side = "right", padx = 15, pady = 15)
+        self.cancle_button.pack(side = "left", padx = 15, pady = 15)
+
 
 
     def create_paquet(self, *args) -> None:
@@ -457,13 +395,13 @@ class PaquetCreationMenu(tk.Frame):
         PaquetCreationMenu.instance_counter -= 1
         self.destroy()
 
-
-    def on_enter(self, button):
-        button.config(foreground = "#ffcc22")
-
-
-    def on_leave(self, button):
-        button.config(foreground = "#FFFFFF")
+    def passdown_func(self, arg) -> None:
+        
+        if arg == "cancel":
+            self.cancel_paquet()
+        
+        elif arg == "create":
+            self.create_paquet()
 
 
 
@@ -487,64 +425,80 @@ class NewNetworkMenu(tk.Frame):
 
         self.app = app
         self.kwargs = kwargs
+        
+        # Icons ========================================================================
+
         self.icon_size : tuple = (85, 85)  
         self.icons : dict = {
             "Success" : load_to_size("success", 35, 35),
             "NetworkTitle" : load_to_size("network", 100, 100),
+            "Yes" : (load_to_size("yes", 75, 75), load_to_size("highlight_yes", 75, 75)),
             "Back" : (load_to_size("back", 75, 75), load_to_size("highlight_back", 75, 75)),
             "NetworkButton" : (load_to_size("network", *self.icon_size), load_to_size("highlight_network", *self.icon_size)),
             "Load" : (load_to_size("load", *self.icon_size), load_to_size("highlight_load", *self.icon_size)),
             }
 
-        # Frames =======================================================================
+        # Page Title ===================================================================
+        
+        self.title_frame = tk.Frame(self, background = self.kwargs.get("background"))
+        self.page_title = tk.Label(self.title_frame, image = self.icons["NetworkTitle"], compound = "left", text = "  New Network", font = f"{font} 35 bold", foreground = "#FFFFFF", background = self.kwargs.get("background"))
+        self.buffer_frame_2 = tk.Frame(self.title_frame, background = "#1D2123", height = "5")
+        
+        self.title_frame.pack(side = "top", fill = "x")
+        self.page_title.pack(side = "top", anchor = "w", pady = 30, padx = 15)
+        self.buffer_frame_2.pack(side = "top", fill = "x", padx = 15)
+        
+        # Options ======================================================================
 
-        self.page_title = tk.Label(self, image = self.icons["NetworkTitle"], compound = "left", text = "  New Network", font = f"{font} 30 bold", foreground = "#FFFFFF", background = self.kwargs.get("background"))
-        self.buffer_frame_2 = tk.Frame(self, background = "#1D2123", height = "5")
         self.option_frame = tk.Frame(self, background = self.kwargs.get("background"))
+        self.create_network_button = CustomButton(self.option_frame, parent_obj = self, func_arg = "new", icons = self.icons["NetworkButton"], image = self.icons["NetworkButton"][0], compound = "top", text = "Create\nNetwork", justify = "center", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.load_network_button = CustomButton(self.option_frame, parent_obj = self, func_arg = "load", icons = self.icons["Load"], image = self.icons["Load"][0], compound = "top", text = "Load\nNetwork", justify = "center", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))     
+
+
+        self.option_frame.pack(anchor = "center", expand = True, fill = "both")
+        self.create_network_button.pack(side = "left", anchor = "center", expand = True, padx = (15, 0))
+        self.load_network_button.pack(side = "right", anchor = "center", expand = True, padx = (0, 15))
+        
+        # Settings =====================================================================
+
         self.settings_frame = tk.Frame(self, background = self.kwargs.get("background"))
         self.name_frame = tk.Frame(self.settings_frame, background = self.kwargs.get("background"))
         self.paquet_size_frame = tk.Frame(self.settings_frame, background = self.kwargs.get("background"))
-
-        self.page_title.pack(side = "top", anchor = "w", pady = 30, padx = 15)
-        self.buffer_frame_2.pack(side = "top", fill = "x")
-        self.option_frame.pack(side = "top", fill = "both")
-        self.name_frame.pack(side = "top", anchor = "w", pady = (60, 15), padx = 15)
-        self.paquet_size_frame.pack(side = "top", anchor = "w", padx = 15)
-
-        # Widgets ======================================================================
-
-        self.create_network_button = CustomButton(self.option_frame, parent_obj = self, func_arg = "new", icons = self.icons["NetworkButton"], image = self.icons["NetworkButton"][0], compound = "left", text = "  Create Network", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.load_network_button = CustomButton(self.option_frame, parent_obj = self, func_arg = "load", icons = self.icons["Load"], image = self.icons["Load"][0], compound = "left", text = "  Load Network", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))     
-        
-        self.name_label = tk.Label(self.name_frame, text = "Name :             ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.name_entry = tk.Entry(self.name_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
-        
+        self.name_label = tk.Label(self.name_frame, text = "Name :  ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.name_entry = tk.Entry(self.name_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)    
         self.paquet_size_label = tk.Label(self.paquet_size_frame, text = "Paquet Size :  ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.paquet_size_entry = tk.Entry(self.paquet_size_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
-
-        self.back_button = CustomButton(self.settings_frame, parent_obj = self, func_arg = "go_back", icons = self.icons["Back"], image = self.icons["Back"][0], background = kwargs.get("background"))
-        self.create_button = tk.Button(self.settings_frame, padx = 10, image = self.icons["Success"], compound = "left", justify = "left", text = "Create", font = f"{font} 25 bold", foreground = "#FFFFFF", activeforeground = "#ffcc22", background = "#004d00", activebackground = "#004d00", relief = "sunken", border = 0, command = self.create_network)
-
-
-        self.create_network_button.pack(side = "top", anchor = "w", padx = 15, pady = (60, 15))
-        self.load_network_button.pack(side = "top", anchor = "w", padx = 15)
-        self.name_label.pack(side = "left")
-        self.name_entry.pack(side = "right")
-        self.paquet_size_label.pack(side = "left")
-        self.paquet_size_entry.pack(side = "right")
-        self.create_button.pack(side = "right", anchor = "se", padx = 15, pady = 15)
-        self.back_button.pack(side = "left", anchor = "sw", padx = 15, pady = 15)
+        self.name_frame.pack(side = "top", anchor = "w", expand = True, fill = "y", padx = 15, pady = 15)
+        self.paquet_size_frame.pack(side = "top", anchor = "w", expand = True, fill = "y", padx = 15, pady = 15)
         
-        # Binds ======================================================================
+        self.name_label.pack(side = "left", anchor = "s")
+        self.name_entry.pack(side = "right", anchor = "s")
+        self.paquet_size_label.pack(side = "left", anchor = "n")
+        self.paquet_size_entry.pack(side = "right", anchor = "n")
 
-        self.create_button.bind("<Enter>", lambda args, button = self.create_button: self.on_enter(button))
-        self.create_button.bind("<Leave>", lambda args, button = self.create_button: self.on_leave(button))
+        # Controls =====================================================================
+
+        self.control_frame = tk.Frame(self.settings_frame, background = self.kwargs.get("background"))
+        self.buffer_frame_3 = tk.Frame(self.control_frame, background = "#1D2123", height = "5")
+        self.back_button = CustomButton(self.control_frame, parent_obj = self, func_arg = "go_back", icons = self.icons["Back"], image = self.icons["Back"][0], compound = "left", text = "  Back", font = f"{font} 30 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.create_button = CustomButton(self.control_frame, parent_obj = self, func_arg = "create", icons = self.icons["Yes"], image = self.icons["Yes"][0], compound = "right", text = "Create  ", font = f"{font} 30 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+
+        self.control_frame.pack(side = "bottom", fill = "x")
+        self.buffer_frame_3.pack(side = "top", fill = "x", anchor = "center", padx = 15)
+        self.create_button.pack(side = "right", padx = 15, pady = 15)
+        self.back_button.pack(side = "left", padx = 15, pady = 15)
 
 
     def create_network(self, name : str = None, paquet_size : int = None) -> None:
         if name == None:
             name = self.name_entry.get()
             paquet_size = int(self.paquet_size_entry.get()) if int(self.paquet_size_entry.get()) >= 0 else 10
+
+            if name in self.app.network_instances and self.app.network_instances[name]:
+                self.app.alert = ("Error", "SameNetworkName")
+                self.event_generate("<<Alert>>")
+                return
+
             self.app.add_network(name = name, temp_name = self.app.tab_bar.selected_tab.name, paquet_size = paquet_size)
      
         else:
@@ -554,22 +508,23 @@ class NewNetworkMenu(tk.Frame):
         self.destroy()
 
 
-    def on_enter(self, button : tk.Widget):
-        button.config(foreground = "#ffcc22")
-
-
-    def on_leave(self, button : tk.Widget):
-        button.config(foreground = "#FFFFFF")
-
-
     def passdown_func(self, arg : str):
+        '''
+        Handles all commands from the "CustomButton" widgets
+        In this menu there are 4 commands:
+            - new : goes to the create network menu
+            - load : calls the "tk.filedialog.askopenfilename" function so the user can select a save file to load
+            - go_back : goes back to the options menu (load or create network)
+            - create : calls the "self.create_network" function
+        '''
+        
         if arg == "new":
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{self.app.tab_bar.selected_tab.name}")
             self.paquet_size_entry.delete(0, "end")
             self.paquet_size_entry.insert(0, "10")
             
-            self.settings_frame.pack(side = "top", fill = "both", expand = True)
+            self.settings_frame.pack(expand = True, fill = "both", anchor = "center")
             self.option_frame.pack_forget()
 
 
@@ -588,3 +543,259 @@ class NewNetworkMenu(tk.Frame):
         elif arg == "go_back":
             self.settings_frame.pack_forget()
             self.option_frame.pack(side = "top", fill = "both", expand = True)
+        
+        elif arg == "create":
+            self.create_network()
+
+
+
+
+
+
+
+
+class NetControls(tk.Frame):
+
+    def __init__(self, parent, network, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+
+        self.network = network
+        self.kwargs = kwargs
+        self.icon_size : tuple = 65, 65
+        self.icons : dict[str : tuple] = {
+            "Next" : (load_to_size("next", *self.icon_size), load_to_size("highlight_next", *self.icon_size)),
+            "Pause" : (load_to_size("pause", *self.icon_size), load_to_size("highlight_pause", *self.icon_size)),
+            "Play" : (load_to_size("play", *self.icon_size), load_to_size("highlight_play", *self.icon_size)),
+            }
+
+        # Frames =======================================================================
+
+        self.buffer_frame_1 = tk.Frame(self, background = "#1D2123", width = 5)
+        self.buffer_frame_2 = tk.Frame(self, background = "#1D2123", height = 5)
+
+        self.buffer_frame_1.pack(side = "left", fill = "both")
+        self.buffer_frame_2.pack(side = "top", fill = "both")
+
+        # Widgets ======================================================================
+
+        self.play_button = CustomButton(self, parent_obj = self, func_arg = "play", icons = self.icons["Play"], image = self.icons["Play"][0], background = self.kwargs.get("background"))
+        self.pause_button = CustomButton(self, parent_obj = self, func_arg = "pause", icons = self.icons["Pause"], image = self.icons["Pause"][0], background = self.kwargs.get("background"))
+        self.go_farward = CustomButton(self, parent_obj = self, func_arg = "update", icons = self.icons["Next"], image = self.icons["Next"][0], background = self.kwargs.get("background"))
+
+        self.set_play_button()
+
+
+    def set_pause_button(self):
+        self.play_button.pack_forget()
+
+        self.go_farward.pack(side = "right", padx = 15, pady = 15)
+        self.pause_button.pack(side = "right", padx = 15, pady = 15)
+
+
+    def set_play_button(self):
+        self.pause_button.pack_forget()
+
+        self.go_farward.pack(side = "right", padx = 15, pady = 15)
+        self.play_button.pack(side = "right", padx = 15, pady = 15)
+
+
+    def passdown_func(self, arg):
+        if arg == "play":
+            self.set_pause_button()
+            self.network.play_network()
+        
+        elif arg == "pause":
+            self.set_play_button()
+            self.network.pause_network()
+        
+        elif arg == "update":
+            self.network.update_network()
+
+
+
+
+
+
+
+
+
+
+class DataAnalysisMenu(tk.Frame):
+
+    def __init__(self, parent, app, *args, **kwargs) -> None:
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+
+        self.parent = parent
+        self.app = app
+        self.kwargs = kwargs
+        
+        self.icon_size = 100, 100
+        self.icons = {
+            "Network" : load_to_size("network", *self.icon_size),
+            "Compare" : load_to_size("compare", *self.icon_size),
+            "Back" : (load_to_size("back", 75, 75), load_to_size("highlight_back", 75, 75))
+            }
+
+        self.data_table_tags = (
+            "Name",
+            "Paquet Size",
+            "Paquets Created",
+            "Paquets Transfered",
+            "Paquets Lost",
+            "Paquet Wait Time",
+            "Nodes"
+            )
+        
+        self.data_graph_tags = (
+            "Name",
+            "Paquets Lost",
+            "Most Connected Buffer Output"
+            )
+
+        self.network_table_data : list[dict] = self.get_network_table_data()
+        self.network_graph_data : list[dict] = self.get_network_graph_data()
+
+        # Main Frame ==================================================================
+
+        self.main_frame = ctk.CTkScrollableFrame(self, fg_color = "#22282a", orientation = "vertical")
+        self.main_frame.place(anchor = "center", relx = 0.5, rely = 0.5, relwidth = 0.6, relheight = 1)
+        
+        # Page Title ==================================================================
+
+        self.title_frame = tk.Frame(self.main_frame, background = "#22282a")
+        self.page_title = tk.Label(self.title_frame, image = self.icons["Compare"], compound = "left", text = "  Network Comparison", font = f"{font} 35 bold", foreground = "#FFFFFF", background = "#22282a")
+        self.buffer_frame_1 = tk.Frame(self.title_frame, background = "#1D2123", height = "5")
+
+        self.title_frame.pack(side = "top", fill = "x", padx = 20)
+        self.page_title.pack(side = "top", anchor = "w", pady = 15)
+        self.buffer_frame_1.pack(side = "top", fill = "x")
+
+        # Network Data ================================================================
+
+        self.h_scroll_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color = "#22282a", orientation = "horizontal", height = 450)
+        self.table_title = tk.Label(self.h_scroll_frame, text = "Network Data", font = f"{font} 25 bold underline", foreground = "#FFFFFF", background = "#22282a")
+        self.buffer_frame_2 = tk.Frame(self.h_scroll_frame, background = "#1D2123", height = "5")
+        self.table_frame = tk.Frame(self.h_scroll_frame, background = "#22282a")
+        self.set_table_widgets()
+        self.buffer_frame_3 = tk.Frame(self.h_scroll_frame, background = "#1D2123", height = "5")
+
+        self.h_scroll_frame.pack(side = "top", fill = "x", padx = 20, pady = (25, 0))
+        self.table_title.pack(side = "top", anchor = "w", pady = (15, 30))
+        self.buffer_frame_2.pack(side = "top", fill = "x", padx = 10)
+        self.table_frame.pack(side = "top")
+        self.buffer_frame_3.pack(side = "top", fill = "x", padx = 10)
+
+        # Network Graphs ==============================================================
+
+        self.graphs_frame = tk.Frame(self.main_frame, background = "#22282a")
+        self.graphs_title = tk.Label(self.graphs_frame, text = "Network Graphs", font = f"{font} 25 bold underline", foreground = "#FFFFFF", background = "#22282a")
+
+        self.graphs_frame.pack(side = "top", fill = "x", padx = 20, pady = (25, 0))
+        self.graphs_title.pack(side = "top", anchor = "w", pady = (15, 30))
+        self.set_graph_widgets()
+
+        # Exit Controls ===============================================================
+
+        self.back_button = CustomButton(self, parent_obj = self, func_arg = "go_back", icons = self.icons["Back"], image = self.icons["Back"][0], background = kwargs.get("background"))
+        
+        self.back_button.place(anchor = "nw", x = 10, y = 10)
+
+
+
+    def get_network_table_data(self) -> None:
+        data = []
+        
+        for network_name in self.app.network_instances:
+            if network := self.app.network_instances[network_name]:
+                
+                data.append({
+                    "Name" : network.name,
+                    "Paquet Size" : network.paquet_size,
+                    "Paquets Created" : network.total_paquets_created,
+                    "Paquets Transfered" : network.total_paquets_transfered,
+                    "Paquets Lost" : network.total_paquets_lost,
+                    "Paquet Wait Time" : network.mean_paquet_wait_time,
+                    "Nodes" : len(network.connections)
+                })
+        
+        return data
+
+
+    def get_network_graph_data(self) -> None:
+        data = {
+            "Name" : [],
+            "Paquet Loss" : [],
+            "Lambda" : []
+            }
+        
+        for network_name in self.app.network_instances:
+
+            if network := self.app.network_instances[network_name]:
+                most_connected_buffer_node = None
+                
+                for node_name in network.connections:
+                    if network.nodes[node_name].type == "Buffer":
+                        
+                        if most_connected_buffer_node == None:
+                            most_connected_buffer_node = network.nodes[node_name]
+                        elif len(network.nodes[node_name].connections) > len(most_connected_buffer_node.connections):
+                            most_connected_buffer_node = network.connections[node_name]
+                paquet_output = 0 if most_connected_buffer_node == None else most_connected_buffer_node.paquet_output
+
+                data["Name"].append(network.name)
+                data["Paquet Loss"].append(network.total_paquets_lost)
+                data["Lambda"].append(paquet_output)
+
+        return data
+
+
+    def set_table_widgets(self) -> None:
+        
+        buffer_offset = 1
+        tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "300").grid(column = 0, row = 0, rowspan = len(self.data_table_tags), sticky = "n", padx = 10)
+
+        for row_index, tag in enumerate(self.data_table_tags):
+            tk.Label(self.table_frame, text = tag, font = f"{font} 15 bold", foreground = "#FFFFFF", background = "#22282a").grid(column = buffer_offset, row = row_index, sticky = "w")
+
+        for colum_index, network_data in enumerate(self.network_table_data):
+            tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "300").grid(column = colum_index + buffer_offset + 1, row = 0, rowspan = len(network_data), sticky = "n", padx = 10)
+            buffer_offset += 1 
+            for row_index, tag in enumerate(self.data_table_tags):
+                if tag == "Paquet Wait Time":
+                    tk.Label(self.table_frame, text = f"{network_data[tag] : 0.2f}", font = f"{font} 15 bold", foreground = "#FFFFFF", background = "#22282a").grid(column = colum_index + buffer_offset + 1, row = row_index)
+                else:
+                    tk.Label(self.table_frame, text = network_data[tag], font = f"{font} 15 bold", foreground = "#FFFFFF", background = "#22282a").grid(column = colum_index + buffer_offset + 1, row = row_index)
+        
+        tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "300").grid(column = len(self.network_table_data) + buffer_offset + 1, row = 0, rowspan = len(self.data_table_tags), sticky = "n", padx = 10)
+    
+
+
+    def set_graph_widgets(self) -> None:
+        # for network in self.network_graph_data["Name"]:
+        #     # tk.Label(self.graphs_frame, text = network[0], font = f"{font} 15 bold", foreground = "#FFFFFF", background = "#22282a").pack(side = "top", anchor = "w", padx = 15, pady = 15)
+
+        graph = plt.Figure(dpi = 100, facecolor = "#22282a")
+        graph_canvas = FigureCanvasTkAgg(graph, self.graphs_frame)
+        axes = graph.add_subplot(111, facecolor = "#171a1c")
+        
+        axes.bar(self.network_graph_data["Lambda"], self.network_graph_data["Paquet Loss"], width = 1, align = "center", color = "red")  
+        
+        axes.spines[["top", "right"]].set_visible(False)
+        axes.spines[["bottom", "left"]].set_color("white")     
+
+        axes.tick_params(axis = "both", colors = "white")  
+        axes.set_xbound(0, None); axes.set_ybound(0, None)
+        axes.set_xlabel("Lambda", color = "white"); axes.set_ylabel("Paquet Loss", color = "white")
+        
+        rects = axes.patches
+        for rect, label in zip(rects, self.network_graph_data["Name"]):
+            height = rect.get_height()
+            axes.text(rect.get_x() + rect.get_width() / 2, height + 2, label, ha = "center", va = "bottom", color = "white")
+
+        graph_canvas.get_tk_widget().pack(side = "top", fill = "x", padx = 15, pady = (0, 15))
+            
+
+
+    def passdown_func(self, arg) -> None:
+        if arg == "go_back":
+            self.app.close_comparison_menu()

@@ -63,11 +63,11 @@ class Source(Node):
         self.paquet_output = self.output_speed // self.paquet_size  
         
         self.paquets_created = 0
+        self.paquets_lost = 0 # total paquets lost during its existance
 
         self.behaviour : str = behaviour
         if self.behaviour == "Buffered":
             self.capacity = capacity
-            self.paquets_lost = 0 # total paquets lost during its existance
 
             self.paquet_loss = 0 # paquets lost during network update
 
@@ -162,7 +162,6 @@ class Buffer(Node):
         while self.number_element != self.capacity and total_paquets != 0:
             for node in self.connections:
                 if paquet_input := self.capacity - self.number_element:
-                    print(paquet_input)
                     extracted_paquets, node.paquet_queue = node.paquet_queue[: paquet_input], node.paquet_queue[paquet_input :]
 
 
