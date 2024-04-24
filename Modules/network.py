@@ -50,8 +50,6 @@ class Network(tk.Canvas):
 
         self.pause : bool = True
         self.last_updated : float = time()
-        
-        self.paquet_loss_over_time = []
 
         self.total_paquets_created : int = 0
         self.total_paquets_transfered : int = 0

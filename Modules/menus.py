@@ -343,27 +343,22 @@ class PaquetCreationMenu(tk.Frame):
         self.paquet_settings = tk.Frame(self, background = kwargs.get("background"))
         self.data_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
         self.size_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
-        self.tracking_frame = tk.Frame(self.paquet_settings, background = kwargs.get("background")) 
         self.data_lable = tk.Label(self.data_frame, text = "Data : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.data_entry = tk.Entry(self.data_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         self.data_entry.insert(0, f"Hello from {self.node.name}")
         self.size_lable = tk.Label(self.size_frame, text = "Data Size : ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.size_entry = tk.Entry(self.size_frame, font = f"{font} 18 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
-        self.size_entry.insert(0, "10")
-        self.tracking_lable = tk.Label(self.tracking_frame, text = "Tracking : ",font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.tracking_checkbox = ctk.CTkCheckBox(self.tracking_frame, width = 0, height = 0, checkbox_width = 40, checkbox_height = 40, text = None, corner_radius = 0, hover = False, checkmark_color = "#ffcc22", bg_color = kwargs.get("background"), fg_color = kwargs.get("background"), border_color = "#1D2123")
+        self.size_entry = tk.Entry(self.size_frame, font = f"{font} 18 bold", borderwidth = 0, selectborderwidth = 0, disabledbackground = "#171a1c", disabledforeground = "#FFFFFF")
+        self.size_entry.insert(0, str(self.network.paquet_size))
+        self.size_entry.config(state = "disabled")
 
 
         self.paquet_settings.pack(side = "top", fill = "x", expand = True, padx = 20, pady = 20)
         self.data_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
-        self.size_frame.pack(padx = 20, pady = 10, fill = "x")
-        self.tracking_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)  
+        self.size_frame.pack(padx = 20, pady = 10, fill = "x", expand = True)
         self.data_lable.pack(side = "left")
         self.data_entry.pack(side = "right")
         self.size_lable.pack(side = "left")
         self.size_entry.pack(side = "right")
-        self.tracking_lable.pack(side = "left")
-        self.tracking_checkbox.pack(side = "right")      
 
         # Controls =====================================================================
 
@@ -382,8 +377,7 @@ class PaquetCreationMenu(tk.Frame):
     def create_paquet(self, *args) -> None:
         data = self.data_entry.get()
         size = float(self.size_entry.get()) if float(self.size_entry.get()) >= 0 else 0
-        tracking = self.tracking_checkbox.get()
-        self.node.create_paquet(data = data, size = size, tracking = tracking)
+        self.node.create_paquet(data = data, size = size)
         
         self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         PaquetCreationMenu.instance_counter -= 1
@@ -642,6 +636,7 @@ class DataAnalysisMenu(tk.Frame):
             "Paquets Created",
             "Paquets Transfered",
             "Paquets Lost",
+            "Paquets Lost (%)",
             "Paquet Wait Time",
             "Nodes"
             )
@@ -670,7 +665,7 @@ class DataAnalysisMenu(tk.Frame):
         self.page_title.pack(side = "top", anchor = "w", pady = 15)
         self.buffer_frame_1.pack(side = "top", fill = "x")
 
-        # Network Data ================================================================
+        # Network Data Table Frames ===================================================
 
         self.h_scroll_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color = "#22282a", orientation = "horizontal", height = 450)
         self.table_title = tk.Label(self.h_scroll_frame, text = "Network Data", font = f"{font} 25 bold underline", foreground = "#FFFFFF", background = "#22282a")
@@ -685,7 +680,7 @@ class DataAnalysisMenu(tk.Frame):
         self.table_frame.pack(side = "top")
         self.buffer_frame_3.pack(side = "top", fill = "x", padx = 10)
 
-        # Network Graphs ==============================================================
+        # Network Graph Frames ========================================================
 
         self.graphs_frame = tk.Frame(self.main_frame, background = "#22282a")
         self.graphs_title = tk.Label(self.graphs_frame, text = "Network Graphs", font = f"{font} 25 bold underline", foreground = "#FFFFFF", background = "#22282a")
@@ -714,6 +709,7 @@ class DataAnalysisMenu(tk.Frame):
                     "Paquets Created" : network.total_paquets_created,
                     "Paquets Transfered" : network.total_paquets_transfered,
                     "Paquets Lost" : network.total_paquets_lost,
+                    "Paquets Lost (%)" : network.total_paquets_lost * 100 / network.total_paquets_created,
                     "Paquet Wait Time" : network.mean_paquet_wait_time,
                     "Nodes" : len(network.connections)
                 })
@@ -740,11 +736,11 @@ class DataAnalysisMenu(tk.Frame):
                             most_connected_buffer_node = network.nodes[node_name]
                         elif len(network.nodes[node_name].connections) > len(most_connected_buffer_node.connections):
                             most_connected_buffer_node = network.connections[node_name]
-                paquet_output = 0 if most_connected_buffer_node == None else most_connected_buffer_node.paquet_output
+                output_speed = 0 if most_connected_buffer_node == None else most_connected_buffer_node.output_speed
 
                 data["Name"].append(network.name)
-                data["Paquet Loss"].append(network.total_paquets_lost)
-                data["Lambda"].append(paquet_output)
+                data["Paquet Loss"].append(network.total_paquets_lost * 100 / network.total_paquets_created)
+                data["Lambda"].append(output_speed)
 
         return data
 
@@ -771,21 +767,21 @@ class DataAnalysisMenu(tk.Frame):
 
 
     def set_graph_widgets(self) -> None:
-        # for network in self.network_graph_data["Name"]:
-        #     # tk.Label(self.graphs_frame, text = network[0], font = f"{font} 15 bold", foreground = "#FFFFFF", background = "#22282a").pack(side = "top", anchor = "w", padx = 15, pady = 15)
-
         graph = plt.Figure(dpi = 100, facecolor = "#22282a")
         graph_canvas = FigureCanvasTkAgg(graph, self.graphs_frame)
         axes = graph.add_subplot(111, facecolor = "#171a1c")
         
-        axes.bar(self.network_graph_data["Lambda"], self.network_graph_data["Paquet Loss"], width = 1, align = "center", color = "red")  
+        axes.set_ybound(lower = 0, upper = 110)
+        axes.set_xbound(lower = min(self.network_graph_data["Lambda"]) - 10, upper = max(self.network_graph_data["Lambda"]) + 10)
+        
+        axes.bar(self.network_graph_data["Lambda"], self.network_graph_data["Paquet Loss"], width = 0.8, align = "center", color = "red")  
         
         axes.spines[["top", "right"]].set_visible(False)
         axes.spines[["bottom", "left"]].set_color("white")     
 
         axes.tick_params(axis = "both", colors = "white")  
         axes.set_xbound(0, None); axes.set_ybound(0, None)
-        axes.set_xlabel("Lambda", color = "white"); axes.set_ylabel("Paquet Loss", color = "white")
+        axes.set_xlabel("Lambda", color = "white"); axes.set_ylabel("Paquet Loss (%)", color = "white")
         
         rects = axes.patches
         for rect, label in zip(rects, self.network_graph_data["Name"]):

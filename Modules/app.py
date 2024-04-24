@@ -150,7 +150,7 @@ class App(object):
             self.current_network.pack_forget()
         else:
             self.create_network_menu.instance_counter -= 1
-            self.create_network_menu.pack_forget()
+            self.create_network_menu.place_forget()
             self.side_bar.pack(side = "right", fill = "y")
         
         

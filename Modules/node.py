@@ -26,9 +26,9 @@ class Node(object):
         return ''.join([rd.choice(string.ascii_letters + string.digits) for _ in range(5)]) 
     
 
-    def create_paquet(self, data : str = None, size : int = None, tracking : bool = None) -> None:
+    def create_paquet(self, data : str = None, size : int = None) -> None:
         '''Créer un paquet et le stocke dans l'inventaire du Nœud'''
-        self.paquet_queue.append(Paquet(data, size, tracking))
+        self.paquet_queue.append(Paquet(data, size))
 
 
     def receve_paquet(self, paquet : Paquet) -> None:
@@ -74,7 +74,7 @@ class Source(Node):
 
     def create_paquets(self) -> None:
         for _ in range(self.paquet_output):
-            self.create_paquet(data = self.generate_data(), size = self.paquet_size, tracking = False)
+            self.create_paquet(data = self.generate_data(), size = self.paquet_size)
 
 
         self.paquets_created += self.paquet_output 
@@ -128,7 +128,11 @@ class Buffer(Node):
         "Random" : self.random_choice
         }
 
-        self.paquet_output = self.output_speed  // self.paquet_size   
+        self.output_speed_overflow = self.output_speed  % self.paquet_size
+        self.paquet_output_overflow = 0
+        self.paquet_output = self.output_speed // self.paquet_size   
+
+
 
         self.paquet_transfer = 0
         self.paquets_transfered = 0
@@ -155,6 +159,8 @@ class Buffer(Node):
                 node.paquet_queue.clear()
             self.paquet_loss = total_paquet_loss
             self.paquets_lost += self.paquet_loss
+
+        self.paquet_output_overflow += self.output_speed_overflow
 
 
     def fifo(self, total_paquets : int) -> list[Paquet]:
@@ -225,9 +231,11 @@ class Buffer(Node):
         
         if extracted_paquets:
             if self.mean_paquet_wait_time == 0:
-                self.mean_paquet_wait_time = sum([time() - paquet.creation_time for paquet in extracted_paquets]) / len(extracted_paquets)
+                output_time = time()
+                self.mean_paquet_wait_time = sum([output_time - paquet.creation_time for paquet in extracted_paquets]) / len(extracted_paquets)
             else:
-                self.mean_paquet_wait_time = (self.mean_paquet_wait_time + (sum([time() - paquet.creation_time for paquet in extracted_paquets]) / len(extracted_paquets)) / 2)
+                output_time = time()
+                self.mean_paquet_wait_time = (sum([output_time - paquet.creation_time for paquet in extracted_paquets]) / len(extracted_paquets)) / 2
 
         self.paquet_transfer = len(extracted_paquets)
         self.paquets_transfered += self.paquet_transfer
