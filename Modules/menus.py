@@ -1,5 +1,4 @@
 import json
-import pandas as pd
 import tkinter as tk
 import customtkinter as ctk
 import matplotlib.pyplot as plt
