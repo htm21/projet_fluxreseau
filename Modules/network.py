@@ -355,21 +355,12 @@ class Network(tk.Canvas):
             self.event_generate("<<Alert>>")
             return
         
-        nodes = []
-        for node_name in self.connections:
-            node_data = {
-                "type" : self.nodes[node_name].type,
-                "name" : self.nodes[node_name].name,
-                "output_speed" : self.nodes[node_name].output_speed,
-                "coords" : self.coords(self.nodes[node_name].id)
-                }
-            
-            nodes.append(node_data)
+        node_data = [self.nodes[node_name].__dict__() for node_name in self.connections]
 
         data = {
             "network_name" : self.name,
             "paquet_size" : self.paquet_size, 
-            "nodes" : nodes,
+            "nodes" : node_data,
             "connections" : self.connections
         }
 
