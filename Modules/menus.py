@@ -13,7 +13,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 
-class NodeCreationMenu(tk.Frame):
+class NodeCreationMenu(tk.Frame):                   # Initialisation de la class permettant la création d'un Node par l'utilisateur (dans l'application), il s'agit d'un Frame
 
     instance_counter = 0
 
@@ -113,9 +113,10 @@ class NodeCreationMenu(tk.Frame):
 
 
     def create_node(self, *args):
+        """ Création d'un Node en fonction des choix de l'utilisateur """
         
-        node_type = self.node_class_label.cget("text")
-        if not node_type: return
+        node_type = self.node_class_label.cget("text")              # on recupère le text du choix cliqué par l'utilisateur
+        if not node_type: return        
         
         name = self.name_entry.get()
 
@@ -141,12 +142,14 @@ class NodeCreationMenu(tk.Frame):
 
 
     def cancel_node(self, *args):
+        """ Fonction pour annuler la création d'un Node """
         self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         NodeCreationMenu.instance_counter -= 1
         self.destroy()
 
 
     def reset_settings(self) -> None:
+        """ Fonction permettant de remttre à 0 les paramètres du Node """
         
         # Frames ======================================
         self.type_frame.pack_forget()

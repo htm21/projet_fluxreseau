@@ -1,4 +1,4 @@
-# *Stratégie de Flux Réseau, unprojet de 2ème année de Licence Informatique*
+# *Stratégie de Flux Réseau, un projet de 2ème année de Licence Informatique*
 **NOM DES ÉTUDIANTS** : \
 Ahmad HATOUM (22202060) - Francesco DI GENNARO (22205989)  
 
@@ -26,10 +26,10 @@ L'objectif de ce projet repose sur l'analyse de *"Stratégie de gestion des flux
 - Réalisation de l'interface graphique, en intégrant le code
 - Compréhension et intégration de la logique d'arrivée des paquets avec le processus de Poisson
 - Ajout des différentes stratégies de gestion du Buffer
-- Comparaison des stratégies 
+- Comparaison des stratégies
 
 
-# Comprendre la structure du projet ?
+# Comment distinguer la structure du projet ?
 
 **Dossier "Modules"**  
 Ce dossier contient tout les sous fichiers permettant le fonctionnement du code, les différentes fichiers sont importés dans d'autres pour permettre l'utilisation de leurs code.  

@@ -11,18 +11,18 @@ from Modules.tab_bar import *
 
 
 
-class App(object):
+class App(object):                              # Initalisation de la class App qui permettra de gérée l'application entière
 
-
+    # Ignore la mise à l'échelle de l'écran des système d'exploitation "Windows" afin que les widgets de l'interface graphique n'apparaissent pas trop gros à l'écran (en général pour les widgets contenant du texte)
     if platform.system() == "Windows":
-        pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")      # if the machine is on Windows, we add a font (not available for macOS)
+        pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf") 
 
 
     def __init__(self, parent : tk.Tk) -> None:
         
         self.parent = parent
-        self.Running = True
-        self.update_speed = 1
+        self.Running = True                                         # on lance l'application 
+        self.update_speed = 1                                       # on initialise un temps entre update d'une seconde
 
         self.icon_size = 15, 15
         self.icons = {

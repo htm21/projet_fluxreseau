@@ -10,15 +10,15 @@ from Modules.custom_button import *
 
 class SideBar(tk.Frame):
     '''
-    The "SideBar" is GUI object that uses properties of the "tk.Frame" object to position and display
-    user controls (tkinter widgets) and "Network" or "Node" information for the user
+    La « SideBar » est un objet GUI qui utilise les propriétés de l'objet « tk.Frame » pour positionner et afficher 
+    des contrôles de l'utilisateur (widgets tkinter) et des informations sur le « réseau » ou le « nœud » pour l'utilisateur.
     '''
 
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
 
-        # All Icons used on the "SideBar" are fitted at a sertain size and stored into "self.icons" as a "ImageTk.PhotoImage".
-        # If an GUI image has to show activity (like hovering over a button) images have a "Highlighted" version. Both icons are then stored as tuples.
+        # Toutes les icônes utilisées sur la « SideBar » sont ajustées à une certaine taille et stockées dans « self.icons » en tant qu'« ImageTk.PhotoImage ».
+        # Si l'image d'une interface graphique doit montrer une activité (comme le survol d'un bouton), les images ont une version « mise en évidence ». Les deux icônes sont alors stockées sous forme de tuples.
         self.icon_size : tuple = 65, 65
         self.icons : dict = {
             "Network" : load_to_size("network", *self.icon_size),
@@ -35,8 +35,8 @@ class SideBar(tk.Frame):
         }
 
         # Frames =======================================================================
-        # These are Sub-Frames to more seperate and customize the layout of the widgets on the "SideBar"
-        # The "self.buffer_frame" are used to show a seperation of the widgets on the GUI 
+        # Il s'agit de « sous-Frames » qui permettent de séparer et de personnaliser la disposition des widgets sur la « SideBar »
+        # Les « self.buffer_frame » sont utilisés pour montrer une séparation des widgets sur l'interface graphique. 
         self.buffer_frame_1 = tk.Frame(self, background = "#1D2123", width = 5)
         self.controls = tk.Frame(self, background = kwargs.get("background"))
         self.buffer_frame_2 = tk.Frame(self, background = "#1D2123", height = 5)
@@ -52,7 +52,7 @@ class SideBar(tk.Frame):
         self.object_controls.pack(side = "top", pady = 15, fill = "x")
 
         # Widgets ======================================================================
-        # These are the individual widgets (Buttons, Labels) that constitute the "SideBar"
+        # Il s'agit des widgets existants (boutons, étiquettes) qui constituent la « SideBar » (barre latérale)
         self.add_node = CustomButton(self.controls, event = "<<AddNode>>", icons = self.icons["Node"], image = self.icons["Node"][0], text = "    Add Node", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.add_connection = CustomButton(self.controls, event = "<<AddConnection>>", icons = self.icons["Connection"], image = self.icons["Connection"][0], text = "    Add Connection", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.info_title = tk.Label(self.info, image = self.icons["Network"], text = "    Network Info", compound = "left", font = f"{font} 20 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
@@ -75,8 +75,8 @@ class SideBar(tk.Frame):
 
     def reset_controls(self) -> None:
         '''
-        Removes all controls that are not appropriate for another "Object" 
-        (self.delete is not removed as it is appropriate for all "Objects")
+        Supprime tous les contrôles qui ne sont pas appropriés pour un autre « Objet » 
+        (self.delete n'est pas supprimé car il est approprié pour tous les « Objets »)
         '''
 
         self.save.pack_forget()
@@ -87,7 +87,7 @@ class SideBar(tk.Frame):
 
     def set_object_controls(self, data : object) -> None:
         '''
-        Sets the appropriate controls on the "SideBar" for the selected object 
+        Définit les contrôles appropriés sur la « SideBar » pour l'objet sélectionné 
         '''
         
         self.reset_controls()
@@ -103,11 +103,11 @@ class SideBar(tk.Frame):
 
     def set_object_info(self, obj : object) -> None:
         '''
-        Sets Selected Object information and displays it onto the "SideBar"
+        Définit les informations relatives à l'objet sélectionné et les affiche sur la « SideBar »
         '''
         info_text = ""
         
-        if isinstance(obj, Network): # Network Info
+        if isinstance(obj, Network): # MAJ des informations concernant l'object Network 
             network = obj
             self.info_title.config(image = self.icons["Network"], text = f"    {network.name}")
             
@@ -122,7 +122,7 @@ class SideBar(tk.Frame):
             info_text += f"Paquets Lost : {network.total_paquets_lost}" 
             
             
-        elif isinstance(obj, Node): # Node Info
+        elif isinstance(obj, Node): # MAJ des informations concernant l'object Node (et ses class héritantes)
             node = obj
             self.info_title.config(image = self.icons[node.type], text = f"    {node.name}")
             
@@ -149,13 +149,13 @@ class SideBar(tk.Frame):
 
 
             if node.type == "Source" and node.behaviour == "Buffered" or node.type == "Buffer":
-                # Here we take only a maximum of 5 paquets to show onto the "SideBar".
-                # If there are more than 5 paquets present in the "Node" a number dispaying the total remaining paquets is shown.
+                # Ici, nous ne prenons qu'un maximum de 5 paquets (leurs détails : data, ...) pour les afficher sur la « SideBar », permettant de visualiser leurs arrivées
+                # S'il y a plus de 5 paquets présents dans le « Node », un nombre représentant le total des paquets restants est affiché.
                 paquets = "\n● " + "\n● ".join(str(paquet) for paquet in node.paquet_queue[:5])
                 if len(node.paquet_queue) > 5:
                     paquets += f"\n And {len(node.paquet_queue) - 5} more..."
                 info_text += f"Paquet Queue : {paquets}"
             
 
-        # Updates the Info Label
+        # MAJ des informations du Label
         self.info_lable.config(text = info_text)

@@ -1,13 +1,13 @@
 import tkinter as tk
 
 
-class CustomButton(tk.Label):
+class CustomButton(tk.Label):               # Initialisation de la class CustomButton, modélisant les boutons, hérite de l'objet Frame de tkinter
     def __init__(self, parent, event = None, parent_obj = None, func_arg = None, icons = [], *args, **kwargs) -> None:
         tk.Label.__init__(self, parent, *args, kwargs)
         
         self.kwargs = kwargs
-        self.icons = icons
-        self.event = event
+        self.icons = icons                  # Association de l'icône correspondante au bouton
+        self.event = event                  # Association à l'événement associé au bouton
         self.parent_obj = parent_obj
         self.func_arg = func_arg
 
@@ -17,6 +17,7 @@ class CustomButton(tk.Label):
 
 
     def on_click(self, *args):
+        """ Fonction qui permet la mise en marche de l'événement associé au bouton (s'active quand celui si est cliqué) """
         if self.event:
             self.event_generate(self.event)
         

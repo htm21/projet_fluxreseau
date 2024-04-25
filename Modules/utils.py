@@ -12,7 +12,7 @@ from PIL import Image,ImageTk
 app_folder_path = os.getcwd().replace("\\", "/")
 font = "Montserrat" if platform.system() == "Windows" else "Arial"
 
-NODE_TYPES : dict[str : Node]= {
+NODE_TYPES : dict[str : Node]= {                    # dictionnaire qui relie les types à leurs class respectives
     "Source" : Source,
     "Endpoint" : Endpoint,
     "Buffer" : Buffer,
@@ -20,7 +20,7 @@ NODE_TYPES : dict[str : Node]= {
     }
 
 
-ALERTS = {
+ALERTS = {                                          # les différentes alertes utilisateurs
     "Success": {
         "Connection" : "Connection created!",
         "DeletedNode" : "Node deleted!",
@@ -53,10 +53,12 @@ ALERTS = {
 
 
 def screen_dimensions(root : tk.Tk) -> tuple[int, int]:
+    """ Fonction qui "manage" les dimmensions de l'application sur la machine de l'utilisateur """                
     return root.winfo_screenwidth(), root.winfo_screenheight()
 
 
 def load_to_size(icon : str, width : int, height : int) -> ImageTk.PhotoImage:
+    """ Fonction permettant de charger dans l'interface graphique tout les logos de boutons, etc. présents dans le dossier Icons """          
     icon = Image.open(f"{app_folder_path}/Icons/{icon}.png")
     icon = icon.resize((width, height))
 
