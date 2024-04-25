@@ -2,10 +2,12 @@ import json
 import tkinter as tk
 import customtkinter as ctk
 import matplotlib.pyplot as plt
+
  
 from Modules.node import *
 from Modules.custom_button import * 
 from Modules.utils import *
+import matplotlib.ticker as ticker
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
@@ -166,7 +168,7 @@ class NodeCreationMenu(tk.Frame):
     def show_source_capacity(self, *args):
         if self.source_behaviour_dropdown.get() == "Buffered":
             self.capacity_entry.delete(0, "end")
-            self.capacity_entry.insert(0, "10")
+            self.capacity_entry.insert(0, "100")
             self.capacity_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
         elif self.source_behaviour_dropdown.get() == "Normal":
             if self.capacity_frame.winfo_ismapped(): self.capacity_frame.pack_forget()
@@ -196,8 +198,8 @@ class NodeCreationMenu(tk.Frame):
             self.node_class_label.config(text = arg, foreground = "#3d3829")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            self.output_speed_entry.insert(0, "50")
-            self.capacity_entry.insert(0, "10")
+            self.output_speed_entry.insert(0, "80")
+            self.capacity_entry.insert(0, "50")
             
             self.output_speed_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.buffer_behaviour_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
@@ -531,7 +533,7 @@ class NewNetworkMenu(tk.Frame):
             with open(file_path) as file:
                 data = json.load(file)
                 self.create_network(data["network_name"], data["paquet_size"])
-                self.app.current_network.load(file_path = file_path)
+                self.app.current_network.load_network(file_path = file_path)
 
         elif arg == "go_back":
             self.settings_frame.pack_forget()
@@ -636,8 +638,11 @@ class DataAnalysisMenu(tk.Frame):
             "Paquets Transfered",
             "Paquets Lost",
             "Paquets Lost (%)",
-            "Paquet Wait Time",
-            "Nodes"
+            "Paquet Wait Time (Avg.)",
+            "Nodes",
+            "Normal Sources",
+            "Buffered Sources",
+            "Buffers"
             )
         
         self.data_graph_tags = (
@@ -666,7 +671,7 @@ class DataAnalysisMenu(tk.Frame):
 
         # Network Data Table Frames ===================================================
 
-        self.h_scroll_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color = "#22282a", orientation = "horizontal", height = 450)
+        self.h_scroll_frame = ctk.CTkScrollableFrame(self.main_frame, fg_color = "#22282a", orientation = "horizontal", height = 525)
         self.table_title = tk.Label(self.h_scroll_frame, text = "Network Data", font = f"{font} 25 bold underline", foreground = "#FFFFFF", background = "#22282a")
         self.buffer_frame_2 = tk.Frame(self.h_scroll_frame, background = "#1D2123", height = "5")
         self.table_frame = tk.Frame(self.h_scroll_frame, background = "#22282a")
@@ -702,21 +707,42 @@ class DataAnalysisMenu(tk.Frame):
         for network_name in self.app.network_instances:
             if network := self.app.network_instances[network_name]:
                 
+                paquet_loss = 0
+                normal_sources = 0
+                buffered_sources = 0
+                buffers = 0
+                
+                if not network.total_paquets_transfered + network.total_paquets_lost == 0:
+                    paquet_loss = (network.total_paquets_lost / (network.total_paquets_transfered + network.total_paquets_lost)) * 100
+
+                for node_name in network.connections:
+                    node = network.nodes[node_name]
+                    if node.type == "Source" and node.behaviour == "Normal":
+                        normal_sources += 1
+                    elif node.type == "Source" and node.behaviour == "Buffered":
+                        buffered_sources += 1
+                    elif node.type == "Buffer":
+                        buffers += 1
+
                 data.append({
                     "Name" : network.name,
                     "Paquet Size" : network.paquet_size,
                     "Paquets Created" : network.total_paquets_created,
                     "Paquets Transfered" : network.total_paquets_transfered,
                     "Paquets Lost" : network.total_paquets_lost,
-                    "Paquets Lost (%)" : (network.total_paquets_lost / (network.total_paquets_transfered+network.total_paquets_lost))*100,
-                    "Paquet Wait Time" : network.mean_paquet_wait_time,
-                    "Nodes" : len(network.connections)
+                    "Paquets Lost (%)" : paquet_loss,
+                    "Paquet Wait Time (Avg.)" : network.mean_paquet_wait_time,
+                    "Nodes" : len(network.connections),
+                    "Normal Sources" : normal_sources,
+                    "Buffered Sources" : buffered_sources,
+                    "Buffers" : buffers
                 })
         
         return data
 
 
     def get_network_graph_data(self) -> None:
+        
         data = {
             "Name" : [],
             "Paquet Loss" : [],
@@ -735,11 +761,16 @@ class DataAnalysisMenu(tk.Frame):
                             most_connected_buffer_node = network.nodes[node_name]
                         elif len(network.nodes[node_name].connections) > len(most_connected_buffer_node.connections):
                             most_connected_buffer_node = network.connections[node_name]
-                output_speed = 0 if most_connected_buffer_node == None else most_connected_buffer_node.output_speed
+                
+                
+                paquet_output = 0 if most_connected_buffer_node == None else most_connected_buffer_node.paquet_output
+                paquet_loss = 0
+                if not network.total_paquets_transfered + network.total_paquets_lost == 0:
+                    paquet_loss = (network.total_paquets_lost / (network.total_paquets_transfered + network.total_paquets_lost)) * 100
 
                 data["Name"].append(network.name)
-                data["Paquet Loss"].append(network.total_paquets_lost)
-                data["Lambda"].append(output_speed)
+                data["Paquet Loss"].append(paquet_loss)
+                data["Lambda"].append(paquet_output)
 
         return data
 
@@ -747,13 +778,13 @@ class DataAnalysisMenu(tk.Frame):
     def set_table_widgets(self) -> None:
         
         buffer_offset = 1
-        tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "300").grid(column = 0, row = 0, rowspan = len(self.data_table_tags), sticky = "n", padx = 10)
+        tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "400").grid(column = 0, row = 0, rowspan = len(self.data_table_tags), sticky = "n", padx = 10)
 
         for row_index, tag in enumerate(self.data_table_tags):
             tk.Label(self.table_frame, text = tag, font = f"{font} 15 bold", foreground = "#FFFFFF", background = "#22282a").grid(column = buffer_offset, row = row_index, sticky = "w")
 
         for colum_index, network_data in enumerate(self.network_table_data):
-            tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "300").grid(column = colum_index + buffer_offset + 1, row = 0, rowspan = len(network_data), sticky = "n", padx = 10)
+            tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "400").grid(column = colum_index + buffer_offset + 1, row = 0, rowspan = len(network_data), sticky = "n", padx = 10)
             buffer_offset += 1 
             for row_index, tag in enumerate(self.data_table_tags):
                 if tag == "Paquet Wait Time":
@@ -761,26 +792,26 @@ class DataAnalysisMenu(tk.Frame):
                 else:
                     tk.Label(self.table_frame, text = network_data[tag], font = f"{font} 15 bold", foreground = "#FFFFFF", background = "#22282a").grid(column = colum_index + buffer_offset + 1, row = row_index)
         
-        tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "300").grid(column = len(self.network_table_data) + buffer_offset + 1, row = 0, rowspan = len(self.data_table_tags), sticky = "n", padx = 10)
+        tk.Frame(self.table_frame, background = "#1D2123", width = "5", height = "400").grid(column = len(self.network_table_data) + buffer_offset + 1, row = 0, rowspan = len(self.data_table_tags), sticky = "n", padx = 10)
     
 
 
     def set_graph_widgets(self) -> None:
         graph = plt.Figure(dpi = 100, facecolor = "#22282a")
         graph_canvas = FigureCanvasTkAgg(graph, self.graphs_frame)
+        
         axes = graph.add_subplot(111, facecolor = "#171a1c")
-        
-        axes.set_ybound(lower = 0, upper = 110)
-        axes.set_xbound(lower = min(self.network_graph_data["Lambda"]) - 10, upper = max(self.network_graph_data["Lambda"]) + 10)
-        
-        axes.bar(self.network_graph_data["Lambda"], self.network_graph_data["Paquet Loss"], width = 0.8, align = "center", color = "red")  
-        
+        for ax in [axes.xaxis, axes.yaxis]:
+            ax.set_major_locator(ticker.MaxNLocator(integer = True))
         axes.spines[["top", "right"]].set_visible(False)
         axes.spines[["bottom", "left"]].set_color("white")     
-
         axes.tick_params(axis = "both", colors = "white")  
         axes.set_xbound(0, None); axes.set_ybound(0, None)
-        axes.set_xlabel("Lambda", color = "white"); axes.set_ylabel("Paquet Loss (%)", color = "white")
+        axes.set_xlabel("Lambda", color = "white")
+        axes.set_ylabel("Paquet Loss (%)", color = "white")
+        axes.set_xbound(lower = min(self.network_graph_data["Lambda"]) - 1, upper = max(self.network_graph_data["Lambda"]) + 1)
+        axes.bar(self.network_graph_data["Lambda"], self.network_graph_data["Paquet Loss"], width = 0.8, align = "center", color = "red")    
+        axes.set_ybound(lower = 0, upper = 100)
         
         rects = axes.patches
         for rect, label in zip(rects, self.network_graph_data["Name"]):

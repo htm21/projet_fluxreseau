@@ -23,7 +23,7 @@ class Network(tk.Canvas):
         
         self.app = app
         self.parent : tk.Frame = parent
-        self.kwargs : dict =  kwargs
+        self.kwargs : dict[str] =  kwargs
         self.icon_size : tuple = 90, 90
         self.icons : dict[str : tuple] = {
             "Node" : (load_to_size("node", *self.icon_size), load_to_size("highlight_node", *self.icon_size)),
@@ -42,10 +42,10 @@ class Network(tk.Canvas):
 
         # Logic Stuff ==================================================================
         
-        self.name = name                                    # Name to distinguish each network  
-        self.nodes : dict[str or int: Node] = {}            # Sources, Endpoints or Buffers in the network
-        self.connections : dict = {}                        # Links between nodes
-        self.connection_counter :int = 0
+        self.name = name                                     # Name to distinguish each network  
+        self.nodes : dict[str or int : Node] = {}            # Sources, Endpoints or Buffers in the network
+        self.connections : dict[str : list] = {}             # Links between nodes
+        self.connection_counter : int = 0
         self.paquet_size : int = paquet_size
 
         self.pause : bool = True                           
@@ -356,7 +356,16 @@ class Network(tk.Canvas):
             self.event_generate("<<Alert>>")
             return
         
-        node_data = [self.nodes[node_name].__dict__() for node_name in self.connections]
+        node_data = []
+        for node_name in self.connections:
+            node_vars = vars(self.nodes[node_name])
+            node_vars.__delitem__("connections")
+            node_vars.__delitem__("paquet_queue")
+            if self.nodes[node_name].type == "Buffer":
+                node_vars.__delitem__("behaviour_types")
+            node_vars.update({"coords" : self.coords(self.nodes[node_name].id)})
+            
+            node_data.append(node_vars)
 
         data = {
             "network_name" : self.name,
@@ -372,7 +381,7 @@ class Network(tk.Canvas):
         self.event_generate("<<Alert>>")
 
 
-    def load_network(self,*, file_path : str) -> None:
+    def load_network(self,*, file_path : str = None) -> None:
         if not file_path:
             file_path = tk.filedialog.askopenfilename(title = "Gimme a save file", filetypes = (('Json File', '*.json'), ("Tous les fichiers", "*.*")))
             if not file_path:
@@ -383,20 +392,39 @@ class Network(tk.Canvas):
         with open(file_path) as file:
             data = json.load(file)
 
+        if data["network_name"] in self.app.tab_bar.tabs and self.app.tab_bar.selected_tab.name != self.name:
+            self.app.alert = ("Error", "LoadNetSameName")
+            self.event_generate("<<Alert>>")   
+            return
+
         self.delete_network()
         
+        # Recreates Nodes
         for node_data in data["nodes"]:
-            self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"])
+            if node_data["type"] == "Source":
+                if node_data["behaviour"] == "Normal":
+                    self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"], behaviour = node_data["behaviour"])
+                elif node_data["behaviour"] == "Buffered":
+                    self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"], behaviour = node_data["behaviour"], capacity = node_data["capacity"])
+            
+            if node_data["type"] == "Buffer":
+                self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"], behaviour = node_data["behaviour"], capacity = node_data["capacity"])
+            
             self.moveto(self.nodes[node_data["name"]].id, *node_data["coords"])
 
+        # Recreates connections
         for main_node in data["connections"]:
             for sub_node in data["connections"][main_node]:
                 self.add_connection(self.nodes[main_node], self.nodes[sub_node])
 
+        # set network paquet size
+        self.paquet_size = data["paquet_size"]
+        
+        # Set tab name
+        self.app.tab_bar.tabs[data["network_name"]] = self.app.tab_bar.tabs.pop(self.name)
+        self.app.tab_bar.tabs[self.name].name = data["network_name"]
+        self.app.tab_bar.tabs[self.name].select()
+
+
         self.app.alert = ("Success", "NetworkLoaded")
         self.event_generate("<<Alert>>")
-
-
-# How to click and drag canvas items:
-    # https://stackoverflow.com/questions/61834886/how-to-make-a-drag-and-drop-animation-in-tkinter-canvas
-                

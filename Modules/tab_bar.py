@@ -70,7 +70,7 @@ class TabBar(tk.Frame):
         self.icons : dict = {
             "Add" : (load_to_size("Add", *self.icon_size), load_to_size("highlight_add", *self.icon_size))
             }
-        self.tabs : dict[Tab] = dict()
+        self.tabs : dict[str : Tab] = dict()
         self.selected_tab : Tab = None
 
         # Frame & Widgets ==============================================================

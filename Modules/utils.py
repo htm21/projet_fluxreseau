@@ -46,7 +46,8 @@ ALERTS = {
         "OneNetAtATime" : "You can only create one network at a time!",
         "ExitOfMenu" : "Exit out of the current menu before creating or switching to a new tab!",
         "TwoBuffers" : "You can't connect two Buffers!",
-        "SameNetworkName" : "You can't have two networks with the same name!"
+        "SameNetworkName" : "You can't have two networks with the same name!",
+        "LoadNetSameName" : "You can't load a network with an existing name!"
         }
     }
 

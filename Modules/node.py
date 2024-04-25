@@ -49,7 +49,7 @@ class Node(object):
 class Source(Node): 
 
     instance_counter : int = 0
-    behaviour_types : dict = [
+    behaviour_types : list = [
         "Normal",
         "Buffered"
         ]

@@ -191,7 +191,7 @@ class App(object):
         self.parent.bind("<<CustomPaquet>>", lambda args : self.current_network.create_paquet(self.current_network.selected_node))
         self.parent.bind("<<AddConnection>>", self.current_network.create_connection)
         self.parent.bind("<<SaveNet>>", self.current_network.save_network)
-        self.parent.bind("<<LoadNet>>", self.current_network.load_network)
+        self.parent.bind("<<LoadNet>>", lambda args : self.current_network.load_network())
         self.parent.bind("<<Compare>>", self.compare_networks)
 
 
