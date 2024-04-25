@@ -42,13 +42,13 @@ class Network(tk.Canvas):
 
         # Logic Stuff ==================================================================
         
-        self.name = name                                     # Name to distinguish each network  
-        self.nodes : dict[str or int : Node] = {}            # Sources, Endpoints or Buffers in the network
-        self.connections : dict[str : list] = {}             # Links between nodes
+        self.name = name                                        # On donne un nom propre au Network pour pouvoir le distinguer
+        self.nodes : dict[str or int : Node] = {}               # dictionnaire contenant tout les Nodes du network
+        self.connections : dict[str : list] = {}                # ... toutes les connections du Network
         self.connection_counter : int = 0
         self.paquet_size : int = paquet_size
 
-        self.pause : bool = True                           
+        self.pause : bool = True                             
         self.last_updated : float = time()
 
         self.total_paquets_created : int = 0                
@@ -61,7 +61,7 @@ class Network(tk.Canvas):
 
 
     def update_network(self):
-        """ Function that enables inter-code interactions to run """
+        """ Fonction qui permet aux interactions entre entités de fonctionner """
         
         if not self.connections:            
             self.pause_network()
@@ -71,21 +71,21 @@ class Network(tk.Canvas):
         for node_name in self.connections:               
             node = self.nodes[node_name]  
             if node.type == "Source":                          
-                node.create_paquets()                               # if the node is a Source, we create_paquets()
+                node.create_paquets()                               # si le Node est une Source alors on crée des paquets
 
-                self.total_paquets_created += node.paquet_output 
-                if node.behaviour == "Buffered":                   
-                    self.total_paquets_lost += node.paquet_loss     
+                self.total_paquets_created += node.paquet_output    # on incrémente le nombre total de paquets créer
+                if node.behaviour == "Buffered":                    
+                    self.total_paquets_lost += node.paquet_loss     # une Source qui contient une FIFO peut perdre des paquets, dans ce cas là on MAJ
 
 
         for node_name in self.connections:
             node = self.nodes[node_name]    
 
-            if node.type == "Buffer" and node.connections:        # if the node is a Buffer and have connections, we can send paquets and also collect some
-                node.send_paquets()
+            if node.type == "Buffer" and node.connections:        # si le node est un Buffer qui est connecté alors on peut collecter et envoyer des paquets
+                node.send_paquets()                               
                 node.collect_paquets()
 
-                self.total_paquets_lost += node.paquet_loss                 # update the numbers
+                self.total_paquets_lost += node.paquet_loss                 # on MAJ les données
                 self.total_paquets_transfered += node.paquet_transfer       # ...
 
                 if self.mean_paquet_wait_time == 0:                         
@@ -93,20 +93,20 @@ class Network(tk.Canvas):
                 else:
                     self.mean_paquet_wait_time = (self.mean_paquet_wait_time + node.mean_paquet_wait_time) / 2
 
-        for node_name in self.connections:
+        for node_name in self.connections:      
             node = self.nodes[node_name]  
-            if node.type == "Source" and node.behaviour == "Normal":        # if the node is a "simple Source" (without buffer)
+            if node.type == "Source" and node.behaviour == "Normal":        # si c'est une Source "normale" (faisant référence à la source de la partie1)
                 if node.paquet_queue:                                       
-                    node.paquets_lost += len(node.paquet_queue)
-                    self.total_paquets_lost += len(node.paquet_queue)
+                    node.paquets_lost += len(node.paquet_queue)             # MAJ des données
+                    self.total_paquets_lost += len(node.paquet_queue)       # ...
                     node.paquet_queue.clear()
 
 
     def add_node(self, node_type, name, *args, **kwargs) -> None:
         '''
-        Creates a node and adds it onto the network by adding it to the "self.nodes" dictionary which anc be later accessed by the node name or canvas id.
-        If no node type is given it defaults to a "Source" type Node
-        If no name is given to the node it will be automaticaly given one using this formatting: "NODE_TYPE-NODE_TYPE.instance_counter" -> Node-1  
+        Crée un Node et l'ajoute au réseau en l'ajoutant au dictionnaire « self.nodes » qui peut être accédé ultérieurement par le nom du noeud.
+        Si aucun type de noeud n'est indiqué, il s'agit alors d'un noeud de type « Source » par défaut.
+        Si aucun nom n'est donné au noeud, un nom lui sera automatiquement donné en utilisant ce formatage : « NODE_TYPE-NODE_TYPE.instance_counter » -> Node-1  
         '''
         
         if self.nodes.get(name):
@@ -115,15 +115,15 @@ class Network(tk.Canvas):
             return
 
         canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0], tags = "node")
-        # Creating canvas object with "node_type" in the middle of the Canvas
+        # Création d'un objet canvas avec « node_type » au milieu du Canvas
         
         node = NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, paquet_size = self.paquet_size, *args, **kwargs)
-        # Creating the node object with "node_type"
+        # Création de l'objet nœud avec « node_type »
 
         self.nodes[canvas_node] = node
         self.nodes[name] = node
         self.connections[name] = []
-        # Use Node name or canvas_id to acces the node object in the dict of nodes
+        # Utiliser le nom du nœud ou l'identifiant du canvas pour accéder à l'objet nœud dans le dict des nœuds.
 
         self.tag_raise("node")
         self.app.alert = ("Success", "CreateNode")
@@ -132,8 +132,7 @@ class Network(tk.Canvas):
 
     def del_node(self, node : Node) -> None:
         '''
-        Deletes a Node from the network by deleting the node from the "self.nodes" dictionary 
-        and deleting all existing links to the deleted node from the "self.links" set.
+        Supprime un nœud du réseau en supprimant le nœud du dictionnaire « self.nodes » et en supprimant tous les liens existants vers le nœud de « self.links ». 
         '''
         
         self.deselect_object()
@@ -173,18 +172,19 @@ class Network(tk.Canvas):
 
 
     def delete_network(self) -> None:
+        """ Fonction permettant de complétement supprimer un Network en nettoyant ces données """
         for node_name in list(self.connections.keys()):
-            self.del_node(self.nodes[node_name])
+            self.del_node(self.nodes[node_name])                # on applique la suppression (profonde) des Nodes à chaque Node de ce Network
     
-        self.app.alert = ("Success", "DeletedNetwork")
+        self.app.alert = ("Success", "DeletedNetwork")          
         self.event_generate("<<Alert>>")
         self.deselect_object()
 
 
     def add_connection(self, node_1 : object, node_2 : object) -> None:
         '''
-        Creates a connection between two nodes if it satisfies the linking requirements
-        Adds a tuple(node_name, node_name) to the 'self.links' set
+        Crée une connexion entre deux nœuds si elle satisfait les exigences de liaison (pas de lien Source-Source par exemple).
+        Ajoute un tuple (nom_du_nœud, nom_du_nœud) à 'self.links'.
         '''
 
         if node_1.type == "Endpoint":
@@ -232,6 +232,7 @@ class Network(tk.Canvas):
 
 
     def create_paquet(self, node : Node) -> None:
+        """ Fonction permettant de créer un paquet personnalisé dans une Source (ouverture d'un menu) """
         self.deselect_object()
         self.net_controls.place_forget()
 
@@ -245,6 +246,7 @@ class Network(tk.Canvas):
 
 
     def create_node(self, *args) -> None:
+        """ Fonction permettant la création d'un Node dans le network (ouverture d'un menu) """
         self.deselect_object()
         self.net_controls.place_forget()
         
@@ -254,6 +256,7 @@ class Network(tk.Canvas):
 
 
     def delete_object(self, *args) -> None:
+        """ Fonction permettant la délétion d'un Node dans le Network (utilisée par un bouton) """
         if self.selected_node:
             self.del_node(self.selected_node)
         
@@ -270,10 +273,11 @@ class Network(tk.Canvas):
 
 
     def create_connection(self, *args) -> None:
+        """ Fonction qui permet à l'utilisateur de créer une connexion entre deux Nodes du Network (précédemment créer) """
         self.deselect_object()
         self.net_controls.place_forget()
 
-        if len(self.connections) < 2:
+        if len(self.connections) < 2:                                           # si le network contient moins de deux Nodes, aucune connection est possible
             self.net_controls.place(anchor = "se", relx = 1, rely = 1)
             self.app.alert = ("Error", "NotEnoughNodes")
             self.event_generate("<<Alert>>")
@@ -283,7 +287,7 @@ class Network(tk.Canvas):
         self.config(highlightbackground = "#ffcc22", highlightthickness = 5) 
         nodes = []
 
-        while len(nodes) < 2:
+        while len(nodes) < 2:                                                   # tant qu'on a deux nodes dans le network, les connexions sont possibles
             if self.selected_node:
                 nodes.append(self.selected_node)
                 self.deselect_object()
@@ -302,6 +306,7 @@ class Network(tk.Canvas):
 
 
     def select_object(self, event): 
+        """ Fonction qui permet à l'utilisateur de selectionner un Node """
         object_ids = self.find_overlapping(event.x, event.y, event.x, event.y) # Finds canvas item closest to cursor      
         if not object_ids: self.deselect_object(); return
         if self.selected_node: self.deselect_object()
@@ -316,6 +321,7 @@ class Network(tk.Canvas):
         
 
     def deselect_object(self):
+        """ Fonction qui permet à l'utilisateur de relâcher un Node """
         if self.selected_node:
             self.itemconfig(self.selected_node.id, image = self.icons[self.selected_node.type][0])
         self.selected_node = None
@@ -335,6 +341,7 @@ class Network(tk.Canvas):
 
 
     def play_network(self, *args) -> None:
+        """ Fonction qui est utilisée par le bouton play pour mettre en pause le programme """
         if not self.nodes:
             self.net_controls.set_play_button()
             return
@@ -342,12 +349,14 @@ class Network(tk.Canvas):
 
 
     def pause_network(self, *args) -> None:
+        """  Fonction qui est utilisée par le bouton pause pour mettre en play le programme """
         if self.net_controls.pause_button.winfo_ismapped():
             self.net_controls.set_play_button()
         self.pause = True
 
 
     def save_network(self, *args) -> None:
+        """ Fonction qui est utilisée par le bouton save, permet d'enregistrer tout le Network actuel, notamment les Nodes, leur connections, la taille des paquets sur la machine dans un fichier json """
         if not self.nodes:
             self.app.alert = ("Error", "EmptyNetToSave")
             self.event_generate("<<Alert>>")
@@ -385,6 +394,7 @@ class Network(tk.Canvas):
 
 
     def load_network(self,*, file_path : str = None) -> None:
+        """ Fonction permettant de charger dans le programme un fichier json contenant un Network entier précédemment enregistrer """
         if not file_path:
             file_path = tk.filedialog.askopenfilename(title = "Gimme a save file", filetypes = (('Json File', '*.json'), ("Tous les fichiers", "*.*")))
             if not file_path:
