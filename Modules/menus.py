@@ -1,5 +1,4 @@
 import json
-import pandas as pd
 import tkinter as tk
 import customtkinter as ctk
 import matplotlib.pyplot as plt
@@ -709,7 +708,7 @@ class DataAnalysisMenu(tk.Frame):
                     "Paquets Created" : network.total_paquets_created,
                     "Paquets Transfered" : network.total_paquets_transfered,
                     "Paquets Lost" : network.total_paquets_lost,
-                    "Paquets Lost (%)" : network.total_paquets_lost * 100 / network.total_paquets_created,
+                    "Paquets Lost (%)" : (network.total_paquets_lost / (network.total_paquets_transfered+network.total_paquets_lost))*100,
                     "Paquet Wait Time" : network.mean_paquet_wait_time,
                     "Nodes" : len(network.connections)
                 })
@@ -739,7 +738,7 @@ class DataAnalysisMenu(tk.Frame):
                 output_speed = 0 if most_connected_buffer_node == None else most_connected_buffer_node.output_speed
 
                 data["Name"].append(network.name)
-                data["Paquet Loss"].append(network.total_paquets_lost * 100 / network.total_paquets_created)
+                data["Paquet Loss"].append(network.total_paquets_lost)
                 data["Lambda"].append(output_speed)
 
         return data

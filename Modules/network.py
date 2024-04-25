@@ -42,16 +42,16 @@ class Network(tk.Canvas):
 
         # Logic Stuff ==================================================================
         
-        self.name = name
-        self.nodes : dict[str or int: Node] = {} # Sources, Endpoints or Buffers in the network
-        self.connections : dict = {} # Links between nodes
+        self.name = name                                    # Name to distinguish each network  
+        self.nodes : dict[str or int: Node] = {}            # Sources, Endpoints or Buffers in the network
+        self.connections : dict = {}                        # Links between nodes
         self.connection_counter :int = 0
         self.paquet_size : int = paquet_size
 
-        self.pause : bool = True
+        self.pause : bool = True                           
         self.last_updated : float = time()
 
-        self.total_paquets_created : int = 0
+        self.total_paquets_created : int = 0                
         self.total_paquets_transfered : int = 0
         self.total_paquets_lost : int = 0
         self.mean_paquet_wait_time : float = 0
@@ -61,41 +61,42 @@ class Network(tk.Canvas):
 
 
     def update_network(self):
+        """ Function that enables inter-code interactions to run """
         
-        if not self.connections:
+        if not self.connections:            
             self.pause_network()
         
         self.last_updated = time()
 
-        for node_name in self.connections:
+        for node_name in self.connections:               
             node = self.nodes[node_name]  
-            if node.type == "Source":
-                node.create_paquets()
+            if node.type == "Source":                          
+                node.create_paquets()                               # if the node is a Source, we create_paquets()
 
-                self.total_paquets_created += node.paquet_output
-                if node.behaviour == "Buffered":
-                    self.total_paquets_lost += node.paquet_loss
+                self.total_paquets_created += node.paquet_output 
+                if node.behaviour == "Buffered":                   
+                    self.total_paquets_lost += node.paquet_loss     
 
 
         for node_name in self.connections:
             node = self.nodes[node_name]    
 
-            if node.type == "Buffer" and node.connections:
+            if node.type == "Buffer" and node.connections:        # if the node is a Buffer and have connections, we can send paquets and also collect some
                 node.send_paquets()
                 node.collect_paquets()
 
-                self.total_paquets_lost += node.paquet_loss
-                self.total_paquets_transfered += node.paquet_transfer
+                self.total_paquets_lost += node.paquet_loss                 # update the numbers
+                self.total_paquets_transfered += node.paquet_transfer       # ...
 
-                if self.mean_paquet_wait_time == 0:
+                if self.mean_paquet_wait_time == 0:                         
                     self.mean_paquet_wait_time = node.mean_paquet_wait_time
                 else:
                     self.mean_paquet_wait_time = (self.mean_paquet_wait_time + node.mean_paquet_wait_time) / 2
 
         for node_name in self.connections:
             node = self.nodes[node_name]  
-            if node.type == "Source" and node.behaviour == "Normal":
-                if node.paquet_queue:
+            if node.type == "Source" and node.behaviour == "Normal":        # if the node is a "simple Source" (without buffer)
+                if node.paquet_queue:                                       
                     node.paquets_lost += len(node.paquet_queue)
                     self.total_paquets_lost += len(node.paquet_queue)
                     node.paquet_queue.clear()
@@ -139,7 +140,7 @@ class Network(tk.Canvas):
         if not node: return
 
         
-        if node.type == "Source":
+        if node.type == "Source":                                               
             self.total_paquets_created -= node.paquets_created
             self.total_paquets_lost -= node.paquets_lost
         

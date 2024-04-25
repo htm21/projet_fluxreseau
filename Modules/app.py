@@ -15,7 +15,7 @@ class App(object):
 
 
     if platform.system() == "Windows":
-        pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")
+        pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf")      # if the machine is on Windows, we add a font (not available for macOS)
 
 
     def __init__(self, parent : tk.Tk) -> None:
@@ -123,7 +123,7 @@ class App(object):
 
 
     def add_network(self, name : str, temp_name : str, paquet_size : int):
-        self.network_instances[name] = Network(self.Main_Frame, name = name, paquet_size = paquet_size, app = self, border = 0, highlightthickness = 0, background = "#171a1c")
+        self.network_instances[name] = Network(self.Main_Frame, name = name, paquet_size = paquet_size, app = self, border = 0, highlightthickness = 0, background = "#171a1c")     # initiate a new Network
         
         self.tab_bar.tabs[name] = self.tab_bar.tabs.pop(temp_name)
         self.tab_bar.tabs[name].name = name

@@ -12,37 +12,36 @@ class Node(object):
     def __init__(self, node_id : int = None, name : str = None, node_type : str = None, output_speed : int = None, paquet_size : int = None) -> None:
         Node.instance_counter += 1
         
-        self.id : int = node_id                     # Canvas id du Nœud 
-        self.name : str = name                      # nom du Nœud  
-        self.type : str = node_type                 # le type du Nœud qui sera soit "Source", soit "Buffer", soit "Network"
-        self.output_speed : int = output_speed      # vitesse de transmisison, si output_speed = 100 (Mb/s) alors si paquet est de 10Mb on aura 
-        self.paquet_size = paquet_size
+        self.id : int = node_id                      
+        self.name : str = name                      
+        self.type : str = node_type                 # the node type : "Source" or "Buffer"
+        self.output_speed : int = output_speed      
+        self.paquet_size = paquet_size              
 
-        self.paquet_queue : list[Paquet] = []       # permet de stocker les paquets contenus dans chaque Nœud
-        self.connections : list[Node] = []
+        self.paquet_queue : list[Paquet] = []       # FIFO initialisation
+        self.connections : list[Node] = []          # if a node is connected to the main node, he will be added to the main node's connection list
 
 
     def generate_data(self):
-        return ''.join([rd.choice(string.ascii_letters + string.digits) for _ in range(5)]) 
+        """ Function which generates random strings (which will be interpreted as data) """
+        return ''.join([rd.choice(string.ascii_letters + string.digits) for _ in range(5)])
     
 
     def create_paquet(self, data : str = None, size : int = None) -> None:
-        '''Créer un paquet et le stocke dans l'inventaire du Nœud'''
+        ''' Create a paquet and integrate it into the FIFO '''
         self.paquet_queue.append(Paquet(data, size))
 
 
     def receve_paquet(self, paquet : Paquet) -> None:
-        '''Stocke dans l'inventaire du Nœud le paquet'''
         self.paquet_queue.append(paquet)
 
 
     def show_paquet_queue(self) -> list[Paquet]:
-        '''Affiche l'inventaire actuel du Nœud'''
         return self.paquet_queue
 
 
     def __repr__(self) -> str:
-        '''Pour afficher proprement l'objet'''
+        ''' To properly display the object '''
         return f"'{self.type}:{self.name}'"
 
 
@@ -106,7 +105,7 @@ class Source(Node):
 class Buffer(Node):
 
     instance_counter : int = 0
-    behaviour_types : list = [
+    behaviour_types : list = [                     # the different types of behaviour
         "Normal",
         "Biggest Queue",
         "Alternating",
@@ -117,12 +116,12 @@ class Buffer(Node):
         Node.__init__(self, *args, **kwargs)       # héritage de la class Nœud
         Buffer.instance_counter += 1
 
-        self.capacity = capacity                    # capacité maximale du 'Buffer'
-        self.number_element = 0                     # le nombre d'élément pour vérifier si ajout possible ou non
+        self.capacity = capacity                    # the max capacity of the buffer
+        self.number_element = 0                     
   
-        self.behaviour = behaviour
-        self.behaviour_types : dict = {
-        "Normal" : self.fifo,
+        self.behaviour = behaviour  
+        self.behaviour_types : dict = {             # connects each "behaviour" to its function
+        "Normal" : self.fifo,           
         "Biggest Queue" : self.biggest_queue,
         "Alternating" : self.alternating,
         "Random" : self.random_choice
@@ -164,6 +163,7 @@ class Buffer(Node):
 
 
     def fifo(self, total_paquets : int) -> list[Paquet]:
+        """ Buffer normal behaviour """
         paquets = []
         while self.number_element != self.capacity and total_paquets != 0:
             for node in self.connections:
@@ -179,6 +179,7 @@ class Buffer(Node):
 
 
     def biggest_queue(self, total_paquets : int) -> list[Paquet]:
+        """ Buffer behaviour : choosing the biggest connected queue """
         paquets = []
         while self.number_element != self.capacity and total_paquets != 0:
             paquet_input = self.capacity - self.number_element
@@ -198,6 +199,7 @@ class Buffer(Node):
         
 
     def alternating(self, total_paquets : int) -> list[Paquet]:
+        """ Buffer behaviour : alternating the interaction between connected queues """
         paquets = []
         while self.number_element != self.capacity and total_paquets != 0:
             for node in self.connections:
@@ -212,6 +214,7 @@ class Buffer(Node):
 
 
     def random_choice(self, total_paquets : int) -> list[Paquet]:
+        """ Buffer behaviour : choosing randomly the connected queue to interact """
         paquets = []
         while self.number_element != self.capacity and total_paquets != 0:
             amount = self.capacity - self.number_element
@@ -269,5 +272,3 @@ class Endpoint(Node):
 
     def create_paquet(self, *args, **kwargs) -> Paquet:
         raise AttributeError( "'objet 'Endpoint' n'a pas de méthode 'create_paquet'" )      # surcharge de la méthode
-
-
