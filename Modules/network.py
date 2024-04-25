@@ -232,6 +232,7 @@ class Network(tk.Canvas):
 
 
     def create_paquet(self, node : Node) -> None:
+        self.deselect_object()
         self.net_controls.place_forget()
 
         if NodeCreationMenu.instance_counter == 0:
@@ -244,6 +245,7 @@ class Network(tk.Canvas):
 
 
     def create_node(self, *args) -> None:
+        self.deselect_object()
         self.net_controls.place_forget()
         
         if NodeCreationMenu.instance_counter == 0:
@@ -268,6 +270,7 @@ class Network(tk.Canvas):
 
 
     def create_connection(self, *args) -> None:
+        self.deselect_object()
         self.net_controls.place_forget()
 
         if len(self.connections) < 2:

@@ -168,7 +168,7 @@ class NodeCreationMenu(tk.Frame):
     def show_source_capacity(self, *args):
         if self.source_behaviour_dropdown.get() == "Buffered":
             self.capacity_entry.delete(0, "end")
-            self.capacity_entry.insert(0, "100")
+            self.capacity_entry.insert(0, "10")
             self.capacity_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
         elif self.source_behaviour_dropdown.get() == "Normal":
             if self.capacity_frame.winfo_ismapped(): self.capacity_frame.pack_forget()
@@ -198,8 +198,8 @@ class NodeCreationMenu(tk.Frame):
             self.node_class_label.config(text = arg, foreground = "#3d3829")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            self.output_speed_entry.insert(0, "80")
-            self.capacity_entry.insert(0, "50")
+            self.output_speed_entry.insert(0, "60")
+            self.capacity_entry.insert(0, "6")
             
             self.output_speed_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.buffer_behaviour_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
