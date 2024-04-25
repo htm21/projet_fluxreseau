@@ -713,7 +713,7 @@ class DataAnalysisMenu(tk.Frame):
                 buffers = 0
                 
                 if not network.total_paquets_transfered + network.total_paquets_lost == 0:
-                    paquet_loss = (network.total_paquets_lost / (network.total_paquets_transfered + network.total_paquets_lost)) * 100
+                    paquet_loss = round((network.total_paquets_lost / (network.total_paquets_transfered + network.total_paquets_lost)) * 100, 2)
 
                 for node_name in network.connections:
                     node = network.nodes[node_name]
@@ -731,7 +731,7 @@ class DataAnalysisMenu(tk.Frame):
                     "Paquets Transfered" : network.total_paquets_transfered,
                     "Paquets Lost" : network.total_paquets_lost,
                     "Paquets Lost (%)" : paquet_loss,
-                    "Paquet Wait Time (Avg.)" : network.mean_paquet_wait_time,
+                    "Paquet Wait Time (Avg.)" : round(network.mean_paquet_wait_time, 2),
                     "Nodes" : len(network.connections),
                     "Normal Sources" : normal_sources,
                     "Buffered Sources" : buffered_sources,
