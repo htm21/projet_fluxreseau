@@ -190,6 +190,7 @@ class Buffer(Node):
         
         # Executes the function tied to the buffers behaviour
         extracted_paquets = self.behaviour_types[self.behaviour]()
+        
         # Add collected paquets to queue
         self.paquet_queue.extend(extracted_paquets)
         
@@ -216,7 +217,7 @@ class Buffer(Node):
         exhausted_nodes = []
         
         # Used to go through the nodes within the self.connections list (FIFO)
-        max_index = len(self.connections)
+        max_index = len(self.connections) - 1
         index = 0
     
         while self.number_element != self.capacity and len(exhausted_nodes) != len(self.connections):  
@@ -304,7 +305,7 @@ class Buffer(Node):
         exhausted_nodes = []
         
         # Used to go through the nodes within the self.connections list (FIFO)
-        max_index = len(self.connections)
+        max_index = len(self.connections) - 1
         index = 0
         
         # Tacks for all buffered sources, the total wait time of each paquet extracted
@@ -317,30 +318,27 @@ class Buffer(Node):
         while self.number_element != self.capacity and len(exhausted_nodes) != len(self.connections):
             node = self.connections[index]
             if node not in exhausted_nodes:
-                if not node.paquet_queue:
-                    exhausted_nodes.append(node)
-                
-                elif node.behaviour == "Buffered":
-                    # Checks if wait time of paquet + total wait time of all paquets 
-                    # currently extraceted > 1
-                    wait_time = node.generate_wait_time()
-                    if lambda_tracker[node] + wait_time > 1:
-                        exhausted_nodes.append(node)
-                    else:
-                        # if total paquet wait time is still < 1 second then the paquet is extracted
-                        lambda_tracker[node] += wait_time
-                        paquets.append(node.paquet_queue.pop(0))
-                        self.number_element += 1     
-                
-                elif node.behaviour == "Normal":
-                    # Takes paquet out of paquet queue
-                    paquets.append(node.paquet_queue.pop(0))    
-                    if not node.paquet_queue:
-                        exhausted_nodes.append(node)
+                if node.paquet_queue:
                     
-                    # update remaning capacity
-                    self.number_element += 1     
-
+                    if node.behaviour == "Normal":
+                        # Takes paquet out of paquet queue
+                        paquets.append(node.paquet_queue.pop(0))    
+                        # update remaning capacity
+                        self.number_element += 1 
+                    
+                    elif node.behaviour == "Buffered":
+                        # Checks if wait time of paquet + total wait time of all paquets 
+                        # currently extraceted > 1
+                        wait_time = node.generate_wait_time()
+                        if lambda_tracker[node] + wait_time > 1:
+                            exhausted_nodes.append(node)
+                        else:
+                            # if total paquet wait time is still < 1 second then the paquet is extracted
+                            lambda_tracker[node] += wait_time
+                            paquets.append(node.paquet_queue.pop(0))
+                            self.number_element += 1         
+                else:
+                    exhausted_nodes.append(node)
             # next node index in the list else loop back
             index = 0 if index == max_index else index + 1
 
