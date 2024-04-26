@@ -11,7 +11,7 @@ from Modules.custom_button import *
 class SideBar(tk.Frame):
     '''
     La « SideBar » est un objet GUI qui utilise les propriétés de l'objet « tk.Frame » pour positionner et afficher 
-    des contrôles de l'utilisateur (widgets tkinter) et des informations sur le « réseau » ou le « nœud » pour l'utilisateur.
+    des contrôles de l'utilisateur (widgets tkinter) et des informations sur le « réseau » ou le « noeud » pour l'utilisateur.
     '''
 
     def __init__(self, parent, *args, **kwargs):
@@ -104,7 +104,7 @@ class SideBar(tk.Frame):
     def set_object_info(self, obj : object) -> None:
         '''
         Définit les informations relatives à l'objet sélectionné et les affiche sur la « SideBar »
-        '''
+        '''      
         info_text = ""
         
         if isinstance(obj, Network): # MAJ des informations concernant l'object Network 
@@ -112,14 +112,13 @@ class SideBar(tk.Frame):
             self.info_title.config(image = self.icons["Network"], text = f"    {network.name}")
             
             info_text += f"Name : {network.name}\n"
-            info_text += f"Connections : {network.connection_counter}\n\n"
-            
-            info_text += f"Paquet Size : {network.paquet_size}\n"
-            info_text += f"Paquet Wait Time : {network.mean_paquet_wait_time : 0.2f}\n\n"
+            info_text += f"Connections : {network.connection_counter}\n"
+            info_text += f"Paquet Size : {network.paquet_size}\n\n"
             
             info_text += f"Data Output : {network.data_output}\n"
             info_text += f"Paquet Output : {network.paquet_output}\n\n" 
 
+            info_text += f"Paquet Wait Time : {network.mean_paquet_wait_time : 0.2f}\n"
             info_text += f"Paquets Created : {network.total_paquets_created}\n"
             info_text += f"Paquets Sent : {network.total_paquets_transfered}\n"
             info_text += f"Paquets Lost : {network.total_paquets_lost}" 

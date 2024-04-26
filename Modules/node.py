@@ -216,16 +216,16 @@ class Buffer(Node):
         exhausted_nodes = []
         
         while self.number_element != self.capacity and len(exhausted_nodes) != len(self.connections):
-            biggest_node_queue = self.connections[0]
-            if node not in exhausted_nodes:
+            biggest_node_queue = self.connections[0]            
+            for node in self.connections:
+                if len(node.paquet_queue) > len(biggest_node_queue.paquet_queue): 
+                    biggest_node_queue = node
                 
-                for node in self.connections:
-                    if len(node.paquet_queue) > len(biggest_node_queue.paquet_queue): 
-                        biggest_node_queue = node
+            if biggest_node_queue not in exhausted_nodes:
 
                 max_paquet_input = self.capacity - self.number_element
                 paquet_input = max_paquet_input             
-                if node.behaviour == "Buffered" and node not in exhausted_nodes:
+                if biggest_node_queue.behaviour == "Buffered":
                     exhausted_nodes.append(node)
                     paquet_input = biggest_node_queue.calc_paquet_output()
                     paquet_input = max_paquet_input if paquet_input > max_paquet_input else paquet_input

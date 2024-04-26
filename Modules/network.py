@@ -156,6 +156,11 @@ class Network(tk.Canvas):
             self.total_paquets_transfered -= node.paquets_transfered
 
 
+        for node_name in self.connections[node.name]:
+            sub_node = self.nodes[node_name]
+            sub_node.connections.remove(node)
+
+
         NODE_TYPES[node.type].instance_counter -= 1
         self.connection_counter -= len(self.connections[node.name])
         del self.connections[node.name]        
