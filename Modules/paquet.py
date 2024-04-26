@@ -3,10 +3,10 @@ from time import time
 
 class Paquet:
     '''
-    Paquet is a data class containing 3 pieces of information:
-    - data (random)
-    - data size 
-    - ceration time (used to calculate paquet wait times in the buffers) 
+    Paquet est une class de données contenant trois éléments d’information :
+    - données (aléatoires)
+    - taille des données 
+    - moment de la création (utilisé pour calculer les temps d’attente des paquets dans les Buffers) 
     '''
     def __init__(self, data : str = None, size : int = None) -> None:
         
