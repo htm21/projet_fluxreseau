@@ -3,17 +3,16 @@ import tkinter as tk
 import customtkinter as ctk
 import matplotlib.pyplot as plt
 
- 
 from Modules.node import *
-from Modules.custom_button import * 
 from Modules.utils import *
 import matplotlib.ticker as ticker
+from Modules.custom_button import * 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 
 
-class NodeCreationMenu(tk.Frame):                   # Initialisation de la class permettant la création d'un Node par l'utilisateur (dans l'application), il s'agit d'un Frame
+class NodeCreationMenu(tk.Frame):   
 
     instance_counter = 0
 
@@ -23,14 +22,12 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
 
         self.network = network
         
-        self.icon_size : tuple = 75, 75
+        self.icon_size : tuple = 70, 70
         self.icons : dict[str : tuple] = {
-            "Node" : (load_to_size("node", *self.icon_size), load_to_size("highlight_node", *self.icon_size)),
             "Source" : (load_to_size("source_node", *self.icon_size), load_to_size("highlight_source_node", *self.icon_size)),
             "Buffer" : (load_to_size("buffer_node", *self.icon_size), load_to_size("highlight_buffer_node", *self.icon_size)),
-            "Endpoint" : (load_to_size("endpoint_node", *self.icon_size), load_to_size("highlight_endpoint_node", *self.icon_size)),
-            "Yes" : (load_to_size("yes", *self.icon_size), load_to_size("highlight_yes", *self.icon_size)),
-            "No" : (load_to_size("no", *self.icon_size), load_to_size("highlight_no", *self.icon_size)),
+            "Yes" : (load_to_size("yes", 70, 70), load_to_size("highlight_yes", 70, 70)),
+            "No" : (load_to_size("no", 70, 70), load_to_size("highlight_no", 70, 70)),
             }
 
         # Frames =======================================================================
@@ -42,12 +39,12 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
         self.controls = tk.Frame(self, background = kwargs.get("background"))
         self.type_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.name_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
-        self.output_speed_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
+        self.output_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.input_speed_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.source_behaviour_frame = tk.Frame(self.node_settings, background = kwargs.get("background"))
         self.buffer_behaviour_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
         self.capacity_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
-
+        self.lambda_frame = tk.Frame(self.node_settings, background = kwargs.get("background")) 
 
         self.node_choice.pack(side = "top", fill = "x", padx = 20, pady = 15)
         self.buffer_frame1.pack(side = "top", fill = "x")
@@ -69,8 +66,8 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
         self.name_label = tk.Label(self.name_frame, text = "Name : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.name_entry = tk.Entry(self.name_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
         
-        self.output_speed_label = tk.Label(self.output_speed_frame, text = "Output : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
-        self.output_speed_entry = tk.Entry(self.output_speed_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+        self.output_label = tk.Label(self.output_frame, text = "Output : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.output_entry = tk.Entry(self.output_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
 
         self.source_behaviour_label = tk.Label(self.source_behaviour_frame, text = "Behaviour : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.source_behaviour_dropdown = ctk.CTkComboBox(self.source_behaviour_frame, state = "readonly", width = 323, height = 40, corner_radius = 0, border_width = 0, font = (f"{font} bold", 20), dropdown_font = (f"{font} bold", 15), text_color = "#FFFFFF", fg_color = "#171a1c", border_color = "#171a1c", button_hover_color = "#ffcc22", values = Source.behaviour_types, command = self.show_source_capacity)
@@ -81,8 +78,12 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
         self.capacity_label = tk.Label(self.capacity_frame, text = "Capacity : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.capacity_entry = tk.Entry(self.capacity_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
 
+        self.lambda_label = tk.Label(self.lambda_frame, text = "Lambda : ", font = f"{font} 23 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+        self.lambda_entry = tk.Entry(self.lambda_frame, font = f"{font} 17 bold", foreground = "#FFFFFF", background = "#171a1c", borderwidth = 0, selectborderwidth = 0)
+        
         self.create_button = CustomButton(self.controls, parent_obj = self, func_arg = "create", icons = self.icons["Yes"], image = self.icons["Yes"][0], compound = "right", text = "Create  ", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
         self.cancel_button = CustomButton(self.controls, parent_obj = self, func_arg = "cancel", icons = self.icons["No"], image = self.icons["No"][0], compound = "left", text = "  Cancel", font = f"{font} 25 bold", foreground = "#FFFFFF", background = kwargs.get("background"))
+
 
 
         self.choose_node_lable.pack(anchor = "center", fill = "x", expand = True)
@@ -96,8 +97,8 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
         self.name_label.pack(side = "left")
         self.name_entry.pack(side = "right")
         
-        self.output_speed_label.pack(side = "left")
-        self.output_speed_entry.pack(side = "right")
+        self.output_label.pack(side = "left")
+        self.output_entry.pack(side = "right")
 
         self.source_behaviour_label.pack(side = "left")
         self.source_behaviour_dropdown.pack(side = "right")
@@ -107,6 +108,9 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
 
         self.capacity_label.pack(side = "left")
         self.capacity_entry.pack(side = "right")
+
+        self.lambda_label.pack(side = "left")
+        self.lambda_entry.pack(side = "right")
 
         self.create_button.pack(side = "right", padx = (30, 0))
         self.cancel_button.pack(side = "left", padx = (0, 30))
@@ -121,20 +125,22 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
         name = self.name_entry.get()
 
         if node_type == "Source":
-            output_speed = int(self.output_speed_entry.get()) if int(self.output_speed_entry.get()) >= 0 else 0
+            output = int(self.output_entry.get()) if int(self.output_entry.get()) >= 0 else 100
             behaviour = self.source_behaviour_dropdown.get()  
+
             if behaviour ==  "Normal":
-                self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, behaviour = behaviour)
+                self.network.add_node(node_type = node_type, name = name, output = output, behaviour = behaviour)
+            
             elif behaviour ==  "Buffered":
                 capacity = int(self.capacity_entry.get()) if int(self.capacity_entry.get()) >= 0 else 10
-                self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, behaviour = behaviour, capacity = capacity)
+                lambda_const = int(self.lambda_entry.get()) if int(self.lambda_entry.get()) >= 0 else 2
+                self.network.add_node(node_type = node_type, name = name, output = output, behaviour = behaviour, capacity = capacity, lambda_const = lambda_const)
 
         elif node_type == "Buffer":
             behaviour = self.buffer_behaviour_dropdown.get()
-            output_speed = int(self.output_speed_entry.get()) if int(self.output_speed_entry.get()) >= 0 else 0
             capacity = int(self.capacity_entry.get()) if int(self.capacity_entry.get()) >= 0 else 0
-
-            self.network.add_node(node_type = node_type, name = name, output_speed = output_speed, behaviour = behaviour, capacity = capacity)
+            lambda_const = int(self.lambda_entry.get()) if int(self.lambda_entry.get()) >= 0 else 2
+            self.network.add_node(node_type = node_type, name = name, behaviour = behaviour, capacity = capacity, lambda_const = lambda_const)
 
         self.network.net_controls.place(anchor = "se", relx = 1, rely = 1)
         NodeCreationMenu.instance_counter -= 1
@@ -155,17 +161,19 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
         self.type_frame.pack_forget()
         self.choose_node_lable.pack_forget()
         self.name_frame.pack_forget()
-        self.output_speed_frame.pack_forget()
+        self.output_frame.pack_forget()
         self.input_speed_frame.pack_forget()
         self.source_behaviour_frame.pack_forget()
         self.buffer_behaviour_frame.pack_forget()
         self.capacity_frame.pack_forget()
+        self.lambda_frame.pack_forget()
         
         # Widgets ======================================
-        self.output_speed_entry.delete(0, "end")
+        self.output_entry.delete(0, "end")
         self.source_behaviour_dropdown.set(Source.behaviour_types[0])
         self.buffer_behaviour_dropdown.set(Buffer.behaviour_types[0])
         self.capacity_entry.delete(0, "end")
+        self.lambda_entry.delete(0, "end")
 
 
     def show_source_capacity(self, *args):
@@ -173,8 +181,14 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
             self.capacity_entry.delete(0, "end")
             self.capacity_entry.insert(0, "10")
             self.capacity_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            
+            self.lambda_entry.delete(0, "end")
+            self.lambda_entry.insert(0, "2")
+            self.lambda_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            
         elif self.source_behaviour_dropdown.get() == "Normal":
-            if self.capacity_frame.winfo_ismapped(): self.capacity_frame.pack_forget()
+            self.capacity_frame.pack_forget()
+            self.lambda_frame.pack_forget()
 
 
     def passdown_func(self, arg):
@@ -187,9 +201,9 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
             self.node_class_label.config(text = arg, foreground = "#354d33")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            self.output_speed_entry.insert(0, "100")
+            self.output_entry.insert(0, "100")
             
-            self.output_speed_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            self.output_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.source_behaviour_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
 
             self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 15)
@@ -201,12 +215,12 @@ class NodeCreationMenu(tk.Frame):                   # Initialisation de la class
             self.node_class_label.config(text = arg, foreground = "#3d3829")
             self.name_entry.delete(0, "end")
             self.name_entry.insert(0, f"{arg}-{NODE_TYPES[arg].instance_counter + 1}")
-            self.output_speed_entry.insert(0, "60")
-            self.capacity_entry.insert(0, "6")
-            
-            self.output_speed_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            self.capacity_entry.insert(0, "10")
+            self.lambda_entry.insert(0, "2")
+
             self.buffer_behaviour_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
             self.capacity_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
+            self.lambda_frame.pack(padx = 20, pady = 5, fill = "x", expand = True)
 
             self.node_settings.pack(side = "top", fill = "x", padx = 20, pady = 15)
 
@@ -766,14 +780,14 @@ class DataAnalysisMenu(tk.Frame):
                             most_connected_buffer_node = network.connections[node_name]
                 
                 
-                paquet_output = 0 if most_connected_buffer_node == None else most_connected_buffer_node.paquet_output
+                lambda_const = 0 if most_connected_buffer_node == None else most_connected_buffer_node.lambda_const
                 paquet_loss = 0
                 if not network.total_paquets_transfered + network.total_paquets_lost == 0:
                     paquet_loss = (network.total_paquets_lost / (network.total_paquets_transfered + network.total_paquets_lost)) * 100
 
                 data["Name"].append(network.name)
                 data["Paquet Loss"].append(paquet_loss)
-                data["Lambda"].append(paquet_output)
+                data["Lambda"].append(lambda_const)
 
         return data
 

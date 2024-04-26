@@ -51,9 +51,13 @@ class Network(tk.Canvas):
         self.pause : bool = True                             
         self.last_updated : float = time()
 
+        self.paquet_output : int = 0
+        self.data_output : int = 0
+
         self.total_paquets_created : int = 0                
         self.total_paquets_transfered : int = 0
         self.total_paquets_lost : int = 0
+        
         self.mean_paquet_wait_time : float = 0
 
 
@@ -79,19 +83,23 @@ class Network(tk.Canvas):
 
 
         for node_name in self.connections:
+            self.paquet_output = 0
             node = self.nodes[node_name]    
 
             if node.type == "Buffer" and node.connections:        # si le node est un Buffer qui est connecté alors on peut collecter et envoyer des paquets
-                node.send_paquets()                               
+
+                node.send_paquets()                
                 node.collect_paquets()
 
                 self.total_paquets_lost += node.paquet_loss                 # on MAJ les données
                 self.total_paquets_transfered += node.paquet_transfer       # ...
+                self.paquet_output += node.paquet_transfer
 
                 if self.mean_paquet_wait_time == 0:                         
                     self.mean_paquet_wait_time = node.mean_paquet_wait_time
                 else:
                     self.mean_paquet_wait_time = (self.mean_paquet_wait_time + node.mean_paquet_wait_time) / 2
+        self.data_output = self.paquet_output * self.paquet_size
 
         for node_name in self.connections:      
             node = self.nodes[node_name]  
@@ -203,11 +211,6 @@ class Network(tk.Canvas):
             self.event_generate("<<Alert>>")
             return
 
-        elif node_1.type == "Endpoint" and node_2.type == "Endpoint":
-            self.app.alert = ("Error","TwoEndpoints")
-            self.event_generate("<<Alert>>")
-            return
-
         elif node_1.type == "Buffer" and node_2.type == "Buffer":
             self.app.alert = ("Error","TwoBuffers")
             self.event_generate("<<Alert>>")
@@ -238,7 +241,7 @@ class Network(tk.Canvas):
 
         if NodeCreationMenu.instance_counter == 0:
             menu = PaquetCreationMenu(self, node = node, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
-            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
+            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.65)
         else:
             self.net_controls.place(anchor = "se", relx = 1, rely = 1)
             self.app.alert = ("Error", "NoEndpoints")
@@ -252,7 +255,7 @@ class Network(tk.Canvas):
         
         if NodeCreationMenu.instance_counter == 0:
             menu = NodeCreationMenu(self, network = self, background = "#22282a", highlightbackground = "#1D2123", highlightcolor = "#1D2123", highlightthickness = 5)
-            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.9)
+            menu.place(relx = 0.5, rely = 0.5, anchor = "center", relwidth = 0.7, relheight = 0.97)
 
 
     def delete_object(self, *args) -> None:
@@ -416,12 +419,12 @@ class Network(tk.Canvas):
         for node_data in data["nodes"]:
             if node_data["type"] == "Source":
                 if node_data["behaviour"] == "Normal":
-                    self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"], behaviour = node_data["behaviour"])
+                    self.add_node(node_type = node_data["type"], name = node_data["name"], output = node_data["output"], behaviour = node_data["behaviour"])
                 elif node_data["behaviour"] == "Buffered":
-                    self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"], behaviour = node_data["behaviour"], capacity = node_data["capacity"])
+                    self.add_node(node_type = node_data["type"], name = node_data["name"], output = node_data["output"], behaviour = node_data["behaviour"], capacity = node_data["capacity"], lambda_const = node_data["lambda_const"])
             
             if node_data["type"] == "Buffer":
-                self.add_node(node_type = node_data["type"], name = node_data["name"], output_speed = node_data["output_speed"], behaviour = node_data["behaviour"], capacity = node_data["capacity"])
+                self.add_node(node_type = node_data["type"], name = node_data["name"], lambda_const = node_data["lambda_const"], behaviour = node_data["behaviour"], capacity = node_data["capacity"])
             
             self.moveto(self.nodes[node_data["name"]].id, *node_data["coords"])
 

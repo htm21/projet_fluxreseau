@@ -117,6 +117,9 @@ class SideBar(tk.Frame):
             info_text += f"Paquet Size : {network.paquet_size}\n"
             info_text += f"Paquet Wait Time : {network.mean_paquet_wait_time : 0.2f}\n\n"
             
+            info_text += f"Data Output : {network.data_output}\n"
+            info_text += f"Paquet Output : {network.paquet_output}\n\n" 
+
             info_text += f"Paquets Created : {network.total_paquets_created}\n"
             info_text += f"Paquets Sent : {network.total_paquets_transfered}\n"
             info_text += f"Paquets Lost : {network.total_paquets_lost}" 
@@ -130,20 +133,21 @@ class SideBar(tk.Frame):
             info_text += f"Name : {node.name}\n"
             info_text += f"Behaviour : {node.behaviour}\n\n"
 
-            info_text += f"Output Speed : {node.output_speed}/s\n"
-            info_text += f"Paquet Output : {node.paquet_output}/s\n\n"
-            
-            if node.type == "Source":               
+
+            if node.type == "Source":
+                info_text += f"Paquet Gen : {node.paquet_output}/s\n\n"          
                 info_text += f"Paquets Created : {node.paquets_created}\n"
-                info_text += f"Paquets Lost : {node.paquets_lost}\n"
+                info_text += f"Paquets Lost : {node.paquets_lost}\n\n"
 
                 if node.behaviour == "Buffered":
+                    info_text += f"Lambda : {node.lambda_const}\n"
                     info_text += f"Buffer Capacity : {node.capacity}\n"
             
             elif node.type == "Buffer":
                 info_text += f"Paquets Sent : {node.paquets_transfered}\n"
                 info_text += f"Paquets Lost : {node.paquets_lost}\n\n"
 
+                info_text += f"Lambda : {node.lambda_const}\n"
                 info_text += f"Buffer Capacity : {node.capacity}\n"
                 info_text += f"Current Size : {node.number_element}\n"
 
@@ -151,6 +155,7 @@ class SideBar(tk.Frame):
             if node.type == "Source" and node.behaviour == "Buffered" or node.type == "Buffer":
                 # Ici, nous ne prenons qu'un maximum de 5 paquets (leurs détails : data, ...) pour les afficher sur la « SideBar », permettant de visualiser leurs arrivées
                 # S'il y a plus de 5 paquets présents dans le « Node », un nombre représentant le total des paquets restants est affiché.
+                
                 paquets = "\n● " + "\n● ".join(str(paquet) for paquet in node.paquet_queue[:5])
                 if len(node.paquet_queue) > 5:
                     paquets += f"\n And {len(node.paquet_queue) - 5} more..."
