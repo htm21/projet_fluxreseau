@@ -12,6 +12,41 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 
+
+'''
+The classes defined in this file follow close to the same structure.
+They are GUI Menus that use tk.Frames and tk.Widgets and will give the user the 
+ability to create, delete, and analyse network, nodes, paquets & network data. 
+
+
+The menus in this file are the following:
+    NodeCreationMenu :
+        Menu to setup and create nodes 
+    
+    DelNetMenu :
+        Confirmation Menu to make sure the user understands the implications of 
+        deleting the menu
+    
+    PaquetCreationMenu : 
+        Gives the user the possibility to create custom paquets with a custom message
+        to differentiate from the randomly generated paquets
+
+    NewNetworkMenu : 
+        Menu to setup and create a network (just name & paquet size options)
+    
+    NetControls :
+        Menu afiliated with a Network instance that controls the way it is updated
+
+    DataAnalysisMenu : 
+        Menu that gives the user insights on the diffrent performances of each network
+        depending on the data tracked by each network
+    
+'''
+
+
+
+
+
 class NodeCreationMenu(tk.Frame):   
 
     instance_counter = 0

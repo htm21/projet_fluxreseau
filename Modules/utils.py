@@ -5,10 +5,10 @@ import tkinter as tk
 from Modules.node import *
 from PIL import Image,ImageTk
 
-
+# the path to the folder containing all dependancies
 app_folder_path = os.getcwd().replace("\\", "/")
 
-
+# Custom font used if on windows  
 font = "Montserrat" if platform.system() == "Windows" else "Arial"
 
 

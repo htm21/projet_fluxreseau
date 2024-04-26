@@ -185,17 +185,19 @@ class App(object):
         '''
         Manages the switching of "Network" instances when switching tabs.
         '''
+        # Pauses current network and stops displaying it
         if self.current_network:
             self.current_network.net_controls.set_play_button()
             self.current_network.pause = True
             self.current_network.deselect_object()
             self.current_network.pack_forget()
         else:
+            # if the user is switching back to an empty tab it calls the NewNetworkMenu again
             self.create_network_menu.instance_counter -= 1
             self.create_network_menu.place_forget()
             self.side_bar.pack(side = "right", fill = "y")
         
-        
+        # sets the current network to the one the user is switching to
         self.current_network = self.network_instances[network_name]
         if self.current_network:
             self.bind_events()
@@ -209,12 +211,16 @@ class App(object):
         '''
         Displays the Network comparison menu.
         '''
+
+        # pausing the network
         self.current_network.pause = True
         
+        # Removing any widgets that are currently displaying
         self.current_network.pack_forget()
         self.side_bar.pack_forget()
         self.tab_bar.pack_forget()
 
+        # creates an instance of the "DataAnalysisMenu" class
         self.compare_networks_menu = DataAnalysisMenu(self.Main_Frame, app = self, background = "#171a1c")
         self.compare_networks_menu.pack(anchor = "center", fill = "both", expand = True)
 
@@ -223,9 +229,11 @@ class App(object):
         '''
         Closes the Network comparison menu.
         '''
+        # removes the DataAnalysisMenu menu
         self.compare_networks_menu.pack_forget()
         self.compare_networks_menu = None
         
+        # puts back the GUI widgets  
         self.tab_bar.pack(side = "top", fill = "x")
         self.side_bar.pack(side = "right", fill = "y")
         self.current_network.pack(side = "left", fill = "both", expand = True)

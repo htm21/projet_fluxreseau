@@ -292,13 +292,23 @@ class Buffer(Node):
 
 
     def alternating(self) -> list[Paquet]:
-        """ Fonction qui décrit le comportement additionnel du Buffer : le buffer choisit de manière alternée les "buffered" Sources pour collecter les paquets """
+        '''
+        The alternating function will extract paquets from source nodes one by one while alternating
+        between the connected nodes in FIFO order. 
+        '''
+        # Paquets collected form the sources
         paquets = []    
+        
+        # Sources that can't give anymore paquets are "banned" and stored in here
+        # If a source has no more paquets or can't give any more paquets since its buffer follows the Poisson law
         exhausted_nodes = []
         
+        # Used to go through the nodes within the self.connections list (FIFO)
         max_index = len(self.connections)
         index = 0
         
+        # Tacks for all buffered sources, the total wait time of each paquet extracted
+        # Used to limit upto 1 second
         lambda_tracker = dict()
         for node in self.connections:
             if node.behaviour == "Buffered":
@@ -307,39 +317,55 @@ class Buffer(Node):
         while self.number_element != self.capacity and len(exhausted_nodes) != len(self.connections):
             node = self.connections[index]
             if node not in exhausted_nodes:
+                if not node.paquet_queue:
+                    exhausted_nodes.append(node)
                 
-                if node.behaviour == "Buffered":
+                elif node.behaviour == "Buffered":
+                    # Checks if wait time of paquet + total wait time of all paquets 
+                    # currently extraceted > 1
                     wait_time = node.generate_wait_time()
-                    if lambda_tracker[node] + wait_time >= 1:
+                    if lambda_tracker[node] + wait_time > 1:
                         exhausted_nodes.append(node)
                     else:
+                        # if total paquet wait time is still < 1 second then the paquet is extracted
                         lambda_tracker[node] += wait_time
                         paquets.append(node.paquet_queue.pop(0))
                         self.number_element += 1     
                 
                 elif node.behaviour == "Normal":
+                    # Takes paquet out of paquet queue
                     paquets.append(node.paquet_queue.pop(0))    
                     if not node.paquet_queue:
                         exhausted_nodes.append(node)
                     
+                    # update remaning capacity
                     self.number_element += 1     
 
+            # next node index in the list else loop back
             index = 0 if index == max_index else index + 1
 
+        # return the paquets extracted (list)
         return paquets
 
 
     def random_choice(self) -> list[Paquet]:
-        """ Fonction qui décrit le comportement additionnel du Buffer : le buffer choisit de manière aléatoire les "buffered" Sources qui lui sont connectées """
-        
+        '''
+        The random_choice function will pick a random source node to take as many 
+        paquets that it can.
+        '''
+        # Paquets collected form the sources
         paquets = []
         
+        # Sources that can't give anymore paquets are "banned" and stored in here
+        # If a source has no more paquets or can't give any more paquets since its buffer follows the Poisson law
         exhausted_nodes = []
         
         while self.number_element != self.capacity and len(exhausted_nodes) != len(self.connections):
+            # Takes a random node from "self.connections"
             node = rd.choice(self.connections)
-            if node not in exhausted_nodes:
-                
+            if node not in exhausted_nodes: 
+
+                # amount of paquets we can extract from the source node if its buffered or not   
                 max_paquet_input = self.capacity - self.number_element
                 paquet_input = max_paquet_input             
                 if node.behaviour == "Buffered":
@@ -347,20 +373,31 @@ class Buffer(Node):
                     paquet_input = node.calc_paquet_output()
                     paquet_input = max_paquet_input if paquet_input > max_paquet_input else paquet_input
 
+                # Paquet extraction through slices and tuple unpacking 
                 extracted_paquets, node.paquet_queue = node.paquet_queue[: paquet_input], node.paquet_queue[paquet_input :]
 
+                # update buffer queue and remaning capacity
                 paquets.extend(extracted_paquets)  
                 self.number_element += len(extracted_paquets)    
 
+        # return the paquets extracted (list)
         return paquets
 
 
     def send_paquets(self):
-        """ Fonction qui permet d'envoyer les paquets stockés au Réseau """
+        '''
+        This function represents the buffer node "sending" the paquets in the 
+        paquet queue onto the network. 
+        The Buffer will actualy extract the paquets form its paquet queue following Poissons law, 
+        tally them up, calculate avrage paquet wait time and then delete them.  
+        '''
 
+        # extracting the paquets form its paquet queue following Poissons law
+        # Paquet extraction through slices and tuple unpacking 
         paquet_output = self.calc_paquet_output()
         extracted_paquets, self.paquet_queue = self.paquet_queue[: paquet_output], self.paquet_queue[paquet_output :]
         
+        # update paqute tracking values 
         if extracted_paquets:
             if self.mean_paquet_wait_time == 0:
                 output_time = time()
