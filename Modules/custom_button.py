@@ -1,7 +1,11 @@
 import tkinter as tk
 
 
-class CustomButton(tk.Label):               # Initialisation de la class CustomButton, modélisant les boutons, hérite de l'objet Frame de tkinter
+class CustomButton(tk.Label):
+    '''
+    This is a custom class that combines the functionality of the "tk.Lable" class and Binds & Events to create a
+    custom button to better fit the style of the program.  
+    '''
     def __init__(self, parent, event = None, parent_obj = None, func_arg = None, icons = [], *args, **kwargs) -> None:
         tk.Label.__init__(self, parent, *args, kwargs)
         
@@ -17,7 +21,9 @@ class CustomButton(tk.Label):               # Initialisation de la class CustomB
 
 
     def on_click(self, *args):
-        """ Fonction qui permet la mise en marche de l'événement associé au bouton (s'active quand celui si est cliqué) """
+        '''
+        Fonction qui permet la mise en marche de l'événement associé au bouton (s'active quand celui si est cliqué)
+        '''
         if self.event:
             self.event_generate(self.event)
         
@@ -26,12 +32,18 @@ class CustomButton(tk.Label):               # Initialisation de la class CustomB
 
 
     def on_enter(self, *args) -> None:
+        '''
+        Manages the actions of the button when its hovered by the user with a cursor
+        '''
         if len(self.icons) == 2:
             self.config(foreground = "#ffcc22", image = self.icons[1])
         self.config(foreground = "#ffcc22")
 
 
     def on_leave(self, *args) -> None:
+        '''
+        Manages the actions of the button when the user stops hovering the button with a cursor
+        '''
         if len(self.icons) == 2:
             self.config(foreground = "#ffcc22", image = self.icons[0])
         self.config(foreground = self.kwargs.get("foreground"))

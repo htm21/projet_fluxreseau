@@ -151,14 +151,12 @@ class SideBar(tk.Frame):
                 info_text += f"Current Size : {node.number_element}\n"
 
 
-            if node.type == "Source" and node.behaviour == "Buffered" or node.type == "Buffer":
-                # Ici, nous ne prenons qu'un maximum de 5 paquets (leurs détails : data, ...) pour les afficher sur la « SideBar », permettant de visualiser leurs arrivées
-                # S'il y a plus de 5 paquets présents dans le « Node », un nombre représentant le total des paquets restants est affiché.
-                
-                paquets = "\n● " + "\n● ".join(str(paquet) for paquet in node.paquet_queue[:5])
-                if len(node.paquet_queue) > 5:
-                    paquets += f"\n And {len(node.paquet_queue) - 5} more..."
-                info_text += f"Paquet Queue : {paquets}"
+            # Ici, nous ne prenons qu'un maximum de 5 paquets pour les afficher sur la « SideBar », permettant de visualiser leurs arrivées
+            # S'il y a plus de 5 paquets présents dans le « Node », un nombre représentant le total des paquets restants est affiché.
+            paquets = "\n● " + "\n● ".join(str(paquet) for paquet in node.paquet_queue[:5])
+            if len(node.paquet_queue) > 5:
+                paquets += f"\n And {len(node.paquet_queue) - 5} more..."
+            info_text += f"Paquet Queue : {paquets}"
             
 
         # MAJ des informations du Label

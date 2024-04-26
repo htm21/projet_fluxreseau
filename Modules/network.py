@@ -1,7 +1,6 @@
 import json
 import tkinter as tk
 
-
 from time import time
 from Modules.menus import *
 from Modules.utils import *
@@ -10,7 +9,10 @@ from Modules.paquet import *
 
 
 class Network(tk.Canvas):
-
+    '''
+    The "Network" object manages the individual nodes that are added and removed onto the network and the interacions between nodes.
+    It inherits from the "tk.Canvas" object to display and manipulate the individual nodes.
+    '''
     instance_counter = 0
 
     def __init__(self, parent : tk.Widget, name : str, app : object, paquet_size : int = 10, *args : tuple, **kwargs : dict) -> None:
@@ -34,7 +36,7 @@ class Network(tk.Canvas):
             "Play" : (load_to_size("play", 75, 75), load_to_size("highlight_play", 75, 75)),
             }
         
-        self.net_controls : tk.Frame = NetControls(self, network = self, background = "#22282a")
+        self.net_controls : NetControls = NetControls(self, network = self, background = "#22282a")
         self.net_controls.place(anchor = "se", relx = 1, rely = 1)
         self.selected_node : Node = None
         self.bind("<Button-1>", self.select_object)
@@ -42,9 +44,9 @@ class Network(tk.Canvas):
 
         # Logic Stuff ==================================================================
         
-        self.name = name                                        # On donne un nom propre au Network pour pouvoir le distinguer
+        self.name : str = name                                  # On donne un nom propre au Network pour pouvoir le distinguer
         self.nodes : dict[str or int : Node] = {}               # dictionnaire contenant tout les Nodes du network
-        self.connections : dict[str : list] = {}                # ... toutes les connections du Network
+        self.connections : dict[str : list[str]] = {}           # ... toutes les connections du Network
         self.connection_counter : int = 0
         self.paquet_size : int = paquet_size
 
@@ -65,7 +67,9 @@ class Network(tk.Canvas):
 
 
     def update_network(self):
-        """ Fonction qui permet aux interactions entre entités de fonctionner """
+        '''
+        Fonction qui permet aux interactions entre entités de fonctionner
+        '''
         
         if not self.connections:            
             self.pause_network()
@@ -114,7 +118,8 @@ class Network(tk.Canvas):
         '''
         Crée un Node et l'ajoute au réseau en l'ajoutant au dictionnaire « self.nodes » qui peut être accédé ultérieurement par le nom du noeud.
         Si aucun type de noeud n'est indiqué, il s'agit alors d'un noeud de type « Source » par défaut.
-        Si aucun nom n'est donné au noeud, un nom lui sera automatiquement donné en utilisant ce formatage : « NODE_TYPE-NODE_TYPE.instance_counter » -> Node-1  
+        Si aucun nom n'est donné au noeud, un nom lui sera automatiquement donné en utilisant ce formatage: 
+            « NODE_TYPE-NODE_TYPE.instance_counter » -> Node-1. 
         '''
         
         if self.nodes.get(name):
@@ -122,16 +127,16 @@ class Network(tk.Canvas):
             self.event_generate("<<Alert>>")
             return
 
-        canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0], tags = "node")
         # Création d'un objet canvas avec « node_type » au milieu du Canvas
+        canvas_node = self.create_image(self.winfo_width() // 2, self.winfo_height() // 2, image = self.icons[node_type][0], tags = "node")
         
-        node = NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, paquet_size = self.paquet_size, *args, **kwargs)
         # Création de l'objet nœud avec « node_type »
+        node = NODE_TYPES.get(node_type)(node_id = canvas_node, name = name, node_type = node_type, paquet_size = self.paquet_size, *args, **kwargs)
 
+        # Utiliser le nom du nœud ou l'identifiant du canvas pour accéder à l'objet nœud dans le dict des nœuds.
         self.nodes[canvas_node] = node
         self.nodes[name] = node
         self.connections[name] = []
-        # Utiliser le nom du nœud ou l'identifiant du canvas pour accéder à l'objet nœud dans le dict des nœuds.
 
         self.tag_raise("node")
         self.app.alert = ("Success", "CreateNode")
@@ -140,7 +145,8 @@ class Network(tk.Canvas):
 
     def del_node(self, node : Node) -> None:
         '''
-        Supprime un nœud du réseau en supprimant le nœud du dictionnaire « self.nodes » et en supprimant tous les liens existants vers le nœud de « self.links ». 
+        Supprime un nœud du réseau en supprimant le nœud du dictionnaire « self.nodes » et en supprimant tous 
+        les liens existants vers le nœud de « self.links ». 
         '''
         
         self.deselect_object()
@@ -229,7 +235,6 @@ class Network(tk.Canvas):
             self.create_line((*self.coords(node_1.id), *self.coords(node_2.id)), width = 10, fill = "#1D2123", activefill = "#22282a", smooth = True, tags = [node_1.name, node_2.name])
             self.tag_raise("node")
 
-            # node_1.connections += 1
             self.connections[node_1.name].append(node_2.name)
             node_2.connections.append(node_1)
 
@@ -240,7 +245,9 @@ class Network(tk.Canvas):
 
 
     def create_paquet(self, node : Node) -> None:
-        """ Fonction permettant de créer un paquet personnalisé dans une Source (ouverture d'un menu) """
+        '''
+        Fonction permettant de créer un paquet personnalisé dans une Source (ouverture d'un menu)
+        '''
         self.deselect_object()
         self.net_controls.place_forget()
 
@@ -254,7 +261,9 @@ class Network(tk.Canvas):
 
 
     def create_node(self, *args) -> None:
-        """ Fonction permettant la création d'un Node dans le network (ouverture d'un menu) """
+        '''
+        Fonction permettant la création d'un Node dans le network (ouverture d'un menu)
+        '''
         self.deselect_object()
         self.net_controls.place_forget()
         
@@ -264,7 +273,9 @@ class Network(tk.Canvas):
 
 
     def delete_object(self, *args) -> None:
-        """ Fonction permettant la délétion d'un Node dans le Network (utilisée par un bouton) """
+        '''
+        Fonction permettant la délétion d'un Node dans le Network (utilisée par un bouton)
+        '''
         if self.selected_node:
             self.del_node(self.selected_node)
         
@@ -281,7 +292,9 @@ class Network(tk.Canvas):
 
 
     def create_connection(self, *args) -> None:
-        """ Fonction qui permet à l'utilisateur de créer une connexion entre deux Nodes du Network (précédemment créer) """
+        '''
+        Fonction qui permet à l'utilisateur de créer une connexion entre deux Nodes du Network (précédemment créer)
+        '''
         self.deselect_object()
         self.net_controls.place_forget()
 
@@ -314,7 +327,9 @@ class Network(tk.Canvas):
 
 
     def select_object(self, event): 
-        """ Fonction qui permet à l'utilisateur de selectionner un Node """
+        '''
+        Fonction qui permet à l'utilisateur de selectionner un Node
+        '''
         object_ids = self.find_overlapping(event.x, event.y, event.x, event.y) # Finds canvas item closest to cursor      
         if not object_ids: self.deselect_object(); return
         if self.selected_node: self.deselect_object()
@@ -329,7 +344,9 @@ class Network(tk.Canvas):
         
 
     def deselect_object(self):
-        """ Fonction qui permet à l'utilisateur de relâcher un Node """
+        '''
+        Fonction qui permet à l'utilisateur de relâcher un Node
+        '''
         if self.selected_node:
             self.itemconfig(self.selected_node.id, image = self.icons[self.selected_node.type][0])
         self.selected_node = None
@@ -338,6 +355,9 @@ class Network(tk.Canvas):
 
 
     def move_node(self, event):
+        '''
+        Moves a canvas node with the cursor coordinates.
+        '''
         if not self.selected_node: return
         self.coords("selected", event.x, event.y)
         if canvas_lines := self.find_withtag(self.selected_node.name):
