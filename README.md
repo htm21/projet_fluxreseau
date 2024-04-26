@@ -12,7 +12,7 @@ L'installation des différents modules sont faits par l'utilisation de  [pip](ht
 ```bash
 pip install module
 ```
-Les modules nécessaires sont les suivants : **tkinter**, **customtkinter**, **matplotlib**, **screeninfo**, **os**, **platform**, **ctypes**, **pillow**, **itertools**, **pyglet**,
+Les modules nécessaires sont les suivants : **tkinter**, **customtkinter**, **matplotlib**, **os**, **platform**, **ctypes**, **pillow**, **itertools**, **pyglet**,
 
 
 # Les Objectifs du projet
