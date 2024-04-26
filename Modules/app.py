@@ -16,7 +16,8 @@ class App(object):
     The "App" class is a central objetc that will manage all GUI elements and logic.
     '''
 
-    # Adds the custom font to tkinters font families so the custom font selected can be used 
+    # Adds the custom font to tkinters font families so the custom font selected can be used
+    # Font must be installed on the users pc if it is to be used
     if platform.system() == "Windows":
         pyglet.font.add_file(f"{app_folder_path}/Font/{font}.ttf") 
 
