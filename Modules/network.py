@@ -10,8 +10,8 @@ from Modules.paquet import *
 
 class Network(tk.Canvas):
     '''
-    The "Network" object manages the individual nodes that are added and removed onto the network and the interacions between nodes.
-    It inherits from the "tk.Canvas" object to display and manipulate the individual nodes.
+    L'objet "Network" gère les nœuds individuels ajoutés et supprimés sur le réseau ainsi que les interactions entre les nœuds.
+    Il hérite de l'objet "tk.Canvas" pour afficher et manipuler les nœuds individuels.
     '''
     instance_counter = 0
 
@@ -23,11 +23,13 @@ class Network(tk.Canvas):
         
         tk.Canvas.__init__(self, parent, *args, **kwargs)
         
-        # refrences the App instance that manages this Network instance
+        # fait référence à l'instance App qui gère cette instance de réseau
         self.app = app
-        # refrences the tkinter master of this widget
+        
+        # fait référence au maître widget
         self.parent : tk.Frame = parent
-        # tkinter key word arguments that discribe the tk.Frame
+        
+        # arguments de mot-clé tkinter qui décrivent le tk.Frame
         self.kwargs : dict[str] =  kwargs
 
         # Toutes les icônes utilisées sur la « SideBar » sont ajustées à une certaine taille et stockées dans « self.icons » en tant qu'« ImageTk.PhotoImage ».
@@ -42,11 +44,11 @@ class Network(tk.Canvas):
             "Play" : (load_to_size("play", 75, 75), load_to_size("highlight_play", 75, 75)),
             }
         
-        # Network control GUI widget
+        # Widget GUI de contrôle réseau
         self.net_controls : NetControls = NetControls(self, network = self, background = "#22282a")
         self.net_controls.place(anchor = "se", relx = 1, rely = 1)
         
-        # node currently selected by the user
+        # nœud actuellement sélectionné par l'utilisateur
         self.selected_node : Node = None
         self.bind("<Button-1>", self.select_object)
         self.bind("<B1-Motion>", self.move_node)
@@ -58,14 +60,14 @@ class Network(tk.Canvas):
         self.connections : dict[str : list[str]] = {}           # ... toutes les connections du Network
         self.connection_counter : int = 0
         
-        # this value is thesize of all paquets created in the network 
+        # cette valeur est la taille de tous les paquets créés sur le réseau
         self.paquet_size : int = paquet_size
 
-        # for managing pausing and updating the network 
+        # pour gérer la pause et la mise à jour du réseau
         self.pause : bool = True                             
         self.last_updated : float = time()
 
-        # Paquet tracking values for later network analysis
+        # Valeurs de suivi du paquet pour une analyse ultérieure du réseau
         self.paquet_output : int = 0
         self.data_output : int = 0
         self.total_paquets_created : int = 0                
@@ -79,17 +81,17 @@ class Network(tk.Canvas):
 
     def update_network(self):
         '''
-        Fonction qui permet aux interactions entre entités de fonctionner
+        Met à jour le réseau. gère toutes les interactions de nœuds et la télémétrie.
         '''
         
-        # if no nodes in the network no need to have it running (paused)
+        # si aucun nœud dans le réseau, il n'est pas nécessaire de le faire fonctionner (en pause)
         if not self.connections:            
             self.pause_network()
         
         # upadte the update time
         self.last_updated = time()
 
-        # for all the source nodes in the network
+        # pour tous les nœuds sources du réseau
         for node_name in self.connections:               
             node = self.nodes[node_name]  
             if node.type == "Source":                          
@@ -97,22 +99,23 @@ class Network(tk.Canvas):
 
                 self.total_paquets_created += node.paquet_output    # on incrémente le nombre total de paquets créer
                 if node.behaviour == "Buffered":
-                    # paquets lost when conforming to the buffer capacity the source has are counted as losses                 
+                    # paquets perdus en respectant la capacité tampon de la source sont comptés comme des pertes                 
                     self.total_paquets_lost += node.paquet_loss
 
 
-        # for all buffer nodes in the network
+        # pour tous les nœuds tampon du réseau
         for node_name in self.connections:
             self.paquet_output = 0
             node = self.nodes[node_name]    
 
             if node.type == "Buffer" and node.connections:        # si le node est un Buffer qui est connecté alors on peut collecter et envoyer des paquets
                 
-                # First the buffer sends the paquets 
+                # D'abord le buffer envoie les paquets
                 node.send_paquets()
-                # Second the buffer collects the paquets from connected source nodes
+                # Deuxièmement, le tampon collecte les paquets des nœuds sources connectés
                 node.collect_paquets()
 
+                # Télémétrie Paquet
                 self.total_paquets_lost += node.paquet_loss                 # on MAJ les données
                 self.total_paquets_transfered += node.paquet_transfer       # ...
                 self.paquet_output += node.paquet_transfer
@@ -121,7 +124,7 @@ class Network(tk.Canvas):
                     self.mean_paquet_wait_time = node.mean_paquet_wait_time
                 else:
                     self.mean_paquet_wait_time = (self.mean_paquet_wait_time + node.mean_paquet_wait_time) / 2
-        # calculates the total data output into the network at each update
+        # calcule la sortie totale des données sur le réseau à chaque mise à jour
         self.data_output = self.paquet_output * self.paquet_size
 
         for node_name in self.connections:      
@@ -138,7 +141,7 @@ class Network(tk.Canvas):
         Crée un Node et l'ajoute au réseau en l'ajoutant au dictionnaire « self.nodes » qui peut être accédé ultérieurement par le nom du noeud.
         Si aucun type de noeud n'est indiqué, il s'agit alors d'un noeud de type « Source » par défaut.
         Si aucun nom n'est donné au noeud, un nom lui sera automatiquement donné en utilisant ce formatage: 
-            « NODE_TYPE-NODE_TYPE.instance_counter » -> Node-1. 
+        « NODE_TYPE-NODE_TYPE.instance_counter » -> Node-1. 
         '''
         
         if self.nodes.get(name):
@@ -168,11 +171,11 @@ class Network(tk.Canvas):
         les liens existants vers le nœud de « self.links ». 
         '''
         
-        # We deselect the node (as to not have the node info persist onto the "SideBar")
+        # Nous désélectionnons le nœud (afin que les informations du nœud ne persistent pas sur la "SideBar")
         self.deselect_object()
         if not node: return
 
-        # Removing the data metrics asocciated whith each given node from the total tracked in the NEtwork instance  
+        # Suppression des métriques de données associées à chaque nœud donné du total suivi dans l'instance NEtwork
         if node.type == "Source":                                               
             self.total_paquets_created -= node.paquets_created
             self.total_paquets_lost -= node.paquets_lost
@@ -181,12 +184,12 @@ class Network(tk.Canvas):
             self.total_paquets_lost -= node.paquets_lost
             self.total_paquets_transfered -= node.paquets_transfered
 
-        # For all of its connections remove them from the sub nodes "self.connections" list
+        # Pour toutes ses connexions, supprimez-les de la liste "self.connections" des sous-nœuds
         for node_name in self.connections[node.name]:
             sub_node = self.nodes[node_name]
             sub_node.connections.remove(node)
 
-        # Removes node traces from "self.nodes" & "self.connections"
+        # Supprime les traces de nœuds de "self.nodes" et "self.connections"
         NODE_TYPES[node.type].instance_counter -= 1
         self.connection_counter -= len(self.connections[node.name])
         del self.connections[node.name]        
@@ -196,17 +199,17 @@ class Network(tk.Canvas):
                     self.connections[main_node].remove(node.name)
                     self.connection_counter -= 1
 
-        # Removes canvas line ascociated with all caonnectios with the node being deleted
+        # Supprime la ligne de canevas associée à toutes les connexions avec le nœud en cours de suppression
         if canvas_lines := self.find_withtag(node.name):
             for line in canvas_lines:
                 self.delete(line)
         
-        # Removes canvas obj that represents the node 
+        # Supprime l'objet canevas qui représente le nœud
         self.delete(node.id)
         del self.nodes[node.name]
         del self.nodes[node.id]
 
-        # Generates alert
+        # Génère une alerte
         self.app.alert = ("Success", "DeletedNode")
         self.event_generate("<<Alert>>")
 
@@ -249,7 +252,7 @@ class Network(tk.Canvas):
             return
 
         else:
-            # Once all conditions have been met the nodes are connected
+            # Une fois toutes les conditions remplies, les nœuds sont connectés
             self.app.alert = ("Success", "Connection")
             self.event_generate("<<Alert>>")
             self.connection_counter += 1
@@ -257,11 +260,11 @@ class Network(tk.Canvas):
             self.create_line((*self.coords(node_1.id), *self.coords(node_2.id)), width = 10, fill = "#1D2123", activefill = "#22282a", smooth = True, tags = [node_1.name, node_2.name])
             self.tag_raise("node")
 
-            # saves the connected in the list of connections in the self.connections dict
+            # enregistre les connectés dans la liste des connexions dans le dict self.connections
             # {node.name : [node.name, node.name ect...]}
             self.connections[node_1.name].append(node_2.name)
             
-            # adds the main node in the node.connections list  
+            # ajoute le nœud principal dans la liste node.connections 
             node_2.connections.append(node_1)
 
 
@@ -466,7 +469,7 @@ class Network(tk.Canvas):
 
         self.delete_network()
         
-        # Recreates Nodes
+        # Recrée les nœuds
         for node_data in data["nodes"]:
             if node_data["type"] == "Source":
                 if node_data["behaviour"] == "Normal":
@@ -479,19 +482,19 @@ class Network(tk.Canvas):
             
             self.moveto(self.nodes[node_data["name"]].id, *node_data["coords"])
 
-        # Recreates connections
+        # Recrée les connexions
         for main_node in data["connections"]:
             for sub_node in data["connections"][main_node]:
                 self.add_connection(self.nodes[main_node], self.nodes[sub_node])
 
-        # set network paquet size
+        # définir la taille du paquet réseau
         self.paquet_size = data["paquet_size"]
         
-        # Set tab name
+        # Définir le nom de l'onglet
         self.app.tab_bar.tabs[data["network_name"]] = self.app.tab_bar.tabs.pop(self.name)
         self.app.tab_bar.tabs[self.name].name = data["network_name"]
         self.app.tab_bar.tabs[self.name].select()
 
-
+        
         self.app.alert = ("Success", "NetworkLoaded")
         self.event_generate("<<Alert>>")
