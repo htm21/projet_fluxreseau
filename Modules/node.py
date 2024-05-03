@@ -377,7 +377,11 @@ class Buffer(Node):
 
                 # Extraction de paquets par coupes et "unpacking" de tuple 
                 extracted_paquets, node.paquet_queue = node.paquet_queue[: paquet_input], node.paquet_queue[paquet_input :]
-
+                
+                # si la source n’a plus de nœuds à donner, elle est marqué comme "épuisée"/exhausted
+                if not node.paquet_queue:
+                    exhausted_nodes.append(node)
+               
                 # MAJ des données du Buffer
                 paquets.extend(extracted_paquets)  
                 self.number_element += len(extracted_paquets)    
