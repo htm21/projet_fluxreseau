@@ -1,4 +1,4 @@
-# *, un projet de 2ème année de Licence Informatique*
+# *Stratégie de Flux Réseau, un projet de 2ème année de Licence Informatique*
 **NOM DES ÉTUDIANTS** : \
 Ahmad HATOUM (22202060) - Francesco DI GENNARO (22205989)  
 
