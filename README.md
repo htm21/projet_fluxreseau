@@ -1,41 +1,20 @@
-# *Stratégie de Flux Réseau, un projet de 2ème année de Licence Informatique*
+# *Transformation de grammaires, un projet de 3ème année de Licence Informatique*
 **NOM DES ÉTUDIANTS** : \
-Ahmad HATOUM (22202060) - Francesco DI GENNARO (22205989)  
+Ahmad HATOUM (22202060) - Bastien Guibert (22307051)  
 
 
 
-**URL DE DÉPÔT DU PROJET** : [https://github.com/htm21/projet_fluxreseau/]
-
-## Mécanisme d'installation
-Avant le lancement du programme, veuillez **installer les modules nécessaires à son fonctionnement.  
-L'installation des différents modules est faite par l'utilisation de  [pip](https://pip.pypa.io/en/stable/)  dans le terminal :
-```bash
-pip install module
-```
-Les modules nécessaires sont les suivants : **tkinter**, **ctypes**, **platform**, **pyglet**, **customtkinter**, **matplotlib**, **json**, **pillow**, **os**, **platform**
-
+**URL DE DÉPÔT DU PROJET** : [https://github.com/htm21/projet_grammaire/]
 
 # Les Objectifs du projet
 
-L'objectif de ce projet repose sur l'analyse de *"Stratégie de gestion des flux"*, ces flux arrive dans un système composé de différentes entités tel que des Sources qui contiennent et créent des Paquets. Ces paquets seront extraits par des Buffer (file d'attente) avant d'être envoyés dans le réseau de communications. On utilise alors la programmation orientée objet.
+L’objectif de ce projet a pour objectif de lire une grammaire algébrique depuis un fichier et de transformer cette grammaire dans les formes normales de Greibach et de Chomsky. Puis à partir de chacune de ces nouvelles grammaires donner tous les mots dont la longueur est inférieure à une longueur donnée.
 
 # Les Différentes Étapes de notre projet
 
-- Création des class permettant la modélisation des éléments clé de notre "système".
-- Création de la logique d'interaction entre ces derniers, avec notamment le passage des Paquets de la Source au Réseau de communication.
-- Réalisation de l'interface graphique, en intégrant le code
-- Compréhension et intégration de la logique d'arrivée des paquets avec le processus de Poisson
-- Ajout des différentes stratégies de gestion du Buffer
-- Comparaison des stratégies
-
-
-# Comment distinguer la structure du projet ?
-
-**Dossier "Modules"**  
-Ce dossier contient tous les sous-fichiers permettant le fonctionnement du code, les différents fichiers sont importés dans d'autres pour permettre l'utilisation de leurs codes.  
-
-**Fichier main.py**  
-Ce fichier permet l'exécution du code, il rassemble le tout, et son exécution dirige sur l'interface graphique de l'application.  
-
-**Autres**  
-Les Dossiers "Icons" et "Fonts" utilisé pour l'embellissement de l'interface graphique
+- Création de la structure de données de la Grammaire (class)
+- Création de fonction permettant la lecture/écriture de fichiers
+- Implémentation des différentes étapes de suppressions 
+- Implémentation de deux fonctions, pour la transformation en forme normale de *Chomsky* et de *Greibach*
+- Création d'un algorithme permettant de lister tout les mots d'une longueur donnée à partir d'une grammaire
+- Mise en place d'un makefile pour faciliter l'exécution du code, écriture dans des fichiers textes, ...
